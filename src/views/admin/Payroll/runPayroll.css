@@ -1,0 +1,174 @@
+/* RunPayroll.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.run-payroll-container {
+  padding: 16px;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.header {
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 24px;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #666;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 20px;
+}
+
+.tab {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: #666;
+  font-weight: 500;
+  gap: 8px;
+}
+
+.tab.active {
+  color: #1a73e8;
+  border-bottom: 2px solid #1a73e8;
+}
+
+.tab-icon {
+  font-size: 16px;
+}
+
+.content {
+  padding: 8px 0;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.total-text {
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.content-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.search-container {
+  position: relative;
+}
+
+.search-input {
+  padding: 8px 12px;
+  padding-right: 32px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  width: 240px;
+}
+
+.search-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+}
+
+.export-button {
+  padding: 8px 16px;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.export-button:hover {
+  background-color: #f5f5f5;
+}
+
+.table-container {
+  overflow-x: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+.payroll-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.payroll-table th,
+.payroll-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.payroll-table th {
+  font-weight: 500;
+  color: #555;
+  background-color: #f9f9f9;
+}
+
+.payroll-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+.payroll-name {
+  color: #1a73e8;
+  cursor: pointer;
+}
+
+.status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  text-transform: lowercase;
+}
+
+.status.inprogress {
+  background-color: #fff9c4;
+  color: #856404;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .content-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .content-actions {
+    width: 100%;
+  }
+  
+  .search-input {
+    width: 100%;
+  }
+}

@@ -1,0 +1,99 @@
+.accepted-leave-container {
+    padding: 20px;
+  }
+  
+  .page-title {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+  }
+  
+  .page-subtitle {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-bottom: 0;
+  }
+  
+  .search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    color: #95a5a6;
+  }
+  
+  .search-input {
+    padding-left: 35px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    height: 38px;
+    width: 200px;
+  }
+  
+  .reason-cell {
+    max-width: 250px;
+  }
+  
+  .reason-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .table {
+    margin-bottom: 0;
+  }
+  
+  .table th {
+    font-weight: 600;
+    color: #34495e;
+    background-color: #f8f9fa;
+  }
+  
+  .table td, .table th {
+    vertical-align: middle;
+  }
+  
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .card {
+    border: none;
+    border-radius: 10px;
+  }
+  
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35em 0.65em;
+    font-size: 0.875em;
+  }
+  
+  .badge.bg-success {
+    background-color: #198754 !important;
+  }
+  
+  @media (max-width: 768px) {
+    .search-box {
+      width: 100%;
+    }
+    
+    .search-input {
+      width: 100%;
+    }
+    
+    .d-flex {
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .table-responsive {
+      overflow-x: auto;
+    }
+  }

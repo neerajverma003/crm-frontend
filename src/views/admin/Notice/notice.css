@@ -1,0 +1,243 @@
+/* Base Styles */
+.notice-container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 1500px;
+    margin: 30px auto;
+    padding: 25px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.notice-header {
+    margin-bottom: 25px;
+}
+
+.notice-header h2 {
+    color: #2c3e50;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.subtitle {
+    color: #7f8c8d;
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 14px;
+}
+
+/* Notice Box */
+.notice-box {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.notice-title-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.notice-title-bar h3 {
+    margin: 0;
+    color: #34495e;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.notice-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #7f8c8d;
+    font-size: 16px;
+}
+
+.notice-actions button:hover {
+    color: #e74c3c;
+}
+
+/* Toolbar */
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 20px;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.toolbar button {
+    padding: 6px 10px;
+    border: 1px solid #e0e0e0;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    border-radius: 4px;
+    min-width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2c3e50;
+    transition: all 0.2s;
+}
+
+.toolbar button:hover {
+    background-color: #e9ecef;
+    border-color: #d6d8db;
+}
+
+.toolbar button svg {
+    font-size: 14px;
+}
+
+.text-format {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* Input Section */
+.input-section {
+    margin-bottom: 25px;
+}
+
+.topic-input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 15px;
+    transition: border-color 0.3s;
+}
+
+.topic-input:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.content-input {
+    width: 100%;
+    min-height: 200px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    font-size: 14px;
+    line-height: 1.5;
+    transition: border-color 0.3s;
+}
+
+.content-input:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Attachments */
+.attachments-section {
+    margin-bottom: 25px;
+}
+
+.attachments-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.attachments-header h4 {
+    margin: 0 0 0 8px;
+    color: #34495e;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.attachment-icon {
+    color: #7f8c8d;
+    font-size: 18px;
+}
+
+.file-chooser {
+    display: inline-block;
+    margin-right: 12px;
+}
+
+.file-chooser-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 15px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #2c3e50;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.file-chooser-button:hover {
+    background-color: #e9ecef;
+    border-color: #d6d8db;
+}
+
+.file-chooser-button svg {
+    margin-right: 6px;
+    font-size: 14px;
+}
+
+.file-status {
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+/* Send Button */
+.send-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.send-button:hover {
+    background-color: #2980b9;
+}
+
+.send-button:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+.send-button svg {
+    margin-right: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .notice-container {
+        padding: 15px;
+    }
+
+    .toolbar {
+        gap: 4px;
+    }
+
+    .toolbar button {
+        min-width: 32px;
+        height: 32px;
+        padding: 4px 6px;
+    }
+}

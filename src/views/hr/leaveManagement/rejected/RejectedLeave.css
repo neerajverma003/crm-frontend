@@ -1,0 +1,42 @@
+.rejected-leave-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .rejected-leave-title {
+    color: #d32f2f;
+    margin-bottom: 20px;
+  }
+  
+  .rejected-leave-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .rejected-leave-table th, 
+  .rejected-leave-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+  }
+  
+  .rejected-leave-table th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+  }
+  
+  .rejected-leave-row:hover {
+    background-color: #f9f9f9;
+  }
+  
+  .rejected-reason {
+    color: #d32f2f;
+    font-weight: bold;
+  }
+  
+  .no-rejected-leaves {
+    color: #666;
+    font-style: italic;
+    margin-top: 20px;
+  }

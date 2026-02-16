@@ -1,0 +1,87 @@
+// Consolidated Lead Data
+export const leadData = [
+  {
+    id: 1,
+    name: "Sarah Johnson",
+    email: "sarah@techcorp.com",
+    phone: "+1 (555) 123-4567",
+    company: "Tech Corp",
+    leadStatus: "Hot",
+    value: "$15,000",
+    lastContact: "2024-09-15",
+    source: "Website",
+    notes: "Interested in enterprise solution, scheduled demo for next week",
+    createdAt: "2024-09-01",
+    assignedTo: "John Doe"
+  },
+  {
+    id: 2,
+    name: "Mike Chen",
+    email: "mike@globalinc.com", 
+    phone: "+1 (555) 234-5678",
+    company: "Global Inc",
+    leadStatus: "Warm",
+    value: "$8,500",
+    lastContact: "2024-09-12",
+    source: "Referral",
+    notes: "Referred by existing customer, needs budget approval",
+    createdAt: "2024-08-28",
+    assignedTo: "Jane Smith"
+  },
+  {
+    id: 3,
+    name: "Emily Davis",
+    email: "emily@startup.co",
+    phone: "+1 (555) 345-6789", 
+    company: "StartUp Co",
+    leadStatus: "Cold",
+    value: "$22,000",
+    lastContact: "2024-09-08",
+    source: "Cold Call",
+    notes: "Not actively looking but showed interest, follow up in Q4",
+    createdAt: "2024-08-15",
+    assignedTo: "Mike Wilson"
+  },
+  {
+    id: 4,
+    name: "Alex Rodriguez",
+    email: "alex@enterprise.com",
+    phone: "+1 (555) 456-7890",
+    company: "Enterprise Ltd", 
+    leadStatus: "Hot",
+    value: "$35,000",
+    lastContact: "2024-09-14",
+    source: "LinkedIn",
+    notes: "Decision maker, very interested, proposal sent",
+    createdAt: "2024-09-05",
+    assignedTo: "Sarah Lee"
+  },
+  {
+    id: 5,
+    name: "Jennifer Wilson",
+    email: "jen@innovate.com",
+    phone: "+1 (555) 567-8901",
+    company: "Innovate Inc",
+    leadStatus: "Warm", 
+    value: "$12,000",
+    lastContact: "2024-09-11",
+    source: "Trade Show",
+    notes: "Met at industry conference, interested in Q1 implementation",
+    createdAt: "2024-09-02",
+    assignedTo: "David Kim"
+  },
+  {
+    id: 6,
+    name: "Robert Taylor",
+    email: "robert@futuretechs.com",
+    phone: "+1 (555) 678-9012", 
+    company: "Future Techs",
+    leadStatus: "Hot",
+    value: "$28,000",
+    lastContact: "2024-09-13",
+    source: "Email Campaign",
+    notes: "Responded to marketing email, ready to purchase",
+    createdAt: "2024-09-03",
+    assignedTo: "Lisa Chen"
+  }
+];

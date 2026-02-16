@@ -1,0 +1,93 @@
+/* Dashboard.css */
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Main container with tight spacing */
+.dashboard-container {
+  width: 100%;
+  max-width: 100%;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* Very tight vertical gap between rows */
+}
+
+/* Compact row styling */
+.dashboard-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem; /* Tight horizontal gap between components */
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Child elements with minimal spacing */
+.dashboard-row > * {
+  flex: 1 1 calc(33.33% - 0.5rem);
+  min-width: 280px;
+  box-sizing: border-box;
+}
+
+/* Special treatment for calendar row */
+.dashboard-row:nth-child(3) {
+  gap: 0.25rem; /* Extra tight gap for calendar and birthday */
+}
+
+/* Make calendar wider than birthday board */
+.CalendarSection {
+  flex: 2 1 calc(66.66% - 0.25rem);
+}
+
+.BirthdayBoard {
+  flex: 1 1 calc(33.33% - 0.25rem);
+}
+
+/* Force tight spacing inside all components */
+.dashboard-row > * > div {
+  padding: 0.25rem !important;
+  margin: 0 !important;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 0.25rem;
+    gap: 0.25rem;
+  }
+  
+  .dashboard-row {
+    gap: 0.25rem;
+  }
+  
+  .dashboard-row > *,
+  .CalendarSection,
+  .BirthdayBoard {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
+}
+
+/* Add these to your Dashboard.css */
+
+/* Reduce the gap specifically for the third row */
+.dashboard-row:nth-child(3) {
+  gap: 0.5rem; /* Extra tight gap for calendar and birthday */
+}
+
+/* Alternatively, you can target the components directly */
+.CalendarSection,
+.BirthdayBoard {
+  margin-top: -0.5rem !important;
+  padding-top: 0 !important;
+}
+
+/* Or if the space is coming from inside the components */
+.CalendarSection > div:first-child,
+.BirthdayBoard > div:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}

@@ -1,0 +1,80 @@
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr); /* 12-column grid */
+  grid-gap: 20px;
+  max-width: 1800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  color: #333;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  font-size: 18px; /* Increased body font size */
+}
+
+/* Shared card style */
+.gridItem {
+  background-color: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  font-size: inherit; /* Inherit font size from parent */
+}
+
+/* Specific grid item placements */
+.timeLog {
+  grid-column: span 4; /* 3 cards per row */
+}
+
+.logBoard {
+  grid-column: span 4;
+}
+
+.noticeBoard {
+  grid-column: span 4;
+}
+
+.calendarSection {
+  grid-column: span 4;
+}
+
+.employeeLeave {
+  grid-column: span 4;
+}
+
+.taskCompletionRate {
+  grid-column: span 4;
+}
+
+.birthdayBoard {
+  grid-column: span 4;
+}
+
+.teamMembers {
+  grid-column: span 4;
+}
+
+/* Tablet view */
+@media (max-width: 1024px) {
+  .dashboardGrid {
+    grid-template-columns: repeat(6, 1fr); /* 6 columns for tablets */
+    font-size: 16px; /* Slightly smaller font size for tablets */
+  }
+
+  .gridItem {
+    grid-column: span 6; /* Full width per card */
+  }
+}
+
+/* Mobile view */
+@media (max-width: 768px) {
+  .dashboardGrid {
+    grid-template-columns: 1fr; /* 1 column on mobile */
+    padding: 15px;
+    font-size: 14px; /* Smaller font size for mobile */
+  }
+
+  .gridItem {
+    padding: 15px;
+    grid-column: span 1; /* Full width per card */
+  }
+}

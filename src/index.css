@@ -1,0 +1,8 @@
+/* CoreUI import must come first */
+@import '@coreui/coreui/dist/css/coreui.min.css';
+
+/* Then Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* master master master master master master  */

@@ -1,0 +1,233 @@
+/* RoleDetails.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.role-details-container {
+    padding: 24px;
+    max-width: 100%;
+    overflow: hidden;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.role-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.role-title h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
+}
+
+.role-title p {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.create-role-btn {
+    display: flex;
+    align-items: center;
+    background-color: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    gap: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
+}
+
+.create-role-btn:hover {
+    background-color: #0b5ed7;
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
+}
+
+.role-table-container {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.role-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.role-table th,
+.role-table td {
+    padding: 16px 20px;
+    text-align: left;
+}
+
+.role-table th {
+    font-weight: 600;
+    color: #495057;
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+}
+
+.action-header {
+    text-align: center;
+}
+
+.role-table td {
+    border-bottom: 1px solid #e9ecef;
+    color: #212529;
+}
+
+.company-cell {
+    color: #495057;
+    font-weight: 500;
+}
+
+.even-row {
+    background-color: #f8f9fa;
+}
+
+.action-cell {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.edit-btn:hover {
+    background-color: rgba(66, 135, 245, 0.1);
+}
+
+.delete-btn:hover {
+    background-color: rgba(245, 66, 66, 0.1);
+}
+
+.table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 4px;
+}
+
+.showing-results {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pagination-btn {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+    font-size: 14px;
+    gap: 6px;
+    transition: all 0.2s ease;
+    color: #495057;
+}
+
+.pagination-btn:hover:not([disabled]) {
+    background-color: #f8f9fa;
+    border-color: #ced4da;
+}
+
+.pagination-btn.page-number {
+    padding: 8px 14px;
+    min-width: 38px;
+    display: flex;
+    justify-content: center;
+}
+
+.pagination-btn.active {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
+}
+
+.pagination-btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+
+    .role-table th,
+    .role-table td {
+        padding: 14px 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .role-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .create-role-btn {
+        align-self: flex-start;
+    }
+
+    .table-footer {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .pagination {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 576px) {
+    .role-details-container {
+        padding: 16px;
+    }
+
+    .role-table {
+        font-size: 14px;
+    }
+
+    .role-table th,
+    .role-table td {
+        padding: 12px;
+    }
+}

@@ -1,0 +1,167 @@
+/* Main container styles */
+.portal-container {
+    font-family: Arial, sans-serif;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Header section */
+.portal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    position: relative;
+}
+
+.portal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.portal-title h2 {
+    font-size: 18px;
+    margin: 0;
+    color: #333;
+}
+
+.portal-count {
+    background-color: #2196f3;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.portal-subtitle {
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+    position: absolute;
+    top: 30px;
+    left: 0;
+}
+
+.add-button {
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.plus-icon {
+    font-weight: bold;
+}
+
+/* Table styles */
+.portal-table {
+    margin-top: 30px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+th {
+    background-color: #f9f9f9;
+    color: #333;
+    font-weight: normal;
+}
+
+.status-badge {
+    background-color: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.edit-button,
+.delete-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-icon {
+    color: #2196f3;
+}
+
+.delete-icon {
+    color: #f44336;
+}
+
+/* Pagination styles */
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 10px 0;
+}
+
+.showing-text {
+    color: #666;
+    font-size: 14px;
+}
+
+.pagination-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.prev-button,
+.next-button,
+.page-button {
+    padding: 5px 10px;
+    border: 1px solid #e0e0e0;
+    background-color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.prev-button:disabled,
+.next-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-button.active {
+    background-color: #2196f3;
+    color: white;
+    border-color: #2196f3;
+}
