@@ -1055,6 +1055,24 @@ const MainDashboard = () => {
         return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     };
 
+    // 🎨 Helper: Priority Colors
+    const getPriorityColor = (priority) => {
+        if (!priority) priority = "Medium";
+        const p = priority.toLowerCase();
+        switch (p) {
+            case "low":
+                return "bg-blue-100 text-blue-700";
+            case "medium":
+                return "bg-yellow-100 text-yellow-700";
+            case "high":
+                return "bg-orange-100 text-orange-700";
+            case "critical":
+                return "bg-red-100 text-red-700";
+            default:
+                return "bg-gray-100 text-gray-700";
+        }
+    };
+
     // ✅ Handle Clock In / Clock Out
     const handleClockAction = async (type) => {
         if (loadingClock) return;
@@ -1143,6 +1161,8 @@ const MainDashboard = () => {
 
     const [time, setTime] = useState("05:42:19");
     const [elapsedTime, setElapsedTime] = useState("00:00:00");
+    const [todayTasks, setTodayTasks] = useState([]);
+    const [last7Tasks, setLast7Tasks] = useState([]);
 
     // ⏱ Fake session timer (UI only)
     useEffect(() => {
@@ -1182,6 +1202,52 @@ const MainDashboard = () => {
 
         return () => clearInterval(interval);
     }, [todayRecord?.clockIn, todayRecord?.clockOut]);
+
+    // 📌 Fetch Tasks and compute Present (today) + Last 7 days
+    useEffect(() => {
+        const fetchTasksForDashboard = async () => {
+            try {
+                const res = await axios.get("http://localhost:4000/tasks/tasks?limit=1000");
+                const tasks = res.data?.data || [];
+
+                const today = new Date();
+                const startDate = new Date();
+                startDate.setDate(today.getDate() - 6); // last 7 days (inclusive)
+                startDate.setHours(0, 0, 0, 0);
+                const endDate = new Date(today);
+                endDate.setHours(23, 59, 59, 999);
+
+                const currentUserId = id || localStorage.getItem("userId");
+
+                const todays = [];
+                const last7 = [];
+
+                tasks.forEach((t) => {
+                    if (!t.dueDate) return;
+
+                    // only include tasks assigned to the logged-in user
+                    const assigned = t.assignedTo;
+                    const assignedId = assigned && (typeof assigned === "string" ? assigned : assigned._id || assigned);
+                    if (!assignedId || String(assignedId) !== String(currentUserId)) return;
+
+                    const d = new Date(t.dueDate);
+
+                    const isSameDay = d.getFullYear() === today.getFullYear() && d.getMonth() === today.getMonth() && d.getDate() === today.getDate();
+                    const inLast7 = d >= startDate && d <= endDate;
+
+                    if (isSameDay) todays.push(t);
+                    else if (inLast7) last7.push(t);
+                });
+
+                setTodayTasks(todays);
+                setLast7Tasks(last7);
+            } catch (err) {
+                console.error("Error fetching tasks:", err);
+            }
+        };
+
+        fetchTasksForDashboard();
+    }, [id]);
     return (
         <div className="flex-1 bg-[#f8fafc] px-4 md:px-8">
             <ToastContainer
@@ -1364,21 +1430,43 @@ const MainDashboard = () => {
                 <div className="rounded-2xl bg-white p-6 shadow-sm">
                     <h3 className="mb-4 font-semibold text-gray-900">Today’s Tasks</h3>
 
-                    <Task
-                        title="Task Section 1"
-                        percent={70}
-                        color="red"
-                    />
-                    <Task
-                        title="Task Section 2"
-                        percent={45}
-                        color="blue"
-                    />
-                    <Task
-                        title="Task Section 3"
-                        percent={90}
-                        color="green"
-                    />
+                    <div className="space-y-4">
+                        <div>
+                            <h4 className="mb-2 text-sm font-semibold text-gray-700">Present</h4>
+                            {todayTasks && todayTasks.length > 0 ? (
+                                todayTasks.map((t) => (
+                                    <div key={t._id} className="mb-4 p-3 border border-gray-200 rounded-lg bg-gray-50">
+                                        <p className="text-xs font-bold text-blue-600 mb-1">Due: {new Date(t.dueDate).toLocaleDateString()}</p>
+                                        <p className="text-base font-bold text-gray-900 mb-2">{t.taskTitle}</p>
+                                        <p className="text-sm text-gray-700 mb-2">{t.description || "No description provided."}</p>
+                                        <div className="flex justify-end">
+                                            <span className={`text-xs font-medium px-3 py-1 rounded-full ${getPriorityColor(t.priority)}`}>{t.priority || "Medium"}</span>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-sm text-gray-500">No tasks for today.</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <h4 className="mb-2 text-sm font-semibold text-gray-700">Last 7 Days</h4>
+                            {last7Tasks && last7Tasks.length > 0 ? (
+                                last7Tasks.map((t) => (
+                                    <div key={t._id} className="mb-4 p-3 border border-gray-200 rounded-lg bg-gray-50">
+                                        <p className="text-xs font-bold text-blue-600 mb-1">Due: {new Date(t.dueDate).toLocaleDateString()}</p>
+                                        <p className="text-base font-bold text-gray-900 mb-2">{t.taskTitle}</p>
+                                        <p className="text-sm text-gray-700 mb-2">{t.description || "No description provided."}</p>
+                                        <div className="flex justify-end">
+                                            <span className={`text-xs font-medium px-3 py-1 rounded-full ${getPriorityColor(t.priority)}`}>{t.priority || "Medium"}</span>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-sm text-gray-500">No tasks in the last 7 days.</p>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
 

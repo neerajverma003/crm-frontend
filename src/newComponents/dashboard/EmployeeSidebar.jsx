@@ -244,6 +244,14 @@ function EmployeeSidebar() {
                         >
                             Attendance
                         </Link>
+                        <Link
+                            to="/employee-tasks"
+                            className={`block rounded-lg px-4 py-2 font-medium ${
+                                location.pathname === "/employee-tasks" ? "bg-black text-white" : "text-gray-800 hover:bg-gray-100"
+                            }`}
+                        >
+                            My Tasks
+                        </Link>
 
                         {loading ? (
                             <p className="mt-4 text-center text-sm text-gray-400">Loading...</p>

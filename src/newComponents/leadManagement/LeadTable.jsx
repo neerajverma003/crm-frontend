@@ -1010,7 +1010,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Eye, Edit2, Trash2, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 
-const LeadTable = ({ searchText = "", selectedStatus = "All Status", refreshTrigger, fromDate = "", toDate = "" }) => {
+const LeadTable = ({ searchText = "", searchType = "name", selectedStatus = "All Status", refreshTrigger, fromDate = "", toDate = "" }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(25);
@@ -1064,16 +1064,20 @@ const LeadTable = ({ searchText = "", selectedStatus = "All Status", refreshTrig
         const normalParams = new URLSearchParams({
           page: pageNum,
           limit: itemsPerPage,
-          ...(searchText && { search: searchText }),
+          ...(searchText && { search: searchText, searchField: searchType }),
           ...(selectedStatus !== "All Status" && { status: selectedStatus }),
         });
 
         const empParams = new URLSearchParams({
           page: pageNum,
           limit: itemsPerPage,
-          ...(searchText && { search: searchText }),
+          ...(searchText && { search: searchText, searchField: searchType }),
           ...(selectedStatus !== "All Status" && { status: selectedStatus }),
         });
+
+        console.log("Search Type:", searchType);
+        console.log("Search Text:", searchText);
+        console.log("Normal Params:", normalParams.toString());
 
         const [normalRes, empRes] = await Promise.all([
           fetch(`http://localhost:4000/leads/recentleads?${normalParams.toString()}`),
@@ -1109,13 +1113,13 @@ const LeadTable = ({ searchText = "", selectedStatus = "All Status", refreshTrig
         setIsLoading(false);
       }
     },
-    [searchText, selectedStatus, itemsPerPage, fromDate, toDate]
+    [searchText, searchType, selectedStatus, itemsPerPage, fromDate, toDate]
   );
 
   useEffect(() => {
     setCurrentPage(1);
     fetchLeadData(1);
-  }, [searchText, selectedStatus, refreshTrigger, fetchLeadData, fromDate, toDate]);
+  }, [searchText, searchType, selectedStatus, refreshTrigger, fetchLeadData, fromDate, toDate]);
 
   useEffect(() => {
     fetchLeadData(currentPage);
@@ -1507,6 +1511,50 @@ const ViewModal = ({ lead, onClose }) => {
   );
 };
 
+// Input Field Component (MOVED OUTSIDE to prevent re-renders)
+const InputField = ({ name, type = "text", placeholder, required, value, error, onChange }) => (
+  <div className="h-[4.5rem]">
+    <label className="block text-xs font-medium text-gray-700 mb-0.5">
+      {name.charAt(0).toUpperCase() + name.slice(1)} {required && <span className="text-red-500">*</span>}
+    </label>
+    <input
+      type={type}
+      name={name}
+      value={value || ""}
+      onChange={onChange}
+      placeholder={placeholder}
+      className={`w-full px-3 py-1.5 border rounded-lg text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${error ? "border-red-300 bg-red-50" : "border-gray-300 hover:border-gray-400"
+        }`}
+      autoComplete="off"
+    />
+    {error && (
+      <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+        <AlertCircle className="w-3 h-3" /> {error}
+      </p>
+    )}
+  </div>
+);
+
+// Select Field Component (MOVED OUTSIDE to prevent re-renders)
+const SelectField = ({ name, options, value, onChange }) => (
+  <div className="h-[4.5rem]">
+    <label className="block text-xs font-medium text-gray-700 mb-0.5">
+      {name.charAt(0).toUpperCase() + name.slice(1)}
+    </label>
+    <select
+      name={name}
+      value={value || ""}
+      onChange={onChange}
+      className="w-full px-3 py-1.5 border rounded-lg text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 border-gray-300 hover:border-gray-400"
+    >
+      <option value="">Select {name}</option>
+      {options.map((opt) => (
+        <option key={opt} value={opt}>{opt}</option>
+      ))}
+    </select>
+  </div>
+);
+
 // Edit Modal Component
 const EditModal = ({ lead, onClose, onSave }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -1655,53 +1703,11 @@ const EditModal = ({ lead, onClose, onSave }) => {
     "10n/11d", "11n/12d", "12n/13d", "13n/14d", "14n/15d", "Others"
   ];
 
-  const InputField = ({ name, type = "text", placeholder, required, value, error, onChange }) => (
-    <div className="h-[4.5rem]">
-      <label className="block text-xs font-medium text-gray-700 mb-0.5">
-        {name.charAt(0).toUpperCase() + name.slice(1)} {required && <span className="text-red-500">*</span>}
-      </label>
-      <input
-        type={type}
-        name={name}
-        value={value || ""}
-        onChange={onChange}
-        placeholder={placeholder}
-        className={`w-full px-3 py-1.5 border rounded-lg text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${error ? "border-red-300 bg-red-50" : "border-gray-300 hover:border-gray-400"
-          }`}
-        autoComplete="off"
-      />
-      {error && (
-        <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-          <AlertCircle className="w-3 h-3" /> {error}
-        </p>
-      )}
-    </div>
-  );
 
   const handleChange = (e) => {
-    e.preventDefault();
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-
-  const SelectField = ({ name, options, value, onChange }) => (
-    <div className="h-[4.5rem]">
-      <label className="block text-xs font-medium text-gray-700 mb-0.5">
-        {name.charAt(0).toUpperCase() + name.slice(1)}
-      </label>
-      <select
-        name={name}
-        value={value || ""}
-        onChange={onChange}
-        className="w-full px-3 py-1.5 border rounded-lg text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 border-gray-300 hover:border-gray-400"
-      >
-        <option value="">Select {name}</option>
-        {options.map((opt) => (
-          <option key={opt} value={opt}>{opt}</option>
-        ))}
-      </select>
-    </div>
-  );
 
   const addChildAge = () => {
     setFormData(prev => ({ ...prev, childAges: [...prev.childAges, ""] }));
@@ -1838,7 +1844,7 @@ const EditModal = ({ lead, onClose, onSave }) => {
                   type="text"
                   placeholder="Type a place, press Enter or click Add"
                   value={placeInput}
-                  onChange={(e) => { e.preventDefault(); setPlaceInput(e.target.value) }}
+                  onChange={(e) => setPlaceInput(e.target.value)}
                   onKeyDown={(e) => handleAddPlace(e)}
                   className="flex-1 px-3 py-1.5 border rounded-lg text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 />

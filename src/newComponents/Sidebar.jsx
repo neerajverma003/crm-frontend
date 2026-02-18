@@ -2067,6 +2067,18 @@ const Sidebar = () => {
       ],
     },
     
+    // 🔹 Task Management
+    {
+      id: 10.5,
+      label: "Task Management",
+      icon: <FiBriefcase size={20} />,
+      type: "dropdown",
+      children: [
+        { id: "task-1", label: "Task Assign", url: "/task-assign" },
+        { id: "task-2", label: "Task Report", url: "/task-report" },
+      ],
+    },
+    
     { id: 11, label: "Settings", icon: <FiSettings size={20} />, url: "/settings" },
     // { id: 12, label: "Change Password", icon: <FiLock size={20} />, url: "/change-password" },
   ];

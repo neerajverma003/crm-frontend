@@ -39,9 +39,47 @@ const AssignCompany = () => {
     getAllAdmin();
   }, []);
 
+  // Fetch pre-assigned companies for selected admin
+  const getAdminAssignedCompanies = async (adminId) => {
+    try {
+      const response = await fetch(`http://localhost:4000/getCompanyByAdminId/${adminId}`);
+      const result = await response.json();
+      
+      if (result.success && result.assignedCompanies) {
+        // Extract company IDs from the assigned companies
+        const companyIds = result.assignedCompanies.map((company) => company._id);
+        setFormData((prev) => ({
+          ...prev,
+          selectedAdmin: adminId,
+          assignedCompanies: companyIds,
+        }));
+      } else {
+        // No companies assigned to this admin
+        setFormData((prev) => ({
+          ...prev,
+          selectedAdmin: adminId,
+          assignedCompanies: [],
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching admin assigned companies:", error);
+      // Still update selectedAdmin even if fetch fails
+      setFormData((prev) => ({
+        ...prev,
+        selectedAdmin: adminId,
+        assignedCompanies: [],
+      }));
+    }
+  };
+
   // Handle dropdown changes
   const handleInputChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (field === 'selectedAdmin') {
+      // Fetch assigned companies when admin is selected
+      getAdminAssignedCompanies(value);
+    } else {
+      setFormData((prev) => ({ ...prev, [field]: value }));
+    }
   };
 
   // Handle company checkbox toggle
@@ -116,11 +154,13 @@ const AssignCompany = () => {
           >
             <option value="">-- Choose Admin --</option>
             {adminList.length > 0 ? (
-              adminList.map((admin) => (
-                <option key={admin._id} value={admin._id}>
-                  {admin.fullName}
-                </option>
-              ))
+              adminList
+                .filter((admin) => admin.accountActive === true)
+                .map((admin) => (
+                  <option key={admin._id} value={admin._id}>
+                    {admin.fullName}
+                  </option>
+                ))
             ) : (
               <option disabled>Loading admins...</option>
             )}

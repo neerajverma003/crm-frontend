@@ -692,6 +692,9 @@ import EmployeeCompanyOverview from "./newComponents/company/EmployeeCompanyOver
 import EmployeeTrainingMaterial from "./newComponents/Tutorials/EmployeeTrainingMaterial.jsx";
 import SimManagement from "./newComponents/inventory/SimManagement.jsx";
 import EmailManagement from "./newComponents/inventory/EmailManagement.jsx";
+import TaskAssign from "./newComponents/TaskManagement/TaskAssign.jsx";
+import TaskReport from "./newComponents/TaskManagement/TaskReport.jsx";
+import EmployeeTasks from "./newComponents/dashboard/EmployeeTasks.jsx";
 
 // ✅ Role groups
 const roles = {
@@ -1267,6 +1270,32 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={roles.adminOnly}>
             <AllTeam />
+          </ProtectedRoute>
+        ),
+      },
+
+      // ✅ Task Management
+      {
+        path: "/task-assign",
+        element: (
+          <ProtectedRoute allowedRoles={roles.superAdminOnly}>
+            <TaskAssign />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/task-report",
+        element: (
+          <ProtectedRoute allowedRoles={roles.superAdminOnly}>
+            <TaskReport />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/employee-tasks",
+        element: (
+          <ProtectedRoute allowedRoles={roles.employeeOnly}>
+            <EmployeeTasks />
           </ProtectedRoute>
         ),
       },

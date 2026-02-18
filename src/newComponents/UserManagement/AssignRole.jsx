@@ -546,7 +546,7 @@ const AssignRoleToAdmin = () => {
     selectedPoints: [],
   });
 
-  // 🔹 Fetch Admins
+  // 🔹 Fetch Admins (only active)
   const getAllAdmins = async () => {
     try {
       const res = await fetch("http://localhost:4000/getAdmins");
@@ -554,6 +554,73 @@ const AssignRoleToAdmin = () => {
       setAdmins(data || []);
     } catch (err) {
       console.error("❌ Failed to fetch admins:", err);
+    }
+  };
+
+  // 🔹 Fetch Pre-assigned Roles/SubRoles/Points for Admin & Company
+  const getAssignedRolesByAdminAndCompany = async (adminId, companyId) => {
+    try {
+      console.log(`📡 Fetching assigned roles for admin: ${adminId}, company: ${companyId}`);
+      const res = await fetch(`http://localhost:4000/getAssignedRoles/${adminId}/${companyId}`);
+      const data = await res.json();
+      console.log("📥 Response from getAssignedRoles:", data);
+
+      if (res.ok && data.assignedRoles && Array.isArray(data.assignedRoles)) {
+        // Extract roles, subroles, and points from the response
+        const roles = [];
+        const subRoles = [];
+        const points = [];
+
+        data.assignedRoles.forEach((assignment) => {
+          console.log("Processing assignment:", assignment);
+          // Add role name
+          if (assignment.roleName) {
+            roles.push(assignment.roleName);
+          }
+          
+          // Add subRole IDs (convert to string for consistent comparison)
+          if (Array.isArray(assignment.subRoles)) {
+            assignment.subRoles.forEach((sub) => {
+              if (sub._id) {
+                const subRoleIdString = String(sub._id);
+                console.log("Adding subRole ID:", subRoleIdString);
+                subRoles.push(subRoleIdString);
+              }
+            });
+          }
+          
+          // Add points
+          if (Array.isArray(assignment.points)) {
+            points.push(...assignment.points);
+          }
+        });
+
+        console.log("Extracted - Roles:", roles, "SubRoles:", subRoles, "Points:", points);
+        setFormData((prev) => ({
+          ...prev,
+          selectedRoles: roles,
+          selectedSubRoles: subRoles,
+          selectedPoints: points,
+        }));
+      } else {
+        console.log("❌ No assigned roles found or invalid response format");
+        // No assigned roles, clear selections
+        setFormData((prev) => ({
+          ...prev,
+          selectedRoles: [],
+          selectedSubRoles: [],
+          selectedPoints: [],
+        }));
+      }
+    } catch (err) {
+      console.error("❌ Failed to fetch assigned roles:", err);
+      // Clear selections on error
+      setFormData((prev) => ({
+        ...prev,
+        selectedRoles: [],
+        selectedSubRoles: [],
+        selectedPoints: [],
+      }));
     }
   };
 
@@ -600,16 +667,33 @@ const AssignRoleToAdmin = () => {
   useEffect(() => {
     getAllAdmins();
     getAllRoles();
+    getAllCompanies();
   }, []);
 
   // 🔹 Auto-fetch companies when admin is selected
   useEffect(() => {
     if (formData.selectedAdmin) {
+      console.log("Admin selected:", formData.selectedAdmin);
       getCompaniesByAdmin(formData.selectedAdmin);
+      // Clear ONLY role selections, NOT company selection
+      setFormData((prev) => ({
+        ...prev,
+        selectedRoles: [],
+        selectedSubRoles: [],
+        selectedPoints: [],
+      }));
     } else {
       setCompanies([]);
     }
   }, [formData.selectedAdmin]);
+
+  // 🔹 Auto-fetch pre-assigned roles when both admin and company are selected
+  useEffect(() => {
+    if (formData.selectedAdmin && formData.selectedCompany) {
+      console.log("Company selected, fetching roles...");
+      getAssignedRolesByAdminAndCompany(formData.selectedAdmin, formData.selectedCompany);
+    }
+  }, [formData.selectedAdmin, formData.selectedCompany]);
 
   // 🔹 Toggle helpers
   const toggleSelection = (array, item) =>
@@ -627,9 +711,11 @@ const AssignRoleToAdmin = () => {
 
   // 🔹 SubRole toggle — ✅ no auto-adding points
   const handleSubRoleToggle = (subRoleId) => {
+    const subIdString = String(subRoleId);
+    console.log("Toggling subrole:", subIdString, "Current selected:", formData.selectedSubRoles);
     setFormData((prev) => ({
       ...prev,
-      selectedSubRoles: toggleSelection(prev.selectedSubRoles, subRoleId),
+      selectedSubRoles: toggleSelection(prev.selectedSubRoles, subIdString),
     }));
   };
 
@@ -712,7 +798,7 @@ const AssignRoleToAdmin = () => {
           <select
             value={formData.selectedAdmin}
             onChange={(e) =>
-              setFormData({ ...formData, selectedAdmin: e.target.value })
+              setFormData((prev) => ({ ...prev, selectedAdmin: e.target.value }))
             }
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
           >
@@ -731,7 +817,7 @@ const AssignRoleToAdmin = () => {
           <select
             value={formData.selectedCompany}
             onChange={(e) =>
-              setFormData({ ...formData, selectedCompany: e.target.value })
+              setFormData((prev) => ({ ...prev, selectedCompany: e.target.value }))
             }
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
           >
@@ -764,31 +850,36 @@ const AssignRoleToAdmin = () => {
 
               {/* Subroles */}
               {Array.isArray(role.subRole) &&
-                role.subRole.map((sub) => (
-                  <div key={sub._id || sub.subRoleName} className="ml-6 mt-1">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={formData.selectedSubRoles.includes(sub._id)}
-                        onChange={() => handleSubRoleToggle(sub._id)}
-                      />
-                      {sub.subRoleName}
-                    </label>
+                role.subRole.map((sub) => {
+                  const subIdString = String(sub._id);
+                  console.log("Checking subrole:", subIdString, "Selected:", formData.selectedSubRoles);
+                  return (
+                    <div key={subIdString} className="ml-6 mt-1">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={formData.selectedSubRoles.includes(subIdString)}
+                          onChange={() => handleSubRoleToggle(subIdString)}
+                        />
+                        {sub.subRoleName}
+                      </label>
 
-                    {/* ✅ Points are now independent checkboxes */}
-                    {Array.isArray(sub.points) &&
-                      sub.points.map((point, idx) => (
-                        <label key={idx} className="flex items-center gap-2 ml-6">
-                          <input
-                            type="checkbox"
-                            checked={formData.selectedPoints.includes(point)}
-                            onChange={() => handlePointToggle(point)}
-                          />
-                          {point}
-                        </label>
-                      ))}
-                  </div>
-                ))}
+                      {/* ✅ Points are now independent checkboxes */}
+                      {Array.isArray(sub.points) &&
+                        sub.points.map((point, idx) => (
+                          <label key={idx} className="flex items-center gap-2 ml-6">
+                            <input
+                              type="checkbox"
+                              checked={formData.selectedPoints.includes(point)}
+                              onChange={() => handlePointToggle(point)}
+                            />
+                            {point}
+                          </label>
+                        ))}
+                    </div>
+                  );
+                })}
+
             </div>
           ))}
         </div>

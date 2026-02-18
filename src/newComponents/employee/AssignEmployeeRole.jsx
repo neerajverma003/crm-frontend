@@ -74,6 +74,58 @@ const AssignEmployeeRole = () => {
         }
     };
 
+        // Fetch assigned roles for an employee and company by calling existing employee endpoint
+        const getAssignedRolesForEmployeeAndCompany = async (employeeId, companyId) => {
+            if (!employeeId || !companyId) return;
+
+            try {
+                const res = await fetch(`http://localhost:4000/employee/getAssignedRoles/${employeeId}`);
+                const data = await res.json();
+                console.log("👷‍♂️ Employee assigned roles raw:", data);
+
+                if (!data.success) {
+                    setFormData((prev) => ({ ...prev, selectedRoles: [], selectedSubRoles: [], selectedPoints: [] }));
+                    return;
+                }
+
+                const assigned = Array.isArray(data.assignedRoles) ? data.assignedRoles : [];
+
+                // Filter assignments that include the selected company
+                const matched = assigned.filter((ar) => Array.isArray(ar.companyIds) && ar.companyIds.map(String).includes(String(companyId)));
+
+                const roleSet = new Set();
+                const subRoleSet = new Set();
+                const pointSet = new Set();
+
+                matched.forEach((ar) => {
+                    (ar.roleId || []).forEach((r) => roleSet.add(String(r)));
+
+                    // ar.subRoles items might be ObjectId strings or objects like { _id, subRoleName }
+                    (ar.subRoles || []).forEach((s) => {
+                        if (!s) return;
+                        if (typeof s === "object") {
+                            const id = s._id ? String(s._id) : String(s);
+                            subRoleSet.add(id);
+                        } else {
+                            subRoleSet.add(String(s));
+                        }
+                    });
+
+                    (ar.points || []).forEach((p) => pointSet.add(String(p)));
+                });
+
+                setFormData((prev) => ({
+                    ...prev,
+                    selectedRoles: Array.from(roleSet),
+                    selectedSubRoles: Array.from(subRoleSet),
+                    selectedPoints: Array.from(pointSet),
+                }));
+            } catch (err) {
+                console.error("❌ Error fetching assigned roles for employee:", err);
+                setFormData((prev) => ({ ...prev, selectedRoles: [], selectedSubRoles: [], selectedPoints: [] }));
+            }
+        };
+
     // ============================================
     // USE EFFECTS
     // ============================================
@@ -89,32 +141,50 @@ const AssignEmployeeRole = () => {
             setCompanies([]);
         }
 
-        setFormData((prev) => ({ ...prev, selectedCompany: "" }));
+        // Clear company + role selections when employee changes
+        setFormData((prev) => ({ ...prev, selectedCompany: "", selectedRoles: [], selectedSubRoles: [], selectedPoints: [] }));
     }, [formData.selectedEmployee]);
+
+
+    // When company is selected, fetch assigned roles/subroles/points for that employee+company
+    useEffect(() => {
+        if (formData.selectedEmployee && formData.selectedCompany) {
+            getAssignedRolesForEmployeeAndCompany(formData.selectedEmployee, formData.selectedCompany);
+        } else {
+            // clear selections when no company
+            setFormData((prev) => ({ ...prev, selectedRoles: [], selectedSubRoles: [], selectedPoints: [] }));
+        }
+    }, [formData.selectedCompany, formData.selectedEmployee]);
 
     // ============================================
     // TOGGLE HELPERS
     // ============================================
-    const toggleSelection = (array, item) => (array.includes(item) ? array.filter((i) => i !== item) : [...array, item]);
+    const toggleSelection = (array, item) => {
+        const s = String(item);
+        return array.includes(s) ? array.filter((i) => i !== s) : [...array, s];
+    };
 
     const handleRoleToggle = (roleId) => {
+        const id = String(roleId);
         setFormData((prev) => ({
             ...prev,
-            selectedRoles: toggleSelection(prev.selectedRoles, roleId),
+            selectedRoles: toggleSelection(prev.selectedRoles, id),
         }));
     };
 
     const handleSubRoleToggle = (subRoleId) => {
+        const id = String(subRoleId);
         setFormData((prev) => ({
             ...prev,
-            selectedSubRoles: toggleSelection(prev.selectedSubRoles, subRoleId),
+            selectedSubRoles: toggleSelection(prev.selectedSubRoles, id),
         }));
     };
 
     const handlePointToggle = (point) => {
+        const p = String(point);
         setFormData((prev) => ({
             ...prev,
-            selectedPoints: toggleSelection(prev.selectedPoints, point),
+            selectedPoints: toggleSelection(prev.selectedPoints, p),
         }));
     };
 
@@ -248,7 +318,7 @@ const AssignEmployeeRole = () => {
                             <label className="flex items-center gap-2">
                                 <input
                                     type="checkbox"
-                                    checked={formData.selectedRoles.includes(role._id)}
+                                    checked={formData.selectedRoles.includes(String(role._id))}
                                     onChange={() => handleRoleToggle(role._id)}
                                 />
                                 <strong>{role.role}</strong>
@@ -263,7 +333,7 @@ const AssignEmployeeRole = () => {
                                     <label className="flex items-center gap-2">
                                         <input
                                             type="checkbox"
-                                            checked={formData.selectedSubRoles.includes(sub._id)}
+                                            checked={formData.selectedSubRoles.includes(String(sub._id))}
                                             onChange={() => handleSubRoleToggle(sub._id)}
                                         />
                                         {sub.subRoleName}
@@ -277,7 +347,7 @@ const AssignEmployeeRole = () => {
                                         >
                                             <input
                                                 type="checkbox"
-                                                checked={formData.selectedPoints.includes(point)}
+                                                checked={formData.selectedPoints.includes(String(point))}
                                                 onChange={() => handlePointToggle(point)}
                                             />
                                             {point}
