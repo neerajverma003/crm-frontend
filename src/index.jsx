@@ -640,6 +640,7 @@ import { LeaveSuperAdmin } from "./views/admin/leaveManagement/LeaveSuperAdmin.j
 import { LeavePage } from "./views/employee/LeaveSection/LeavePage.jsx";
 import ChequeExpense from "./newComponents/expense/ChequeExpense.jsx";
 import DailyExpense from "./newComponents/expense/DailyExpense.jsx";
+import Ledger from "./newComponents/expense/Ledger.jsx";
 import Department from "./newComponents/department/Department.jsx";
 import Designation from "./newComponents/designation/Designation.jsx";
 import AddMyLead from "./newComponents/leadManagement/AddMyLead.jsx"
@@ -684,6 +685,8 @@ import AdminProfile from "./newComponents/profile/AdminProfile.jsx";
 import EmployeeProfile from "./newComponents/profile/EmployeeProfile.jsx";
 import AddProfile from "./newComponents/profile/AddProfile.jsx";
 import AddCandidate from "./newComponents/candidate/AddCandidate.jsx";
+import OfferLetter from "./newComponents/offerLetter/OfferLetter.jsx";
+import OfferLetterFormat from "./newComponents/offerLetter/OfferLetterFormat.jsx";
 import CompanyOverview from "./newComponents/company/CompanyOverview.jsx";
 import EmployeeLeave from "./views/admin/dashboard/EmployeeLeave.jsx";
 import SalaryList from "./newComponents/payroll/SalaryList.jsx";
@@ -1113,6 +1116,22 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "/offer-letter",
+        element: (
+          <ProtectedRoute allowedRoles={roles.superAdminOnly}>
+            <OfferLetter />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/offer-letter-format",
+        element: (
+          <ProtectedRoute allowedRoles={roles.superAdminOnly}>
+            <OfferLetterFormat />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "/employee-data",
         element: (
           <ProtectedRoute allowedRoles={roles.adminOnly}>
@@ -1145,6 +1164,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={roles.all}>
             <ChequeExpense />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/ledger",
+        element: (
+          <ProtectedRoute allowedRoles={roles.all}>
+            <Ledger />
           </ProtectedRoute>
         ),
       },

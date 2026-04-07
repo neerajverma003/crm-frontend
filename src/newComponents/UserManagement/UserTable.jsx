@@ -1344,6 +1344,15 @@ const UserTable = ({ onlyAdmins = false, searchTerm, roleFilter, filterStatus = 
                                             {typeof u.department === "string" ? u.department : u.department?.dep || "—"}
                                         </div>
                                         <div>
+                                            <span className="font-medium">Official Email:</span> {u.officialEmail || u.officalEmail || "—"}
+                                        </div>
+                                        <div>
+                                            <span className="font-medium">Official No:</span> {u.officialNo || "—"}
+                                        </div>
+                                        <div>
+                                            <span className="font-medium">Emergency No:</span> {u.emergencyNo || "—"}
+                                        </div>
+                                        <div>
                                             <span className="font-medium">Phone:</span> {u.phone || "—"}
                                         </div>
                                         <div>
@@ -1495,7 +1504,16 @@ const UserTable = ({ onlyAdmins = false, searchTerm, roleFilter, filterStatus = 
                                 <strong>Email:</strong> {viewingUser.email}
                             </p>
                             <p>
-                                <strong>Phone:</strong> {viewingUser.phone}
+                                <strong>Official Email:</strong> {viewingUser.officialEmail || viewingUser.officalEmail || "—"}
+                            </p>
+                            <p>
+                                <strong>Phone:</strong> {viewingUser.phone || "—"}
+                            </p>
+                            <p>
+                                <strong>Official No:</strong> {viewingUser.officialNo || "—"}
+                            </p>
+                            <p>
+                                <strong>Emergency No:</strong> {viewingUser.emergencyNo || "—"}
                             </p>
                             <p>
                                 <strong>Department:</strong>{" "}

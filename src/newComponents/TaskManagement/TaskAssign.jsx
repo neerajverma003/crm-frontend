@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FiPlus, FiEdit2, FiTrash2, FiX, FiSearch, FiFilter } from "react-icons/fi";
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiSearch, FiFilter, FiChevronDown } from "react-icons/fi";
 
 const TaskAssign = () => {
   const [tasks, setTasks] = useState([]);
@@ -28,6 +28,16 @@ const TaskAssign = () => {
     taskTitle: "",
     description: "",
   });
+
+  const [contentType, setContentType] = useState("description");
+  const [numberData, setNumberData] = useState([
+    { row: 1, col1: "", col2: "", col3: "", col4: "" },
+    { row: 2, col1: "", col2: "", col3: "", col4: "" },
+    { row: 3, col1: "", col2: "", col3: "", col4: "" },
+    { row: 4, col1: "", col2: "", col3: "", col4: "" },
+    { row: 5, col1: "", col2: "", col3: "", col4: "" },
+  ]);
+  const [expandedTaskId, setExpandedTaskId] = useState(null);
 
   const API_BASE_URL = "http://localhost:4000";
   const superAdminId = localStorage.getItem("userId");
@@ -117,6 +127,35 @@ const TaskAssign = () => {
     }));
   };
 
+  const toggleExpandedTask = (taskId) => {
+    setExpandedTaskId((prev) => (prev === taskId ? null : taskId));
+  };
+
+  // Handle number table cell change
+  const handleNumberCellChange = (rowIndex, colName, value) => {
+    setNumberData((prev) => {
+      const newData = [...prev];
+      newData[rowIndex] = {
+        ...newData[rowIndex],
+        [colName]: value,
+      };
+      return newData;
+    });
+  };
+
+  // Add new row to number table
+  const addNumberRow = () => {
+    setNumberData((prev) => [
+      ...prev,
+      { row: prev.length + 1, col1: "", col2: "", col3: "", col4: "" },
+    ]);
+  };
+
+  // Remove row from number table
+  const removeNumberRow = (rowIndex) => {
+    setNumberData((prev) => prev.filter((_, index) => index !== rowIndex));
+  };
+
   // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -130,6 +169,8 @@ const TaskAssign = () => {
       const payload = {
         ...formData,
         assignedBy: superAdminId,
+        contentType: contentType,
+        numberData: contentType === "numbers" ? numberData : [],
       };
 
       if (editingTask) {
@@ -152,6 +193,14 @@ const TaskAssign = () => {
         taskTitle: "",
         description: "",
       });
+      setContentType("description");
+      setNumberData([
+        { row: 1, col1: "", col2: "", col3: "", col4: "" },
+        { row: 2, col1: "", col2: "", col3: "", col4: "" },
+        { row: 3, col1: "", col2: "", col3: "", col4: "" },
+        { row: 4, col1: "", col2: "", col3: "", col4: "" },
+        { row: 5, col1: "", col2: "", col3: "", col4: "" },
+      ]);
       setShowForm(false);
 
       // Refresh tasks
@@ -173,6 +222,18 @@ const TaskAssign = () => {
       taskTitle: task.taskTitle,
       description: task.description,
     });
+    setContentType(task.contentType || "description");
+    if (task.numberData) {
+      setNumberData(task.numberData);
+    } else {
+      setNumberData([
+        { row: 1, col1: "", col2: "", col3: "", col4: "" },
+        { row: 2, col1: "", col2: "", col3: "", col4: "" },
+        { row: 3, col1: "", col2: "", col3: "", col4: "" },
+        { row: 4, col1: "", col2: "", col3: "", col4: "" },
+        { row: 5, col1: "", col2: "", col3: "", col4: "" },
+      ]);
+    }
     setShowForm(true);
   };
 
@@ -265,6 +326,14 @@ const TaskAssign = () => {
                     taskTitle: "",
                     description: "",
                   });
+                  setContentType("description");
+                  setNumberData([
+                    { row: 1, col1: "", col2: "", col3: "", col4: "" },
+                    { row: 2, col1: "", col2: "", col3: "", col4: "" },
+                    { row: 3, col1: "", col2: "", col3: "", col4: "" },
+                    { row: 4, col1: "", col2: "", col3: "", col4: "" },
+                    { row: 5, col1: "", col2: "", col3: "", col4: "" },
+                  ]);
                 }
               }}
             className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
@@ -385,23 +454,154 @@ const TaskAssign = () => {
               {/* Description */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Description
+                  Content Type
                 </label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  rows="3"
+                <select
+                  value={contentType}
+                  onChange={(e) => setContentType(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  placeholder="Add task description"
-                />
+                >
+                  <option value="description">Description</option>
+                  <option value="numbers">Numbers</option>
+                </select>
               </div>
+
+              {/* Conditional Content Area */}
+              {contentType === "description" ? (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    rows="3"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="Add task description"
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    Number Table (Excel-like)
+                  </label>
+                  <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="bg-indigo-100">
+                            <th className="border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 w-12">
+                              Row
+                            </th>
+                            <th className="border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 min-w-32">
+                              Column 1
+                            </th>
+                            <th className="border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 min-w-32">
+                              Column 2
+                            </th>
+                            <th className="border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 min-w-32">
+                              Column 3
+                            </th>
+                            <th className="border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 min-w-32">
+                              Column 4
+                            </th>
+                            <th className="border border-gray-300 px-3 py-2 text-center text-sm font-semibold text-gray-700 w-16">
+                              Action
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {numberData.map((row, rowIndex) => (
+                            <tr key={rowIndex} className="hover:bg-gray-50">
+                              <td className="border border-gray-300 px-3 py-2 bg-gray-100 text-center font-semibold text-sm">
+                                {rowIndex + 1}
+                              </td>
+                              <td className="border border-gray-300 px-3 py-2">
+                                <input
+                                  type="text"
+                                  value={row.col1}
+                                  onChange={(e) =>
+                                    handleNumberCellChange(rowIndex, "col1", e.target.value)
+                                  }
+                                  className="w-full px-2 py-1 border-0 focus:ring-2 focus:ring-indigo-500 rounded"
+                                  placeholder="Enter value"
+                                />
+                              </td>
+                              <td className="border border-gray-300 px-3 py-2">
+                                <input
+                                  type="text"
+                                  value={row.col2}
+                                  onChange={(e) =>
+                                    handleNumberCellChange(rowIndex, "col2", e.target.value)
+                                  }
+                                  className="w-full px-2 py-1 border-0 focus:ring-2 focus:ring-indigo-500 rounded"
+                                  placeholder="Enter value"
+                                />
+                              </td>
+                              <td className="border border-gray-300 px-3 py-2">
+                                <input
+                                  type="text"
+                                  value={row.col3}
+                                  onChange={(e) =>
+                                    handleNumberCellChange(rowIndex, "col3", e.target.value)
+                                  }
+                                  className="w-full px-2 py-1 border-0 focus:ring-2 focus:ring-indigo-500 rounded"
+                                  placeholder="Enter value"
+                                />
+                              </td>
+                              <td className="border border-gray-300 px-3 py-2">
+                                <input
+                                  type="text"
+                                  value={row.col4}
+                                  onChange={(e) =>
+                                    handleNumberCellChange(rowIndex, "col4", e.target.value)
+                                  }
+                                  className="w-full px-2 py-1 border-0 focus:ring-2 focus:ring-indigo-500 rounded"
+                                  placeholder="Enter value"
+                                />
+                              </td>
+                              <td className="border border-gray-300 px-3 py-2 text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => removeNumberRow(rowIndex)}
+                                  className="text-red-600 hover:text-red-800 font-semibold"
+                                >
+                                  ✕
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={addNumberRow}
+                    className="mt-3 px-4 py-2 bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition font-semibold text-sm"
+                  >
+                    + Add Row
+                  </button>
+                </div>
+              )}
 
               {/* Submit Button */}
               <div className="flex gap-3 justify-end">
                 <button
                   type="button"
-                  onClick={() => setShowForm(false)}
+                  onClick={() => {
+                    setShowForm(false);
+                    setContentType("description");
+                    setNumberData([
+                      { row: 1, col1: "", col2: "", col3: "", col4: "" },
+                      { row: 2, col1: "", col2: "", col3: "", col4: "" },
+                      { row: 3, col1: "", col2: "", col3: "", col4: "" },
+                      { row: 4, col1: "", col2: "", col3: "", col4: "" },
+                      { row: 5, col1: "", col2: "", col3: "", col4: "" },
+                    ]);
+                  }}
                   className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
                 >
                   Cancel
@@ -486,10 +686,22 @@ const TaskAssign = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {tasks.map((task) => (
-                    <tr key={task._id} className="hover:bg-gray-50 transition">
-                      <td className="px-6 py-4">
-                        <div className="text-sm font-semibold text-gray-900">{task.taskTitle}</div>
-                        <div className="text-xs text-gray-600 mt-1">{task.description?.substring(0, 50)}...</div>
+                    <>
+                      <tr
+                        key={task._id}
+                        className="hover:bg-gray-50 transition cursor-pointer"
+                        onClick={() => toggleExpandedTask(task._id)}
+                      >
+                        <td className="px-6 py-4">
+                        <div className="flex items-start gap-2">
+                          <FiChevronDown
+                            className={`mt-1 text-gray-500 transition-transform ${expandedTaskId === task._id ? "rotate-180" : "rotate-0"}`}
+                          />
+                          <div>
+                            <div className="text-sm font-semibold text-gray-900">{task.taskTitle}</div>
+                            <div className="text-xs text-gray-600 mt-1">{task.description?.substring(0, 50)}...</div>
+                          </div>
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-sm font-semibold text-gray-900">
@@ -522,21 +734,30 @@ const TaskAssign = () => {
                       <td className="px-6 py-4">
                         <div className="flex gap-2">
                           <button
-                            onClick={() => handleViewHistory(task)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewHistory(task);
+                            }}
                             className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition"
                             title="View History"
                           >
                             <FiSearch size={18} />
                           </button>
                           <button
-                            onClick={() => handleEdit(task)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(task);
+                            }}
                             className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition"
                             title="Edit Task"
                           >
                             <FiEdit2 size={18} />
                           </button>
                           <button
-                            onClick={() => handleDelete(task._id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(task._id);
+                            }}
                             className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition"
                             title="Delete Task"
                           >
@@ -545,6 +766,60 @@ const TaskAssign = () => {
                         </div>
                       </td>
                     </tr>
+                    {expandedTaskId === task._id && (
+                      <tr className="bg-slate-50 transition-all duration-300">
+                        <td colSpan="6" className="px-6 py-4">
+                          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                            <div className="flex items-center justify-between mb-4">
+                              <div>
+                                <h3 className="text-lg font-semibold text-gray-900">Task Details</h3>
+                                <p className="text-sm text-gray-500">
+                                  {task.contentType === "numbers" ? "Numbers table" : "Full description"}
+                                </p>
+                              </div>
+                              <span className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-1 text-sm font-medium text-indigo-700">
+                                {task.contentType === "numbers" ? "Numbers" : "Description"}
+                              </span>
+                            </div>
+                            {task.contentType !== "numbers" ? (
+                              <div className="text-sm text-gray-700 whitespace-pre-line">
+                                {task.description || "No description provided."}
+                              </div>
+                            ) : (
+                              <div className="overflow-x-auto">
+                                <table className="w-full border-collapse">
+                                  <thead>
+                                    <tr className="bg-indigo-50">
+                                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Row</th>
+                                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 1</th>
+                                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 2</th>
+                                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 3</th>
+                                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 4</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {(
+                                      task.numberData && task.numberData.length > 0
+                                        ? task.numberData
+                                        : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "" }))
+                                    ).map((row, index) => (
+                                      <tr key={`${task._id}-detail-${index}`} className="odd:bg-white even:bg-slate-50">
+                                        <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700 font-semibold">{row.row || index + 1}</td>
+                                        <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700">{row.col1 || ""}</td>
+                                        <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700">{row.col2 || ""}</td>
+                                        <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700">{row.col3 || ""}</td>
+                                        <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700">{row.col4 || ""}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                    </>
                   ))}
                 </tbody>
               </table>

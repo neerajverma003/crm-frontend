@@ -425,6 +425,14 @@ const SuperAdminDashboard = () => {
     const [filteredData, setFilteredData] = useState([]);
     const [loadingAttendance, setLoadingAttendance] = useState(true);
 
+    const [employeeAttendance, setEmployeeAttendance] = useState([]);
+    const [loadingEmployeeAttendance, setLoadingEmployeeAttendance] = useState(true);
+    const [employeeAttendanceError, setEmployeeAttendanceError] = useState("");
+
+    const [adminAttendance, setAdminAttendance] = useState([]);
+    const [loadingAdminAttendance, setLoadingAdminAttendance] = useState(true);
+    const [adminAttendanceError, setAdminAttendanceError] = useState("");
+
     const [companies, setCompanies] = useState([]);
     const [loadingCompanies, setLoadingCompanies] = useState(true);
     const [errorCompanies, setErrorCompanies] = useState("");
@@ -453,6 +461,36 @@ const SuperAdminDashboard = () => {
         return true;
     };
 
+    // ------------------------------
+    // Fetch Super Admin Attendance
+    // ------------------------------
+    useEffect(() => {
+        const fetchAdminAttendance = async () => {
+            setLoadingAdminAttendance(true);
+            setAdminAttendanceError("");
+
+            try {
+                const dateParam = encodeURIComponent(selectedDate);
+                const res = await fetch(`http://localhost:4000/adminAttendance/getAllAttendance?date=${dateParam}`);
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.message || "Failed to fetch admin attendance");
+                }
+
+                setAdminAttendance(Array.isArray(data) ? data : []);
+            } catch (error) {
+                console.error("Error fetching admin attendance:", error);
+                setAdminAttendanceError(error.message || "Error fetching admin attendance");
+                setAdminAttendance([]);
+            } finally {
+                setLoadingAdminAttendance(false);
+            }
+        };
+
+        fetchAdminAttendance();
+    }, [selectedDate]);
+
     // 🧩 Session Timeout Watcher
     useEffect(() => {
         if (!checkTokenExpiry()) {
@@ -470,30 +508,36 @@ const SuperAdminDashboard = () => {
         return () => clearInterval(interval);
     }, [navigate]);
 
-    // 📊 Fetch Attendance
+    // 📊 Fetch All Employee Attendance (for list in widget)
     useEffect(() => {
         const fetchAttendance = async () => {
+            setLoadingAttendance(true);
+            setLoadingEmployeeAttendance(true);
+            setEmployeeAttendanceError("");
+
             try {
-                const res = await fetch("http://localhost:4000/attendance/getAllAttendance");
+                const dateParam = encodeURIComponent(selectedDate);
+                const res = await fetch(`http://localhost:4000/attendance/getAllAttendance?date=${dateParam}`);
                 const data = await res.json();
-                console.log("Fetched attendance data:", data);
 
-                const attendance = Array.isArray(data) ? data : data.data || [];
-                const userId = localStorage.getItem("userId");
+                if (!res.ok) {
+                    throw new Error(data.message || "Failed to fetch employee attendance");
+                }
 
-                // Filter by logged-in user
-                const userAttendance = attendance.filter((item) => item.employee?._id === userId);
-
-                setAttendanceData(userAttendance);
+                const attendance = Array.isArray(data) ? data : [];
+                setAttendanceData(attendance);
+                setEmployeeAttendance(attendance);
             } catch (err) {
                 console.error("Error fetching attendance:", err);
+                setEmployeeAttendanceError(err.message || "Error fetching employee attendance");
             } finally {
                 setLoadingAttendance(false);
+                setLoadingEmployeeAttendance(false);
             }
         };
 
         fetchAttendance();
-    }, []);
+    }, [selectedDate]);
 
     // 📈 Fetch Leads
     useEffect(() => {
@@ -609,6 +653,10 @@ const SuperAdminDashboard = () => {
         return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     };
 
+    const activeAdminAttendance = [...adminAttendance, ...employeeAttendance].filter((item) =>
+        ["Present", "Grace Present", "Late", "Half Day"].includes(item.status)
+    );
+
     // 📊 Dashboard Cards
     // const cards = [
     //     {
@@ -718,43 +766,78 @@ const SuperAdminDashboard = () => {
                   </div>
 
                   {/* Attendance */}
-                  <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-                      <div className="flex items-center justify-between border-b px-6 py-4">
-                          <div>
-                              <h3 className="flex items-center gap-2 font-semibold text-gray-900">
-                                  <UserCheck className="h-4 w-4 text-green-600" />
-                                  Attendance
-                              </h3>
-                              <p className="text-xs text-gray-500">Record for {selectedDate}</p>
-                          </div>
-                          <input
-                              type="date"
-                              value={selectedDate}
-                              onChange={(e) => setSelectedDate(e.target.value)}
-                              className="rounded-md border px-2 py-1 text-sm"
-                          />
+                  <div className="rounded-2xl border border-gray-200 bg-white shadow-xl transition hover:-translate-y-0.5 hover:shadow-2xl">
+                    <div className="flex flex-col gap-3 border-b px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <h3 className="flex items-center gap-2 text-xl font-bold text-gray-900">
+                          <UserCheck className="h-6 w-6 text-green-600" />
+                          Attendance
+                        </h3>
+                        <p className="text-sm font-medium text-gray-600">Record for {selectedDate}</p>
                       </div>
-
-                      <div className="flex flex-col items-center p-6">
-                          <div className="mb-4 flex h-28 w-28 items-center justify-center rounded-full bg-green-100">
-                              <UserCheck className="h-10 w-10 text-green-600" />
-                          </div>
-
-                          <span className="mb-6 rounded-full bg-green-100 px-4 py-1 text-sm font-semibold text-green-700">PRESENT</span>
-
-                          {filteredData.length > 0 && (
-                              <div className="flex gap-6">
-                                  <div className="text-center">
-                                      <p className="text-xs text-gray-500">TIME IN</p>
-                                      <p className="font-semibold text-gray-900">{formatTime(filteredData[0]?.clockIn)}</p>
-                                  </div>
-                                  <div className="text-center">
-                                      <p className="text-xs text-gray-500">TIME OUT</p>
-                                      <p className="font-semibold text-gray-900">{formatTime(filteredData[0]?.clockOut)}</p>
-                                  </div>
-                              </div>
-                          )}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <input
+                          type="date"
+                          value={selectedDate}
+                          onChange={(e) => setSelectedDate(e.target.value)}
+                          className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                        />
                       </div>
+                    </div>
+
+                    <div className="p-4">
+                      {loadingAdminAttendance || loadingEmployeeAttendance ? (
+                        <div className="flex items-center justify-center p-8 text-sm text-gray-500">Loading attendance...</div>
+                      ) : adminAttendanceError || employeeAttendanceError ? (
+                        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                          {adminAttendanceError || employeeAttendanceError}
+                        </div>
+                      ) : activeAdminAttendance.length === 0 ? (
+                        <div className="text-center text-sm text-gray-500">No active attendance records found for {selectedDate}.</div>
+                      ) : (
+                        <div className="max-h-72 overflow-y-auto overflow-x-hidden rounded-lg border border-gray-100 ring-1 ring-gray-50">
+                          <table className="w-full table-fixed divide-y divide-gray-200 text-sm">
+                            <thead className="bg-gray-50">
+                              <tr>
+                                <th className="w-3/10 px-4 py-3 text-left text-sm font-semibold uppercase tracking-wider text-gray-600">Name</th>
+                                <th className="w-1/5 px-4 py-3 text-left text-sm font-semibold uppercase tracking-wider text-gray-600">Status</th>
+                                <th className="w-1/5 px-4 py-3 text-left text-sm font-semibold uppercase tracking-wider text-gray-600">Check-in</th>
+                                <th className="w-1/5 px-4 py-3 text-left text-sm font-semibold uppercase tracking-wider text-gray-600">Check-out</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100 bg-white">
+                              {activeAdminAttendance.map((item) => {
+                                const name = item.admin?.fullName || item.employee?.fullName || "Unknown";
+
+                                const statusColor =
+                                  item.status === "Present"
+                                    ? "bg-emerald-100 text-emerald-700"
+                                    : item.status === "Late"
+                                      ? "bg-yellow-100 text-yellow-700"
+                                      : item.status === "Grace Present"
+                                        ? "bg-blue-100 text-blue-700"
+                                        : item.status === "Half Day"
+                                          ? "bg-orange-100 text-orange-700"
+                                          : "bg-gray-100 text-gray-700";
+
+                                return (
+                                  <tr key={item._id} className="hover:bg-blue-50">
+                                    <td className="px-4 py-3 text-sm font-semibold text-gray-700 text-ellipsis overflow-hidden whitespace-nowrap">{name}</td>
+                                    <td className="px-4 py-3 text-sm">
+                                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${statusColor}`}>
+                                        {item.status || "—"}
+                                      </span>
+                                    </td>
+                                    <td className="px-4 py-3 text-sm font-medium text-gray-700">{formatTime(item.clockIn)}</td>
+                                    <td className="px-4 py-3 text-sm font-medium text-gray-700">{formatTime(item.clockOut)}</td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
                   </div>
               </div>
 

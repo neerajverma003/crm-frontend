@@ -7,6 +7,7 @@ const ChequeExpense = () => {
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
+    const [chequePresentFilter, setChequePresentFilter] = useState("all"); // today, tomorrow, 3, 7, 14
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [cheques, setCheques] = useState([]);
@@ -24,6 +25,7 @@ const ChequeExpense = () => {
 
     const [formData, setFormData] = useState({
         issuedDate: "",
+        chequePresentDate: new Date().toISOString().split("T")[0],
         toWhom: "",
         amount: "",
         chequeNumber: "",
@@ -187,6 +189,39 @@ const ChequeExpense = () => {
         return cheques.filter((c) => (c.status || "pending").toLowerCase() === selectedTab);
     }, [cheques, selectedTab]);
 
+    // Helper to apply cheque present date quick filters (today, tomorrow, 3, 7, 14 days)
+    const applyChequePresentQuickFilter = (items) => {
+        if (!chequePresentFilter || chequePresentFilter === "all") return items;
+        const base = new Date();
+        base.setHours(0, 0, 0, 0);
+
+        let start = new Date(base);
+        let end = new Date(base);
+
+        if (chequePresentFilter === "today") {
+            // already set as today
+        } else if (chequePresentFilter === "tomorrow") {
+            start.setDate(start.getDate() + 1);
+            end.setDate(end.getDate() + 1);
+        } else {
+            const days = Number(chequePresentFilter);
+            if (!Number.isNaN(days) && days > 0) {
+                end.setDate(end.getDate() + (days - 1));
+            }
+        }
+
+        return items.filter((c) => {
+            if (!c.chequePresentDate) return false;
+            try {
+                const d = new Date(c.chequePresentDate);
+                d.setHours(0, 0, 0, 0);
+                return d >= start && d <= end;
+            } catch {
+                return false;
+            }
+        });
+    };
+
     // Debounce the search term for performance, so the UI won't filter on every keystroke
     useEffect(() => {
         const handler = setTimeout(() => setDebouncedSearchTerm(searchTerm.trim().toLowerCase()), 300);
@@ -225,8 +260,10 @@ const ChequeExpense = () => {
                 }
             });
         }
+        // apply cheque present date quick filter
+        result = applyChequePresentQuickFilter(result);
         return result;
-    }, [filteredCheques, debouncedSearchTerm, startDate, endDate]);
+    }, [filteredCheques, debouncedSearchTerm, startDate, endDate, chequePresentFilter]);
 
     const finalFilteredTotal = useMemo(() => {
         if (!finalFilteredCheques || finalFilteredCheques.length === 0) return 0;
@@ -321,6 +358,7 @@ const ChequeExpense = () => {
 
         const expenseEntry = {
             chequeIssuedDate: formData.issuedDate,
+            chequePresentDate: formData.chequePresentDate || new Date().toISOString().split("T")[0],
             receiverName: formData.toWhom,
             chequeNumber: formData.chequeNumber,
             chequeAmount: formData.amount,
@@ -362,6 +400,7 @@ const ChequeExpense = () => {
             // Reset form
             setFormData({
                 issuedDate: "",
+                chequePresentDate: new Date().toISOString().split("T")[0],
                 toWhom: "",
                 amount: "",
                 chequeNumber: "",
@@ -378,6 +417,7 @@ const ChequeExpense = () => {
         setEditingChequeId(cheque._id);
         setFormData({
             issuedDate: new Date(cheque.chequeIssuedDate).toISOString().split("T")[0],
+            chequePresentDate: cheque.chequePresentDate ? new Date(cheque.chequePresentDate).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
             toWhom: cheque.receiverName || "",
             amount: cheque.chequeAmount || "",
             chequeNumber: cheque.chequeNumber || "",
@@ -386,11 +426,17 @@ const ChequeExpense = () => {
         });
         setShowModal(true);
     };
-    if (cheques)
-        return (
-            <div className="min-h-screen bg-gray-50 p-6">
-                {/* Status buttons - show at very top for quick access before summary cards */}
-                <div className="mb-4 flex flex-wrap items-center gap-2">
+    return (
+            <div className="bg-[#f8fafc] min-h-dvh py-4 sm:px-6 lg:px-8">
+                <div className="flex w-full flex-col gap-6">
+                    {/* Header */}
+                    <div>
+                        <h1 className="mb-2 text-2xl font-bold text-gray-900">Cheque Expenses</h1>
+                        <p className="text-gray-600">Track, manage and monitor all cheque based expenses</p>
+                    </div>
+
+                    {/* Status buttons - show at very top for quick access before summary cards */}
+                    <div className="mb-2 flex flex-wrap items-center gap-2">
                     {FILTER_OPTIONS.map((s) => (
                         <button
                             key={`top-${s}`}
@@ -409,30 +455,31 @@ const ChequeExpense = () => {
                             </div>
                         </button>
                     ))}
-                </div>
-                {/*  Summary Cards */}
-                <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="rounded-md border border-gray-300 bg-white p-4">
+                    </div>
+
+                    {/*  Summary Cards */}
+                    <div className="mb-2 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
                         <div className="mb-1 text-lg font-semibold text-gray-800">Today Cheque Expense</div>
                         <div className="text-2xl font-bold text-black">₹{formatINR(todayTotal)}</div>
                         <div className="mt-1 text-sm text-gray-500">
                             Showing <span className="capitalize">{selectedTab}</span>: ₹{formatINR(todayTotalFiltered)}
                         </div>
                     </div>
-                    <div className="rounded-md border border-gray-300 bg-white p-4">
+                    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
                         <div className="mb-1 text-lg font-semibold text-gray-800">Monthly Cheque Expense</div>
                         <div className="text-2xl font-bold text-black">₹{formatINR(monthlyTotal)}</div>
                         <div className="mt-1 text-sm text-gray-500">
                             Showing <span className="capitalize">{selectedTab}</span>: ₹{formatINR(monthlyTotalFiltered)}
                         </div>
                     </div>
-                </div>
+                    </div>
 
-                {/*  Header + Add Button and Tabs */}
-                <div className="mb-4 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <h2 className="text-xl font-semibold">Cheque Expenses</h2>
-                        <div className="ml-2 flex items-center gap-2">
+                    {/*  Filters + Add Button */}
+                    <div className="mb-2 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                    <div className="flex flex-wrap items-center gap-3">
+                        <div className="flex items-center gap-2 rounded-full bg-white px-3 py-1 shadow-sm">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">Entry Date</span>
                             <label className="text-sm text-gray-600">From</label>
                             <input
                                 type="date"
@@ -447,23 +494,39 @@ const ChequeExpense = () => {
                                 onChange={(e) => setEndDate(e.target.value)}
                                 className="w-44 rounded-lg border px-3 py-1.5"
                             />
-                            <button
-                                onClick={() => {
-                                    setStartDate("");
-                                    setEndDate("");
-                                }}
-                                className="flex items-center gap-2 text-nowrap rounded-lg bg-black px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-800 sm:px-4 sm:py-2 sm:text-base"
-                            >
-                                Clear Dates
-                            </button>
                         </div>
+
+                        {/* Cheque Present Date quick filters */}
+                        <div className="flex flex-wrap items-center gap-2 rounded-full bg-white px-3 py-1 shadow-sm">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">Present Date</span>
+                            {[
+                                { key: "all", label: "All" },
+                                { key: "today", label: "Today" },
+                                { key: "tomorrow", label: "Tomorrow" },
+                                { key: "3", label: "Next 3 days" },
+                                { key: "7", label: "Next 7 days" },
+                                { key: "14", label: "Next 14 days" },
+                            ].map((opt) => (
+                                <button
+                                    key={opt.key}
+                                    type="button"
+                                    onClick={() => setChequePresentFilter(opt.key)}
+                                    className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                                        chequePresentFilter === opt.key ? "bg-gray-900 text-white shadow-sm" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    }`}
+                                >
+                                    {opt.label}
+                                </button>
+                            ))}
+                        </div>
+
                         <div className="relative">
                             <input
                                 type="search"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 placeholder="Search name or cheque number"
-                                className="w-64 rounded-lg border px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                className="w-64 rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                             />
                             {searchTerm && (
                                 <button
@@ -484,13 +547,13 @@ const ChequeExpense = () => {
                             setEditingChequeId(null);
                             setShowModal(true);
                         }}
-                        className="flex items-center gap-2 text-nowrap rounded-lg bg-black px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-800 sm:px-4 sm:py-2 sm:text-base"
+                        className="flex items-center gap-2 text-nowrap rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800"
                     >
                         + Add Cheque
                     </button>
-                </div>
+                    </div>
 
-                {/* Tabs for statuses */}
+                    {/* Tabs for statuses */}
                 {/* <div className="flex gap-2 items-center mb-4">
         {FILTER_OPTIONS.map((s) => (
           <button
@@ -505,8 +568,8 @@ const ChequeExpense = () => {
         ))}
       </div> */}
 
-                {/* ✅ Cheque Table */}
-                <div className="overflow-x-auto rounded-lg border bg-white shadow-md">
+                    {/* ✅ Cheque Table */}
+                    <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
                     {loading ? (
                         <p className="p-4 text-center text-gray-600">Loading cheques...</p>
                     ) : cheques.length === 0 ? (
@@ -519,18 +582,19 @@ const ChequeExpense = () => {
                             {(startDate || endDate) && <span>{` between ${startDate || "..."} and ${endDate || "..."}`}</span>}.
                         </p>
                     ) : (
-                        <table className="min-w-full border-collapse">
-                            <thead className="border-b bg-gray-100">
+                        <table className="min-w-full border-collapse text-sm">
+                            <thead className="border-b bg-gray-50">
                                 <tr>
-                                    <th className="p-3 text-left text-sm font-semibold text-gray-600">Entry Date</th>
-                                    <th className="p-3 text-left text-sm font-semibold text-gray-600">Cheque Number</th>
-                                    <th className="p-3 text-left text-sm font-semibold text-gray-600">To Whom</th>
-                                    <th className="p-3 text-left text-sm font-semibold text-gray-600">Amount</th>
-                                    <th className="p-3 text-left text-sm font-semibold text-gray-600">Issued Date</th>
-                                    <th className="p-3 text-left text-sm font-semibold text-gray-600">Reason</th>
-                                    <th className="p-3 text-left text-sm font-semibold text-gray-600">Shifted Reason</th>
-                                    <th className="p-3 text-left text-sm font-semibold text-gray-600">Status</th>
-                                    <th className="p-3 text-left text-sm font-semibold text-gray-600">Action</th>
+                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Entry Date</th>
+                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Cheque Number</th>
+                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">To Whom</th>
+                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Amount</th>
+                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Issued Date</th>
+                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Present Date</th>
+                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Reason</th>
+                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Shifted Reason</th>
+                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Status</th>
+                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -539,23 +603,28 @@ const ChequeExpense = () => {
                                         key={cheque._id}
                                         className="border-b hover:bg-gray-50"
                                     >
-                                        <td className="p-3 text-sm text-gray-800">{cheque.entryDate}</td>
-                                        <td className="p-3 text-sm text-gray-800">{cheque.chequeNumber}</td>
-                                        <td className="p-3 text-sm text-gray-800">{cheque.receiverName}</td>
-                                        <td className="p-3 text-sm text-gray-800">₹{cheque.chequeAmount}</td>
-                                        <td className="p-3 text-sm font-semibold text-gray-800">
+                                        <td className="p-3 whitespace-nowrap text-sm text-gray-800">{cheque.entryDate}</td>
+                                        <td className="p-3 whitespace-nowrap text-sm text-gray-800">{cheque.chequeNumber}</td>
+                                        <td className="p-3 whitespace-nowrap text-sm text-gray-800">{cheque.receiverName}</td>
+                                        <td className="p-3 whitespace-nowrap text-sm text-gray-800">₹{cheque.chequeAmount}</td>
+                                        <td className="p-3 whitespace-nowrap text-sm font-semibold text-gray-800">
                                             {new Date(cheque.chequeIssuedDate).toLocaleDateString()}
                                         </td>
+                                        <td className="p-3 whitespace-nowrap text-sm text-gray-800">
+                                            {cheque.chequePresentDate
+                                                ? new Date(cheque.chequePresentDate).toLocaleDateString()
+                                                : "-"}
+                                        </td>
                                         <td className="p-3 text-sm text-gray-800">{cheque.reasonToIssue}</td>
-                                        <td className="p-3 text-sm text-gray-800">{cheque.shiftRemark || "-"}</td>
-                                        <td className="p-3 text-sm">
+                                        <td className="p-3 whitespace-nowrap text-sm text-gray-800">{cheque.shiftRemark || "-"}</td>
+                                        <td className="p-3 whitespace-nowrap text-sm">
                                             <span
                                                 className={`rounded-full px-2 py-1 text-xs font-medium capitalize ${statusBadgeStyles[(cheque.status || "pending").toLowerCase()] || "bg-gray-100 text-gray-700"}`}
                                             >
                                                 {cheque.status || "pending"}
                                             </span>
                                         </td>
-                                        <td className="p-3 text-sm text-gray-800">
+                                        <td className="p-3 whitespace-nowrap text-sm text-gray-800">
                                             <div className="flex items-center gap-2 whitespace-nowrap">
                                                 <button
                                                     onClick={() => openEditModal(cheque)}
@@ -594,6 +663,8 @@ const ChequeExpense = () => {
                     )}
                 </div>
 
+                </div>
+
                 {/* ✅ Add Cheque Modal */}
                 {showModal && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -615,7 +686,7 @@ const ChequeExpense = () => {
                                 onSubmit={handleSubmit}
                                 className="space-y-4"
                             >
-                                <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-4">
                                     {/* Entry Date */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Entry Date</label>
@@ -637,6 +708,18 @@ const ChequeExpense = () => {
                                             value={formData.issuedDate}
                                             onChange={handleChange}
                                             required
+                                            className="mt-1 w-full rounded-lg border p-2 focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+
+                                    {/* Cheque Present Date */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Cheque Present Date</label>
+                                        <input
+                                            type="date"
+                                            name="chequePresentDate"
+                                            value={formData.chequePresentDate}
+                                            onChange={handleChange}
                                             className="mt-1 w-full rounded-lg border p-2 focus:ring-2 focus:ring-blue-500"
                                         />
                                     </div>
@@ -834,6 +917,21 @@ const ChequeExpense = () => {
                                             type="text"
                                             readOnly
                                             value={viewCheque.chequeIssuedDate ? new Date(viewCheque.chequeIssuedDate).toLocaleDateString() : "-"}
+                                            className="mt-1 w-full rounded-lg border bg-gray-50 p-2 text-gray-700"
+                                        />
+                                    </div>
+
+                                    {/* Cheque Present Date */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Cheque Present Date</label>
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={
+                                                viewCheque.chequePresentDate
+                                                    ? new Date(viewCheque.chequePresentDate).toLocaleDateString()
+                                                    : "-"
+                                            }
                                             className="mt-1 w-full rounded-lg border bg-gray-50 p-2 text-gray-700"
                                         />
                                     </div>

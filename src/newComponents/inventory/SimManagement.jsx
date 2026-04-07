@@ -151,13 +151,15 @@ const SimManagement = () => {
 
       if (adminRes.ok) {
         const data = await adminRes.json();
-        admins = (data.admins || []).filter(a => a.accountActive);
+        const adminArray = Array.isArray(data) ? data : data.admins || [];
+        admins = adminArray.filter(a => a.accountActive);
         admins = admins.map(a => ({ ...a, userType: "Admin" }));
       }
 
       if (empRes.ok) {
         const data = await empRes.json();
-        employees = (data.employees || []).filter(e => e.accountActive);
+        const employeeArray = Array.isArray(data) ? data : data.employees || [];
+        employees = employeeArray.filter(e => e.accountActive);
         employees = employees.map(e => ({ ...e, userType: "Employee" }));
       }
 

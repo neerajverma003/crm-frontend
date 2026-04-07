@@ -14,6 +14,9 @@ const EmployeeTasks = () => {
     const [statusModalData, setStatusModalData] = useState({ taskId: null, newStatus: null, reason: "" });
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [historyModalData, setHistoryModalData] = useState({ taskTitle: "", history: [] });
+    const [expandedTaskId, setExpandedTaskId] = useState(null);
+    const [taskNumberEdits, setTaskNumberEdits] = useState({});
+    const [savingTaskId, setSavingTaskId] = useState(null);
 
     const id = localStorage.getItem("userId");
     const role = localStorage.getItem("role");
@@ -50,7 +53,7 @@ const EmployeeTasks = () => {
         const fetchTasksForEmployee = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get("http://localhost:4000/tasks/tasks?limit=1000");
+                const res = await axios.get(`http://localhost:4000/tasks/tasks/assignee/${id}?limit=1000`);
                 const tasks = res.data?.data || [];
 
                 const today = new Date();
@@ -65,11 +68,6 @@ const EmployeeTasks = () => {
 
                 tasks.forEach((t) => {
                     if (!t.dueDate) return;
-
-                    // only include tasks assigned to the logged-in employee
-                    const assigned = t.assignedTo;
-                    const assignedId = assigned && (typeof assigned === "string" ? assigned : assigned._id || assigned);
-                    if (!assignedId || String(assignedId) !== String(id)) return;
 
                     const d = new Date(t.dueDate);
 
@@ -94,6 +92,91 @@ const EmployeeTasks = () => {
             fetchTasksForEmployee();
         }
     }, [id]);
+
+    const toggleExpandedTask = (taskId) => {
+        setExpandedTaskId((prev) => (prev === taskId ? null : taskId));
+    };
+
+    const getTaskNumberRows = (task) => {
+        const baseRows = task.numberData && task.numberData.length > 0
+            ? task.numberData
+            : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "" }));
+        return taskNumberEdits[task._id] || baseRows;
+    };
+
+    const getOriginalNumberRows = (task) => {
+        if (task.originalNumberData && task.originalNumberData.length > 0) {
+            return task.originalNumberData;
+        }
+        if (task.numberData && task.numberData.length > 0) {
+            return task.numberData;
+        }
+        return Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "" }));
+    };
+
+    const isCellOriginallyPrefilled = (task, rowIndex, col) => {
+        return Boolean(getOriginalNumberRows(task)[rowIndex]?.[col]);
+    };
+
+    const handleNumberCellChange = (taskId, rowIndex, column, value) => {
+        setTaskNumberEdits((prev) => {
+            const existing = prev[taskId] ? [...prev[taskId]] : [];
+            let taskRows = existing.length > 0 ? existing : [];
+
+            if (taskRows.length === 0) {
+                const foundTask = todayTasks.find((t) => t._id === taskId) || last7Tasks.find((t) => t._id === taskId);
+                taskRows = foundTask && foundTask.numberData && foundTask.numberData.length > 0
+                    ? foundTask.numberData.map((row) => ({ ...row }))
+                    : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "" }));
+            }
+
+            const row = taskRows[rowIndex] ? { ...taskRows[rowIndex] } : { row: rowIndex + 1, col1: "", col2: "", col3: "", col4: "" };
+            row[column] = value;
+
+            const nextRows = [...taskRows];
+            nextRows[rowIndex] = row;
+
+            return {
+                ...prev,
+                [taskId]: nextRows,
+            };
+        });
+    };
+
+    const saveTaskNumberData = async (task) => {
+        const editedRows = getTaskNumberRows(task);
+        const payloadRows = editedRows.map((row, index) => ({
+            row: row.row || index + 1,
+            col1: row.col1 || "",
+            col2: row.col2 || "",
+            col3: row.col3 || "",
+            col4: row.col4 || "",
+        }));
+
+        setSavingTaskId(task._id);
+        try {
+            const res = await axios.put(`http://localhost:4000/tasks/task/${task._id}`, {
+                numberData: payloadRows,
+            });
+
+            const updatedTask = res.data?.data;
+            if (updatedTask) {
+                setTodayTasks((prev) => prev.map((t) => (t._id === task._id ? updatedTask : t)));
+                setLast7Tasks((prev) => prev.map((t) => (t._id === task._id ? updatedTask : t)));
+                setTaskNumberEdits((prev) => {
+                    const next = { ...prev };
+                    delete next[task._id];
+                    return next;
+                });
+                toast.success("Task table data saved successfully");
+            }
+        } catch (err) {
+            console.error("Error saving task number data:", err);
+            toast.error("Failed to save task data");
+        } finally {
+            setSavingTaskId(null);
+        }
+    };
 
     // 🔄 Handle Status Change - Open Modal
     const handleStatusChange = (taskId, newStatus) => {
@@ -214,38 +297,136 @@ const EmployeeTasks = () => {
                                     </thead>
                                     <tbody>
                                         {todayTasks.map((t) => (
-                                            <tr key={t._id} className="border-b border-gray-200 hover:bg-gray-50 transition">
-                                                <td className="px-4 py-3 font-bold text-blue-600">{new Date(t.dueDate).toLocaleDateString()}</td>
-                                                <td className="px-4 py-3 font-bold text-gray-900">{t.taskTitle}</td>
-                                                <td className="px-4 py-3 text-gray-700 max-w-xs truncate">{t.description || "—"}</td>
-                                                <td className="px-4 py-3 text-center">
-                                                    <span className={`inline-block text-xs font-medium px-3 py-1 rounded-full ${getPriorityColor(t.priority)}`}>
-                                                        {t.priority || "Medium"}
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-3 text-center">
-                                                    <select
-                                                        value={t.taskStatus || "Pending"}
-                                                        onChange={(e) => handleStatusChange(t._id, e.target.value)}
-                                                        disabled={updatingStatusId === t._id}
-                                                        className="text-xs font-medium px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 cursor-pointer hover:border-gray-400 disabled:opacity-50"
-                                                    >
-                                                        {taskStatuses.map((status) => (
-                                                            <option key={status} value={status}>
-                                                                {status}
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                </td>
-                                                <td className="px-4 py-3 text-center">
-                                                    <button
-                                                        onClick={() => handleViewHistory(t)}
-                                                        className="px-3 py-1 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                                                    >
-                                                        View
-                                                    </button>
-                                                </td>
-                                            </tr>
+                                            <React.Fragment key={t._id}>
+                                                <tr className="border-b border-gray-200 hover:bg-gray-50 transition cursor-pointer" onClick={() => toggleExpandedTask(t._id)}>
+                                                    <td className="px-4 py-3 font-bold text-blue-600">{new Date(t.dueDate).toLocaleDateString()}</td>
+                                                    <td className="px-4 py-3 font-bold text-gray-900">{t.taskTitle}</td>
+                                                    <td className="px-4 py-3 text-gray-700 max-w-xs truncate">{t.description || "—"}</td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <span className={`inline-block text-xs font-medium px-3 py-1 rounded-full ${getPriorityColor(t.priority)}`}>
+                                                            {t.priority || "Medium"}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <select
+                                                            value={t.taskStatus || "Pending"}
+                                                            onChange={(e) => {
+                                                                e.stopPropagation();
+                                                                handleStatusChange(t._id, e.target.value);
+                                                            }}
+                                                            disabled={updatingStatusId === t._id}
+                                                            className="text-xs font-medium px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 cursor-pointer hover:border-gray-400 disabled:opacity-50"
+                                                        >
+                                                            {taskStatuses.map((status) => (
+                                                                <option key={status} value={status}>
+                                                                    {status}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <div className="flex items-center justify-center gap-2">
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    toggleExpandedTask(t._id);
+                                                                }}
+                                                                className="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition"
+                                                            >
+                                                                {expandedTaskId === t._id ? "Collapse" : "Details"}
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleViewHistory(t);
+                                                                }}
+                                                                className="px-3 py-1 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                                                            >
+                                                                History
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                {expandedTaskId === t._id && (
+                                                    <tr className="bg-slate-50">
+                                                        <td colSpan="6" className="px-4 py-4">
+                                                            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                                                                <div className="flex items-center justify-between mb-4">
+                                                                    <div>
+                                                                        <h3 className="text-lg font-semibold text-gray-900">Task Details</h3>
+                                                                        <p className="text-sm text-gray-500">
+                                                                            {t.contentType === "numbers" ? "Editable number table" : "Full description"}
+                                                                        </p>
+                                                                    </div>
+                                                                    <span className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-1 text-sm font-medium text-indigo-700">
+                                                                        {t.contentType === "numbers" ? "Numbers" : "Description"}
+                                                                    </span>
+                                                                </div>
+                                                                {t.contentType !== "numbers" ? (
+                                                                    <div className="text-sm text-gray-700 whitespace-pre-line">
+                                                                        {t.description || "No description provided."}
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="space-y-4">
+                                                                        <div className="overflow-x-auto">
+                                                                            <table className="w-full border-collapse">
+                                                                                <thead>
+                                                                                    <tr className="bg-indigo-50">
+                                                                                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Row</th>
+                                                                                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 1</th>
+                                                                                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 2</th>
+                                                                                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 3</th>
+                                                                                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 4</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    {getTaskNumberRows(t).map((row, rowIndex) => (
+                                                                                        <tr key={`${t._id}-row-${rowIndex}`} className="odd:bg-white even:bg-slate-50">
+                                                                                            <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700 font-semibold">{row.row || rowIndex + 1}</td>
+                                                                                            {['col1','col2','col3','col4'].map((col) => {
+                                                                                                const isPrefilled = isCellOriginallyPrefilled(t, rowIndex, col);
+                                                                                                return (
+                                                                                                    <td key={col} className="border border-gray-200 px-3 py-2 text-sm">
+                                                                                                        <input
+                                                                                                            type="text"
+                                                                                                            value={row[col] || ""}
+                                                                                                            onChange={(e) => {
+                                                                                                                if (!isPrefilled) {
+                                                                                                                    handleNumberCellChange(t._id, rowIndex, col, e.target.value);
+                                                                                                                }
+                                                                                                            }}
+                                                                                                            disabled={isPrefilled}
+                                                                                                            className={`w-full px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 ${isPrefilled ? 'border border-gray-200 bg-slate-100 text-gray-700' : 'border border-indigo-300 bg-white text-gray-900'}`}
+                                                                                                            placeholder={isPrefilled ? "Locked" : "Enter value"}
+                                                                                                        />
+                                                                                                    </td>
+                                                                                                );
+                                                                                            })}
+                                                                                        </tr>
+                                                                                    ))}
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                        <div className="flex flex-wrap items-center gap-3">
+                                                                            <button
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    saveTaskNumberData(t);
+                                                                                }}
+                                                                                disabled={savingTaskId === t._id}
+                                                                                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                            >
+                                                                                {savingTaskId === t._id ? "Saving..." : "Save Table Data"}
+                                                                            </button>
+                                                                            <p className="text-sm text-gray-500">Only empty cells are editable. Pre-filled values are locked.</p>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </React.Fragment>
                                         ))}
                                     </tbody>
                                 </table>
@@ -275,38 +456,136 @@ const EmployeeTasks = () => {
                                     </thead>
                                     <tbody>
                                         {last7Tasks.map((t) => (
-                                            <tr key={t._id} className="border-b border-gray-200 hover:bg-gray-50 transition">
-                                                <td className="px-4 py-3 font-bold text-blue-600">{new Date(t.dueDate).toLocaleDateString()}</td>
-                                                <td className="px-4 py-3 font-bold text-gray-900">{t.taskTitle}</td>
-                                                <td className="px-4 py-3 text-gray-700 max-w-xs truncate">{t.description || "—"}</td>
-                                                <td className="px-4 py-3 text-center">
-                                                    <span className={`inline-block text-xs font-medium px-3 py-1 rounded-full ${getPriorityColor(t.priority)}`}>
-                                                        {t.priority || "Medium"}
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-3 text-center">
-                                                    <select
-                                                        value={t.taskStatus || "Pending"}
-                                                        onChange={(e) => handleStatusChange(t._id, e.target.value)}
-                                                        disabled={updatingStatusId === t._id}
-                                                        className="text-xs font-medium px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 cursor-pointer hover:border-gray-400 disabled:opacity-50"
-                                                    >
-                                                        {taskStatuses.map((status) => (
-                                                            <option key={status} value={status}>
-                                                                {status}
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                </td>
-                                                <td className="px-4 py-3 text-center">
-                                                    <button
-                                                        onClick={() => handleViewHistory(t)}
-                                                        className="px-3 py-1 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                                                    >
-                                                        View
-                                                    </button>
-                                                </td>
-                                            </tr>
+                                            <React.Fragment key={t._id}>
+                                                <tr className="border-b border-gray-200 hover:bg-gray-50 transition cursor-pointer" onClick={() => toggleExpandedTask(t._id)}>
+                                                    <td className="px-4 py-3 font-bold text-blue-600">{new Date(t.dueDate).toLocaleDateString()}</td>
+                                                    <td className="px-4 py-3 font-bold text-gray-900">{t.taskTitle}</td>
+                                                    <td className="px-4 py-3 text-gray-700 max-w-xs truncate">{t.description || "—"}</td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <span className={`inline-block text-xs font-medium px-3 py-1 rounded-full ${getPriorityColor(t.priority)}`}>
+                                                            {t.priority || "Medium"}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <select
+                                                            value={t.taskStatus || "Pending"}
+                                                            onChange={(e) => {
+                                                                e.stopPropagation();
+                                                                handleStatusChange(t._id, e.target.value);
+                                                            }}
+                                                            disabled={updatingStatusId === t._id}
+                                                            className="text-xs font-medium px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 cursor-pointer hover:border-gray-400 disabled:opacity-50"
+                                                        >
+                                                            {taskStatuses.map((status) => (
+                                                                <option key={status} value={status}>
+                                                                    {status}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <div className="flex items-center justify-center gap-2">
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    toggleExpandedTask(t._id);
+                                                                }}
+                                                                className="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition"
+                                                            >
+                                                                {expandedTaskId === t._id ? "Collapse" : "Details"}
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleViewHistory(t);
+                                                                }}
+                                                                className="px-3 py-1 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                                                            >
+                                                                History
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                {expandedTaskId === t._id && (
+                                                    <tr className="bg-slate-50">
+                                                        <td colSpan="6" className="px-4 py-4">
+                                                            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                                                                <div className="flex items-center justify-between mb-4">
+                                                                    <div>
+                                                                        <h3 className="text-lg font-semibold text-gray-900">Task Details</h3>
+                                                                        <p className="text-sm text-gray-500">
+                                                                            {t.contentType === "numbers" ? "Editable number table" : "Full description"}
+                                                                        </p>
+                                                                    </div>
+                                                                    <span className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-1 text-sm font-medium text-indigo-700">
+                                                                        {t.contentType === "numbers" ? "Numbers" : "Description"}
+                                                                    </span>
+                                                                </div>
+                                                                {t.contentType !== "numbers" ? (
+                                                                    <div className="text-sm text-gray-700 whitespace-pre-line">
+                                                                        {t.description || "No description provided."}
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="space-y-4">
+                                                                        <div className="overflow-x-auto">
+                                                                            <table className="w-full border-collapse">
+                                                                                <thead>
+                                                                                    <tr className="bg-indigo-50">
+                                                                                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Row</th>
+                                                                                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 1</th>
+                                                                                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 2</th>
+                                                                                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 3</th>
+                                                                                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 4</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    {getTaskNumberRows(t).map((row, rowIndex) => (
+                                                                                        <tr key={`${t._id}-row-${rowIndex}`} className="odd:bg-white even:bg-slate-50">
+                                                                                            <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700 font-semibold">{row.row || rowIndex + 1}</td>
+                                                                                            {['col1','col2','col3','col4'].map((col) => {
+                                                                                                const isPrefilled = isCellOriginallyPrefilled(t, rowIndex, col);
+                                                                                                return (
+                                                                                                    <td key={col} className="border border-gray-200 px-3 py-2 text-sm">
+                                                                                                        <input
+                                                                                                            type="text"
+                                                                                                            value={row[col] || ""}
+                                                                                                            onChange={(e) => {
+                                                                                                                if (!isPrefilled) {
+                                                                                                                    handleNumberCellChange(t._id, rowIndex, col, e.target.value);
+                                                                                                                }
+                                                                                                            }}
+                                                                                                            disabled={isPrefilled}
+                                                                                                            className={`w-full px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 ${isPrefilled ? 'border border-gray-200 bg-slate-100 text-gray-700' : 'border border-indigo-300 bg-white text-gray-900'}`}
+                                                                                                            placeholder={isPrefilled ? "Locked" : "Enter value"}
+                                                                                                        />
+                                                                                                    </td>
+                                                                                                );
+                                                                                            })}
+                                                                                        </tr>
+                                                                                    ))}
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                        <div className="flex flex-wrap items-center gap-3">
+                                                                            <button
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    saveTaskNumberData(t);
+                                                                                }}
+                                                                                disabled={savingTaskId === t._id}
+                                                                                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                            >
+                                                                                {savingTaskId === t._id ? "Saving..." : "Save Table Data"}
+                                                                            </button>
+                                                                            <p className="text-sm text-gray-500">Only empty cells are editable. Pre-filled values are locked.</p>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </React.Fragment>
                                         ))}
                                     </tbody>
                                 </table>

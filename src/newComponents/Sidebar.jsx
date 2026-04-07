@@ -1954,6 +1954,22 @@ const Sidebar = () => {
             { id: "hrms-7-3", label: "Leave Report", url: "/leave-report" },
           ]
         },
+
+        // 8️⃣ Compliances
+        {
+          id: "hrms-8",
+          label: "Compliances",
+          type: "dropdown",
+          children: [
+            { id: "hrms-8-1", label: "Offer Letter", url: "/offer-letter" },
+            { id: "hrms-8-2", label: "Termination", url: "/termination" },
+            { id: "hrms-8-3", label: "Warning", url: "/warning" },
+            { id: "hrms-8-4", label: "Relieving", url: "/relieving" },
+            { id: "hrms-8-5", label: "Experience Letter", url: "/experience-letter" },
+            { id: "hrms-8-6", label: "Other", url: "/other-compliance" },
+            { id: "hrms-8-7", label: "Report List", url: "/compliance-report-list" },
+          ]
+        },
       ],
     },
     // 2️⃣ Lead Dashboard
@@ -2040,6 +2056,7 @@ const Sidebar = () => {
       children: [
         { id: "9-1", label: "Daily Expense", url: "/dailyexpenses" },
         { id: "9-2", label: "Cheque Expense", url: "/cheque" },
+        { id: "9-3", label: "Ledger", url: "/ledger" },
       ],
     },
     
