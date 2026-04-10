@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { FiPlus, FiEdit2, FiTrash2, FiX, FiSearch, FiFilter, FiChevronDown } from "react-icons/fi";
+import * as XLSX from "xlsx";
 
 const TaskAssign = () => {
+  const fileInputRef = useRef(null);
   const [tasks, setTasks] = useState([]);
   const [admins, setAdmins] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -38,6 +40,13 @@ const TaskAssign = () => {
     { row: 5, col1: "", col2: "", col3: "", col4: "" },
   ]);
   const [expandedTaskId, setExpandedTaskId] = useState(null);
+
+  // Upload progress states
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
+  const [isUploading, setIsUploading] = useState(false);
+  const uploadTimeoutRef = useRef(null);
+  const uploadCancelRef = useRef(false);
 
   const API_BASE_URL = "http://localhost:4000";
   const superAdminId = localStorage.getItem("userId");
@@ -154,6 +163,100 @@ const TaskAssign = () => {
   // Remove row from number table
   const removeNumberRow = (rowIndex) => {
     setNumberData((prev) => prev.filter((_, index) => index !== rowIndex));
+  };
+
+  // Handle Excel file upload with real-time progress
+  const handleExcelUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const binaryStr = event.target.result;
+        const workbook = XLSX.read(binaryStr, { type: "binary" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        
+        // Convert worksheet to JSON
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+        if (jsonData.length === 0) {
+          alert("The Excel file is empty");
+          fileInputRef.current.value = "";
+          return;
+        }
+
+        // Reset cancel flag
+        uploadCancelRef.current = false;
+
+        // Show upload modal and start processing
+        setIsUploading(true);
+        setShowUploadModal(true);
+        setUploadProgress({ current: 0, total: jsonData.length });
+
+        // Process data with artificial delay for real-time effect
+        let processedCount = 0;
+        const importedData = [];
+
+        const processRow = (index) => {
+          // Check if upload was cancelled
+          if (uploadCancelRef.current) return;
+
+          if (index < jsonData.length) {
+            const row = jsonData[index];
+            importedData.push({
+              row: index + 1,
+              col1: row[0] ? String(row[0]) : "",
+              col2: row[1] ? String(row[1]) : "",
+              col3: row[2] ? String(row[2]) : "",
+              col4: row[3] ? String(row[3]) : "",
+            });
+
+            processedCount++;
+            setUploadProgress({ current: processedCount, total: jsonData.length });
+
+            // Process next row with small delay for real-time effect
+            const timeoutId = setTimeout(() => processRow(index + 1), 50);
+            uploadTimeoutRef.current = timeoutId;
+          } else {
+            // Upload complete
+            setNumberData(importedData);
+            setIsUploading(false);
+            
+            // Keep modal open for 1 second to show completion
+            const completeTimeoutId = setTimeout(() => {
+              setShowUploadModal(false);
+              fileInputRef.current.value = "";
+            }, 1000);
+            uploadTimeoutRef.current = completeTimeoutId;
+          }
+        };
+
+        // Start processing
+        processRow(0);
+      } catch (error) {
+        console.error("Error parsing Excel file:", error);
+        alert("Error parsing Excel file. Please ensure it's a valid Excel file.");
+        setShowUploadModal(false);
+        setIsUploading(false);
+        fileInputRef.current.value = "";
+      }
+    };
+
+    reader.readAsBinaryString(file);
+  };
+
+  // Cancel upload
+  const handleCancelUpload = () => {
+    uploadCancelRef.current = true;
+    if (uploadTimeoutRef.current) {
+      clearTimeout(uploadTimeoutRef.current);
+    }
+    setIsUploading(false);
+    setShowUploadModal(false);
+    setUploadProgress({ current: 0, total: 0 });
+    fileInputRef.current.value = "";
   };
 
   // Submit form
@@ -584,6 +687,22 @@ const TaskAssign = () => {
                   >
                     + Add Row
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="mt-3 ml-3 px-4 py-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition font-semibold text-sm"
+                  >
+                    📤 Upload Bulk Entry
+                  </button>
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".xlsx, .xls, .csv"
+                    onChange={handleExcelUpload}
+                    className="hidden"
+                  />
                 </div>
               )}
 
@@ -877,6 +996,128 @@ const TaskAssign = () => {
                 >
                   Close
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 📤 Real-time Upload Progress Modal */}
+        {showUploadModal && (
+          <div className="fixed inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+              {/* Header */}
+              <div className="text-center mb-6">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                  {isUploading ? (
+                    <div className="animate-spin">
+                      <svg
+                        className="w-8 h-8 text-green-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3v-6"
+                        />
+                      </svg>
+                    </div>
+                  ) : (
+                    <svg
+                      className="w-8 h-8 text-green-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  )}
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">
+                  {isUploading ? "Uploading Data..." : "Upload Complete!"}
+                </h3>
+                <p className="text-gray-600 text-sm mt-1">
+                  {isUploading
+                    ? "Processing Excel file entries"
+                    : "All data imported successfully"}
+                </p>
+              </div>
+
+              {/* Progress Information */}
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-semibold text-gray-700">Progress</span>
+                  <span className="text-lg font-bold text-green-600">
+                    {uploadProgress.current} / {uploadProgress.total}
+                  </span>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-green-400 to-green-600 h-full transition-all duration-300 ease-out"
+                    style={{
+                      width:
+                        uploadProgress.total > 0
+                          ? `${(uploadProgress.current / uploadProgress.total) * 100}%`
+                          : "0%",
+                    }}
+                  ></div>
+                </div>
+
+                {/* Percentage */}
+                <div className="text-center mt-3">
+                  <span className="text-xs font-semibold text-gray-700">
+                    {uploadProgress.total > 0
+                      ? `${Math.round(
+                          (uploadProgress.current / uploadProgress.total) * 100
+                        )}%`
+                      : "0%"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Status Message */}
+              <div className="text-center mb-4">
+                <p className="text-sm text-gray-600">
+                  {isUploading ? (
+                    <>
+                      Processing row <span className="font-bold text-green-600">{uploadProgress.current}</span> of{" "}
+                      <span className="font-bold text-gray-900">{uploadProgress.total}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-green-600 font-bold">✓</span> Successfully imported{" "}
+                      <span className="font-bold text-green-600">{uploadProgress.total}</span> rows
+                    </>
+                  )}
+                </p>
+              </div>
+
+              {/* Auto-close message & Action Buttons */}
+              <div className="flex items-center justify-between gap-3 mt-6">
+                {!isUploading && (
+                  <div className="flex-1">
+                    <p className="text-xs text-gray-500 text-center">Window will close automatically...</p>
+                  </div>
+                )}
+                
+                {/* Cancel Button - Show only during upload */}
+                {isUploading && (
+                  <button
+                    onClick={handleCancelUpload}
+                    className="flex-1 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition font-semibold text-sm"
+                  >
+                    ✕ Cancel Upload
+                  </button>
+                )}
               </div>
             </div>
           </div>
