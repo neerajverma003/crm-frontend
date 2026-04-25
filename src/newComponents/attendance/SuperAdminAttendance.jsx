@@ -8078,6 +8078,8 @@ const SuperAdminAttendance = () => {
     const handleSaveDateAttendance = async (updatedData) => {
         if (!selectedDateForEdit) return;
 
+        console.log("📤 handleSaveDateAttendance called with:", updatedData);
+
         try {
             if (selectedDateForEdit.records && selectedDateForEdit.records.length > 0) {
                 // Update existing record
@@ -8097,7 +8099,10 @@ const SuperAdminAttendance = () => {
                     body: JSON.stringify(updatedData),
                 });
 
-                if (!res.ok) throw new Error("Failed to update");
+                if (!res.ok) {
+                    const errorData = await res.json().catch(() => ({}));
+                    throw new Error(errorData.message || `Failed to update (${res.status})`);
+                }
                 const result = await res.json();
 
                 // Refresh attendance data
@@ -8124,7 +8129,10 @@ const SuperAdminAttendance = () => {
                     }),
                 });
 
-                if (!res.ok) throw new Error("Failed to create attendance");
+                if (!res.ok) {
+                    const errorData = await res.json().catch(() => ({}));
+                    throw new Error(errorData.message || `Failed to create attendance (${res.status})`);
+                }
 
                 // Refresh attendance data
                 if (selectedUser?._id) {
@@ -8136,12 +8144,13 @@ const SuperAdminAttendance = () => {
             setSelectedDateForEdit(null);
         } catch (err) {
             console.error("Error saving attendance:", err);
-            alert("Error saving attendance: " + err.message);
+            const errorMessage = err.response?.data?.message || err.message || "Failed to save attendance";
+            alert("Error saving attendance: " + errorMessage);
         }
     };
 
     const EditModal = ({ attendance, onClose, onSave }) => {
-        const statusOptions = ["Present", "Absent", "Late", "Grace Present", "Half Day", "Sunday", "Holiday"];
+        const statusOptions = ["Present", "Grace Present", "Late", "Half Day", "Absent"];
 
         const formatLocalDateTime = (dateString) => {
             if (!dateString) return "";

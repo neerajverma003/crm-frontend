@@ -302,6 +302,11 @@ const InvoiceList = () => {
                   inclusions={selectedInvoice.inclusions}
                   termsConditions={selectedInvoice.termsConditions}
                   paymentPolicy={selectedInvoice.paymentPolicy}
+                  isB2B={selectedInvoice.origin === 'b2b'}
+                  referenceId={selectedInvoice.referenceId || ''}
+                  gstInvoiceType={selectedInvoice.gstInvoiceType}
+                  gstNumber={selectedInvoice.gstNumber}
+                  bankName={selectedInvoice.bankName}
                 />
               )}
             </div>

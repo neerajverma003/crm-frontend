@@ -392,7 +392,7 @@
 //     /* 📅 Date Attendance Edit Modal Component */
 //     /* -------------------------------------------------------------------------- */
 //     const DateAttendanceEditModal = ({ date, dayRecords, onClose, onSave }) => {
-//         const statusOptions = ["Present", "Absent", "Late", "Grace Present", "Half Day", "Sunday", "Holiday"];
+//         const statusOptions = ["Present", "Absent", "Late", "Grace Present", "Half Day"];
 
 //         const formatLocalDateTime = (dateString) => {
 //             if (!dateString) return "";
@@ -1881,7 +1881,7 @@
 //     /* 📅 Date Attendance Edit Modal Component */
 //     /* -------------------------------------------------------------------------- */
 //     const DateAttendanceEditModal = ({ date, dayRecords, onClose, onSave }) => {
-//         const statusOptions = ["Present", "Absent", "Late", "Grace Present", "Half Day", "Sunday", "Holiday"];
+//         const statusOptions = ["Present", "Absent", "Late", "Grace Present", "Half Day"];
 
 //         const formatLocalDateTime = (dateString) => {
 //             if (!dateString) return "";
@@ -3425,7 +3425,7 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
     /* 📅 Date Attendance Edit Modal Component */
     /* -------------------------------------------------------------------------- */
     const DateAttendanceEditModal = ({ date, dayRecords, onClose, onSave }) => {
-        const statusOptions = ["Present", "Absent", "Late", "Grace Present", "Half Day", "Sunday", "Holiday"];
+        const statusOptions = ["Present", "Absent", "Late", "Grace Present", "Half Day"];
 
         const formatLocalDateTime = (dateString) => {
             if (!dateString) return "";

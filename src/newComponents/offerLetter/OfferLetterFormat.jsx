@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import PreviewOfferLetter from "./PreviewOfferLetter";
 
 const OfferLetterFormat = () => {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ const OfferLetterFormat = () => {
   const [selectedCompany, setSelectedCompany] = useState(null);
 
   const [ReactQuill, setReactQuill] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -77,6 +79,8 @@ const OfferLetterFormat = () => {
   ];
 
   const [formatData, setFormatData] = useState({
+    title: "Offer Letter Format",
+    // Format-specific sections
     workHours: "",
     confidentiality: "",
     atWillEmployment: "",
@@ -89,6 +93,15 @@ const OfferLetterFormat = () => {
     postEmploymentBenefits: "",
     annexureA: "",
     nonDisclosureAgreement: "",
+    ndaWhereas: "",
+    ndaDefinitionOfConfidential: "",
+    ndaObligationOfConfidentiality: "",
+    ndaExclusions: "",
+    ndaTerm: "",
+    ndaReturnOfMaterials: "",
+    ndaBreachAndRemedies: "",
+    ndaGoverningLaw: "",
+    ndaAdditionalObligations: "",
   });
 
   const fetchFormats = async (companyId = null) => {
@@ -130,6 +143,15 @@ const OfferLetterFormat = () => {
             postEmploymentBenefits: "",
             annexureA: "",
             nonDisclosureAgreement: "",
+            ndaWhereas: "",
+            ndaDefinitionOfConfidential: "",
+            ndaObligationOfConfidentiality: "",
+            ndaExclusions: "",
+            ndaTerm: "",
+            ndaReturnOfMaterials: "",
+            ndaBreachAndRemedies: "",
+            ndaGoverningLaw: "",
+            ndaAdditionalObligations: "",
           }));
         }
       }
@@ -349,7 +371,7 @@ const OfferLetterFormat = () => {
             </div>
 
           <div className="rounded-xl border border-slate-200 p-4">
-            <h2 className="mb-4 text-xl font-bold">OFFER LETTER</h2>
+            <h2 className="mb-4 text-xl font-bold">OFFER LETTER SECTIONS</h2>
 
             <div className="space-y-4">
               {fields.map(([name, label]) => (
@@ -383,18 +405,71 @@ const OfferLetterFormat = () => {
           </div>
 
           <div className="rounded-xl border border-slate-200 p-4">
-            <h2 className="mb-2 text-xl font-bold">Non Disclosure Agreement</h2>
-            <ReactQuill
-              theme="snow"
-              value={formatData.nonDisclosureAgreement}
-              onChange={(value) => handleInput("nonDisclosureAgreement", value)}
-              modules={modules}
-              formats={formatsQuill}
-              placeholder="Non disclosure agreement details..."
-              style={{ minHeight: 170, backgroundColor: "#fff" }}
-            />
+            <h2 className="mb-4 text-xl font-bold">Non Disclosure Agreement (NDA)</h2>
+            
+            {/* Main NDA Description */}
+            <div className="mb-4">
+              <label className="mb-2 block text-sm font-semibold">Data Non-Disclosure Agreement (NDA)</label>
+              <ReactQuill
+                theme="snow"
+                value={formatData.nonDisclosureAgreement}
+                onChange={(value) => handleInput("nonDisclosureAgreement", value)}
+                modules={modules}
+                formats={formatsQuill}
+                placeholder="Non disclosure agreement details..."
+                style={{ minHeight: 120, backgroundColor: "#fff" }}
+              />
+            </div>
+
+            {/* WHEREAS Section */}
+            <div className="mb-4">
+              <label className="mb-2 block text-sm font-semibold">WHEREAS</label>
+              <ReactQuill
+                theme="snow"
+                value={formatData.ndaWhereas}
+                onChange={(value) => handleInput("ndaWhereas", value)}
+                modules={modules}
+                formats={formatsQuill}
+                placeholder="WHEREAS clause..."
+                style={{ minHeight: 100, backgroundColor: "#fff" }}
+              />
+            </div>
+
+            {/* NDA Sections */}
+            <div className="grid grid-cols-1 gap-4">
+              {[
+                { key: "ndaDefinitionOfConfidential", label: "1. Definition of Confidential Information" },
+                { key: "ndaObligationOfConfidentiality", label: "2. Obligation of Confidentiality" },
+                { key: "ndaExclusions", label: "3. Exclusions" },
+                { key: "ndaTerm", label: "4. Term" },
+                { key: "ndaReturnOfMaterials", label: "5. Return of Materials" },
+                { key: "ndaBreachAndRemedies", label: "6. Breach and Remedies" },
+                { key: "ndaGoverningLaw", label: "7. Governing Law and Jurisdiction" },
+                { key: "ndaAdditionalObligations", label: "8. Additional Obligations" },
+              ].map(({ key, label }) => (
+                <div key={key}>
+                  <label className="mb-2 block text-sm font-semibold">{label}</label>
+                  <ReactQuill
+                    theme="snow"
+                    value={formatData[key]}
+                    onChange={(value) => handleInput(key, value)}
+                    modules={modules}
+                    formats={formatsQuill}
+                    placeholder={`${label}...`}
+                    style={{ minHeight: 100, backgroundColor: "#fff" }}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
+          <button
+            type="button"
+            onClick={() => setShowPreview(true)}
+            className="rounded-lg bg-blue-600 px-5 py-2 text-white hover:bg-blue-700 mr-3"
+          >
+            Preview
+          </button>
           <button
             type="submit"
             disabled={loading}
@@ -425,6 +500,14 @@ const OfferLetterFormat = () => {
           </div>
         </div>
       </div>
+
+      {showPreview && (
+        <PreviewOfferLetter
+          formatData={formatData}
+          company={selectedCompany}
+          onClose={() => setShowPreview(false)}
+        />
+      )}
     </div>
   );
 };

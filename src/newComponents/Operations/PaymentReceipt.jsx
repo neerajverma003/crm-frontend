@@ -1,7 +1,7 @@
 import { Bold } from 'lucide-react'
 import React from 'react'
 
-const PaymentReceipt = ({ customer, invoiceNo, date, endDate, amount, advancePayment, paymentMode, costType, inclusions, termsConditions, paymentPolicy, isB2B, referenceId }) => {
+const PaymentReceipt = ({ customer, invoiceNo, date, endDate, amount, advancePayment, paymentMode, costType, inclusions, termsConditions, paymentPolicy, isB2B, referenceId, gstInvoiceType, gstNumber, bankName }) => {
   const formatDate = (dateStr) => {
     if (!dateStr) return 'N/A'
     const d = new Date(dateStr)
@@ -212,6 +212,9 @@ const PaymentReceipt = ({ customer, invoiceNo, date, endDate, amount, advancePay
           <div className="left-info">
             <div><strong>Bill To/ Invoice No</strong></div>
             <div><strong>Name :</strong> {isB2B ? (customer?.normalizedName || customer?.name || 'N/A') : (customer?.name || 'N/A')}</div>
+            {gstInvoiceType === 'with-gst' && gstNumber && (
+              <div><strong>GST Number :</strong> {gstNumber}</div>
+            )}
             <div><strong>Reference ID :</strong> {referenceId || 'N/A'}</div>
             <div><strong>Email :</strong> {isB2B ? (customer?.normalizedEmail || customer?.email || 'N/A') : (customer?.email || 'N/A')}</div>
             <div><strong>Address :</strong> {customer?.departureCity || 'N/A'}</div>
@@ -259,7 +262,12 @@ const PaymentReceipt = ({ customer, invoiceNo, date, endDate, amount, advancePay
                   </div>
                 )}
               </td>
-              <td className="main-cell">{paymentMode || '-'}</td>
+              <td className="main-cell">
+                <div style={{ fontSize: '12px', lineHeight: '1.6' }}>
+                  {paymentMode && <div>{paymentMode}</div>}
+                  {bankName && bankName.trim() && <div style={{ marginTop: '4px', color: '#555' }}>{bankName}</div>}
+                </div>
+              </td>
               <td className="main-cell">{totalQty}</td>
               <td className="main-cell">₹ {totalQty > 0 ? (amount / totalQty).toFixed(2) : '0'}</td>
               <td className="main-cell">₹ {amount || '0'}</td>

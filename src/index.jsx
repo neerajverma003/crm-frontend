@@ -656,6 +656,7 @@ import AddRole from "./newComponents/allCompanies/AddRole.jsx";
 import CreateDestination from "./newComponents/Operations/CreateDestination.jsx";
 import CreateHotel from "./newComponents/Operations/CreateHotel.jsx";
 import CreateState from "./newComponents/Operations/CreateState.jsx";
+import CreateBank from "./newComponents/Operations/CreateBank.jsx";
 import AssignedRoles from "./newComponents/UserManagement/AssignedRoles.jsx";
 import CompanyDashboard from "./newComponents/dashboard/CompanyDashboard.jsx";
 import AddReport from "./newComponents/AddReport.jsx";
@@ -1088,6 +1089,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={roles.all}>
             <CreateTransport />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/create-bank",
+        element: (
+          <ProtectedRoute allowedRoles={roles.all}>
+            <CreateBank />
           </ProtectedRoute>
         ),
       },

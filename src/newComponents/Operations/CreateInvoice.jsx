@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import PaymentReceipt from './PaymentReceipt.jsx'
 
 const CreateInvoice = () => {
-  const [form, setForm] = useState({ customerId: '', costType: '', paymentMode: '', invoiceNo: '', date: '', endDate: '', amount: '', advancePayment: '', inclusions: '', termsConditions: '', paymentPolicy: '' })
+  const [form, setForm] = useState({ customerId: '', costType: '', paymentMode: '', invoiceNo: '', date: '', endDate: '', amount: '', advancePayment: '', inclusions: '', termsConditions: '', paymentPolicy: '', gstInvoiceType: '', gstNumber: '', bankId: '', bankName: '' })
   const [customers, setCustomers] = useState([])
   const [selectedCustomer, setSelectedCustomer] = useState(null)
   const [referenceIds, setReferenceIds] = useState([])
@@ -11,6 +11,10 @@ const CreateInvoice = () => {
   const [activeTab, setActiveTab] = useState('create')
   const [formRefId, setFormRefId] = useState('');
   const [origin,setOrigin] = useState('');
+  const [banks, setBanks] = useState([])
+  const [bankSearch, setBankSearch] = useState('')
+  const [filteredBanks, setFilteredBanks] = useState([])
+  const [showBankDropdown, setShowBankDropdown] = useState(false);
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -38,10 +42,80 @@ const CreateInvoice = () => {
     }
 
     // reset form/selection when switching tabs
-    setForm({ customerId: '', costType: '', paymentMode: '', invoiceNo: '', date: '', endDate: '', amount: '', advancePayment: '', inclusions: '', termsConditions: '', paymentPolicy: '' })
+    setForm({ customerId: '', costType: '', paymentMode: '', invoiceNo: '', date: '', endDate: '', amount: '', advancePayment: '', inclusions: '', termsConditions: '', paymentPolicy: '', gstInvoiceType: '', gstNumber: '', bankId: '', bankName: '' })
     setSelectedCustomer(null)
     fetchCustomers()
   }, [activeTab])
+
+  useEffect(() => {
+    const fetchBanks = async () => {
+      try {
+        const res = await fetch('http://localhost:4000/bank/')
+        if (!res.ok) throw new Error('Failed to fetch banks')
+        const json = await res.json()
+        const bankList = Array.isArray(json) ? json : (json.data ? json.data : [])
+        setBanks(bankList)
+      } catch (err) {
+        console.error('Error fetching banks:', err)
+      }
+    }
+    fetchBanks()
+  }, [])
+
+  useEffect(() => {
+    if (bankSearch.trim() === '') {
+      setFilteredBanks(banks)
+    } else {
+      const filtered = banks.filter((bank) =>
+        bank.bankName.toLowerCase().includes(bankSearch.toLowerCase())
+      )
+      setFilteredBanks(filtered)
+    }
+  }, [bankSearch, banks])
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const bankElement = document.querySelector('[data-bank-dropdown]')
+      if (bankElement && !bankElement.contains(event.target)) {
+        setShowBankDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const generateInvoiceNumber = async () => {
+    try {
+      const currentYear = new Date().getFullYear()
+      const nextYear = currentYear + 1
+      const yearSuffix = `${String(currentYear).slice(-2)}-${String(nextYear).slice(-2)}`
+
+      // Fetch the last invoice number from the backend
+      const res = await fetch('http://localhost:4000/invoice/last-number')
+      let nextNumber = 1
+
+      if (res.ok) {
+        const json = await res.json()
+        if (json.lastNumber) {
+          // Extract the numeric part from the last invoice number
+          const match = json.lastNumber.match(/\/(\d+)$/)
+          if (match) {
+            nextNumber = parseInt(match[1], 10) + 1
+          }
+        }
+      }
+
+      // Format the number with leading zeros (6 digits)
+      const formattedNumber = String(nextNumber).padStart(6, '0')
+      const invoiceNumber = `AD/${yearSuffix}/${formattedNumber}`
+      
+      return invoiceNumber
+    } catch (err) {
+      console.error('Error generating invoice number:', err)
+      return null
+    }
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -51,7 +125,8 @@ const CreateInvoice = () => {
     if (name === 'customerId') {
       const customer = customers.find((c) => c.id === value)
       const raw = customer ? customer.fullData : null
-      setSelectedCustomer(raw ? normalizeLead(raw, activeTab === 'b2b') : null)
+      const normalizedCustomer = raw ? normalizeLead(raw, activeTab === 'b2b') : null
+      setSelectedCustomer(normalizedCustomer)
       setFormRefId('')
       setReferenceIds([])
       // If B2B, fetch reference IDs from the selected lead
@@ -59,13 +134,34 @@ const CreateInvoice = () => {
         const refIds = (raw.referenceId || raw.reference_id || raw.refIds || raw.ref_ids || '').toString().split(',').map(r => r.trim()).filter(r => r)
         setReferenceIds(refIds)
       }
-      updatedForm.costType = ''
-      updatedForm.amount = ''
+      updatedForm.costType = 'land'
+      updatedForm.gstInvoiceType = ''
+      updatedForm.gstNumber = ''
+
+      // Auto-populate amount and advance payment for land cost type
+      if (normalizedCustomer) {
+        const amount = (parseFloat(normalizedCustomer.totalAmount || 0) - parseFloat(normalizedCustomer.discount || 0)).toFixed(2)
+        const advancePayment = normalizedCustomer.advanceRequired || 0
+        updatedForm.amount = amount
+        updatedForm.advancePayment = advancePayment.toString()
+      } else {
+        updatedForm.amount = ''
+        updatedForm.advancePayment = ''
+      }
+
       updatedForm.endDate = ''
-      updatedForm.advancePayment = ''
       updatedForm.inclusions = ''
       updatedForm.termsConditions = ''
       updatedForm.paymentPolicy = ''
+
+      // Auto-generate invoice number when customer is selected
+      if (value) {
+        generateInvoiceNumber().then((invoiceNo) => {
+          if (invoiceNo) {
+            setForm((prevForm) => ({ ...prevForm, invoiceNo }))
+          }
+        })
+      }
     }
 
     // If cost type changed, auto-populate amount and advance payment from customer data
@@ -80,6 +176,13 @@ const CreateInvoice = () => {
         const advancePayment = selectedCustomer.advanceAirfare || 0
         updatedForm.amount = amount
         updatedForm.advancePayment = advancePayment.toString()
+      } else if (value === 'combo') {
+        const landAmount = parseFloat(selectedCustomer.totalAmount || 0) - parseFloat(selectedCustomer.discount || 0)
+        const airfareAmount = parseFloat(selectedCustomer.totalAirfare || 0) - parseFloat(selectedCustomer.discountAirfare || 0)
+        const totalAmount = (landAmount + airfareAmount).toFixed(2)
+        const advancePayment = (parseFloat(selectedCustomer.advanceRequired || 0) + parseFloat(selectedCustomer.advanceAirfare || 0)).toFixed(2)
+        updatedForm.amount = totalAmount
+        updatedForm.advancePayment = advancePayment
       }
     }
 
@@ -88,6 +191,12 @@ const CreateInvoice = () => {
 
   const handleRefIdChange = (e) => {
     setFormRefId(e.target.value)
+  }
+
+  const handleBankSelect = (bank) => {
+    setForm({ ...form, bankId: bank._id, bankName: bank.bankName })
+    setBankSearch(bank.bankName)
+    setShowBankDropdown(false)
   }
 
   const handleSubmit = async (e) => {
@@ -114,7 +223,11 @@ const CreateInvoice = () => {
         paymentMode: form.paymentMode,
         inclusions: form.inclusions,
         termsConditions: form.termsConditions,
-        paymentPolicy: form.paymentPolicy
+        paymentPolicy: form.paymentPolicy,
+        gstInvoiceType: form.gstInvoiceType,
+        gstNumber: form.gstInvoiceType === 'with-gst' ? form.gstNumber : '',
+        bankId: form.bankId,
+        bankName: form.bankName
       }
       const res = await fetch('http://localhost:4000/invoice/create', {
         method: 'POST',
@@ -125,7 +238,8 @@ const CreateInvoice = () => {
       if (!res.ok) throw new Error(json.message || 'Failed to create invoice')
       alert('Invoice created successfully!')
       // Reset form
-      setForm({ customerId: '', costType: '', paymentMode: '', invoiceNo: '', date: '', amount: '', inclusions: '', termsConditions: '', paymentPolicy: '' })
+      setForm({ customerId: '', costType: '', paymentMode: '', invoiceNo: '', date: '', amount: '', inclusions: '', termsConditions: '', paymentPolicy: '', gstInvoiceType: '', gstNumber: '', bankId: '', bankName: '' })
+      setBankSearch('')
       setSelectedCustomer(null)
     } catch (err) {
       alert('Error: ' + (err.message || 'Failed to create invoice'))
@@ -210,6 +324,34 @@ const CreateInvoice = () => {
                   )}
                 </div>
 
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">GST Invoice Type</label>
+                  <select
+                    name="gstInvoiceType"
+                    value={form.gstInvoiceType}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 bg-white text-gray-800"
+                  >
+                    <option value="">Select GST Invoice Type</option>
+                    <option value="with-gst">With GST Invoice</option>
+                    <option value="without-gst">Without GST Invoice</option>
+                  </select>
+                </div>
+
+                {form.gstInvoiceType === 'with-gst' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">GST Number</label>
+                    <input
+                      type="text"
+                      name="gstNumber"
+                      value={form.gstNumber}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 placeholder-gray-400"
+                      placeholder="e.g., 18AABCT1234H1Z0"
+                    />
+                  </div>
+                )}
+
                 {activeTab === 'b2b' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-2">Reference ID</label>
@@ -239,7 +381,38 @@ const CreateInvoice = () => {
                     <option value="">Select cost type</option>
                     <option value="land">Land Package Cost</option>
                     <option value="airfare">Airfare / Train Fare Cost</option>
+                    <option value="combo">Combo (Land Package + Airfare/Train Fare)</option>
                   </select>
+                </div>
+
+                <div className="relative" data-bank-dropdown>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">Bank</label>
+                  <input
+                    type="text"
+                    value={bankSearch}
+                    onChange={(e) => setBankSearch(e.target.value)}
+                    onFocus={() => setShowBankDropdown(true)}
+                    placeholder="Search and select bank..."
+                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 placeholder-gray-400"
+                  />
+                  {showBankDropdown && filteredBanks.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-48 overflow-y-auto">
+                      {filteredBanks.map((bank) => (
+                        <div
+                          key={bank._id}
+                          onClick={() => handleBankSelect(bank)}
+                          className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-800 border-b border-gray-100 last:border-b-0"
+                        >
+                          {bank.bankName}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {showBankDropdown && bankSearch.trim() !== '' && filteredBanks.length === 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 p-3">
+                      <p className="text-sm text-gray-500 text-center">No banks found</p>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -266,9 +439,9 @@ const CreateInvoice = () => {
                   <input
                     name="invoiceNo"
                     value={form.invoiceNo}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 placeholder-gray-400"
-                    placeholder="e.g., INV-001"
+                    readOnly
+                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 placeholder-gray-400 bg-gray-50 cursor-not-allowed text-gray-800"
+                    placeholder="Auto-generated"
                   />
                 </div>
 
@@ -409,6 +582,9 @@ const CreateInvoice = () => {
                     paymentPolicy={form.paymentPolicy}
                     isB2B={activeTab === 'b2b'}
                     referenceId={formRefId}
+                    gstInvoiceType={form.gstInvoiceType}
+                    gstNumber={form.gstNumber}
+                    bankName={form.bankName}
                   />
                 </div>
               ) : (

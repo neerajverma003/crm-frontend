@@ -38,6 +38,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^6.26.2",
     "react-to-pdf": "^2.0.1",
+    "react-to-print": "^3.3.0",
     "react-toastify": "^11.0.5",
     "recharts": "^2.15.4",
     "redux": "^5.0.1",

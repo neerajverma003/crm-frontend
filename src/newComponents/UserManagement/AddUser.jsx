@@ -485,7 +485,8 @@ const AddUser = () => {
             handleClose();
         } catch (error) {
             console.error("Error adding user:", error);
-            alert("Failed to add user.");
+            const errorMessage = error.response?.data?.message || "Failed to add user.";
+            alert(errorMessage);
         } finally {
             setIsSubmitting(false);
         }
