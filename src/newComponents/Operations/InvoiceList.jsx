@@ -78,7 +78,16 @@ const InvoiceList = () => {
 
   return (
     <div className="p-6">
-      <h2 className="text-xl font-semibold mb-6">Invoice List</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold">Invoice List</h2>
+        <button
+          onClick={fetchInvoices}
+          disabled={loading}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
+        >
+          {loading ? 'Refreshing...' : 'Refresh'}
+        </button>
+      </div>
       {loading ? (
         <div className="text-gray-500">Loading invoices...</div>
       ) : error ? (
@@ -234,6 +243,12 @@ const InvoiceList = () => {
                                 <p className="text-xs font-semibold text-gray-600 uppercase mb-1">Amount</p>
                                 <p className="text-xl font-bold text-gray-900">₹ {parseFloat(inv.amount).toFixed(2)}</p>
                               </div>
+                              {inv.advancePayment > 0 && (
+                                <div className="pt-3 border-t border-gray-100">
+                                  <p className="text-xs font-semibold text-gray-600 uppercase mb-1">Advance Payment</p>
+                                  <p className="text-lg font-bold text-indigo-600">₹ {parseFloat(inv.advancePayment).toFixed(2)}</p>
+                                </div>
+                              )}
                               <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-100">
                                 <div>
                                   <p className="text-xs font-semibold text-gray-600 uppercase mb-1">Type</p>

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import PaymentReceipt from './PaymentReceipt.jsx'
 
 const CreateInvoice = () => {
+  const navigate = useNavigate()
   const [form, setForm] = useState({ customerId: '', costType: '', paymentMode: '', invoiceNo: '', date: '', endDate: '', amount: '', advancePayment: '', inclusions: '', termsConditions: '', paymentPolicy: '', gstInvoiceType: '', gstNumber: '', bankId: '', bankName: '', gstPercentage: '', gstAmount: '' })
   const [customers, setCustomers] = useState([])
   const [selectedCustomer, setSelectedCustomer] = useState(null)
@@ -246,11 +248,17 @@ const CreateInvoice = () => {
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.message || 'Failed to create invoice')
+      
+      // Show success and navigate to invoice list
       alert('Invoice created successfully!')
-      // Reset form
       setForm({ customerId: '', costType: '', paymentMode: '', invoiceNo: '', date: '', amount: '', inclusions: '', termsConditions: '', paymentPolicy: '', gstInvoiceType: '', gstNumber: '', bankId: '', bankName: '', gstPercentage: '', gstAmount: '' })
       setBankSearch('')
       setSelectedCustomer(null)
+      
+      // Navigate to invoice list to see the newly created invoice
+      setTimeout(() => {
+        navigate('/invoicelist')
+      }, 500)
     } catch (err) {
       alert('Error: ' + (err.message || 'Failed to create invoice'))
       console.error(err)
