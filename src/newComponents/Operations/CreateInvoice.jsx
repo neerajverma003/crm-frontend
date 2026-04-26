@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import PaymentReceipt from './PaymentReceipt.jsx'
 
 const CreateInvoice = () => {
-  const [form, setForm] = useState({ customerId: '', costType: '', paymentMode: '', invoiceNo: '', date: '', endDate: '', amount: '', advancePayment: '', inclusions: '', termsConditions: '', paymentPolicy: '', gstInvoiceType: '', gstNumber: '', bankId: '', bankName: '' })
+  const [form, setForm] = useState({ customerId: '', costType: '', paymentMode: '', invoiceNo: '', date: '', endDate: '', amount: '', advancePayment: '', inclusions: '', termsConditions: '', paymentPolicy: '', gstInvoiceType: '', gstNumber: '', bankId: '', bankName: '', gstPercentage: '', gstAmount: '' })
   const [customers, setCustomers] = useState([])
   const [selectedCustomer, setSelectedCustomer] = useState(null)
   const [referenceIds, setReferenceIds] = useState([])
@@ -42,7 +42,7 @@ const CreateInvoice = () => {
     }
 
     // reset form/selection when switching tabs
-    setForm({ customerId: '', costType: '', paymentMode: '', invoiceNo: '', date: '', endDate: '', amount: '', advancePayment: '', inclusions: '', termsConditions: '', paymentPolicy: '', gstInvoiceType: '', gstNumber: '', bankId: '', bankName: '' })
+    setForm({ customerId: '', costType: '', paymentMode: '', invoiceNo: '', date: '', endDate: '', amount: '', advancePayment: '', inclusions: '', termsConditions: '', paymentPolicy: '', gstInvoiceType: '', gstNumber: '', bankId: '', bankName: '', gstPercentage: '', gstAmount: '' })
     setSelectedCustomer(null)
     fetchCustomers()
   }, [activeTab])
@@ -137,6 +137,8 @@ const CreateInvoice = () => {
       updatedForm.costType = 'land'
       updatedForm.gstInvoiceType = ''
       updatedForm.gstNumber = ''
+      updatedForm.gstPercentage = ''
+      updatedForm.gstAmount = ''
 
       // Auto-populate amount and advance payment for land cost type
       if (normalizedCustomer) {
@@ -186,6 +188,12 @@ const CreateInvoice = () => {
       }
     }
 
+    // Calculate GST amount if amount or gstPercentage changed
+    if ((name === 'amount' || name === 'gstPercentage') && updatedForm.gstPercentage && updatedForm.amount) {
+      const gstAmount = (parseFloat(updatedForm.amount) * parseFloat(updatedForm.gstPercentage)) / 100
+      updatedForm.gstAmount = gstAmount.toFixed(2)
+    }
+
     setForm(updatedForm)
   }
 
@@ -226,6 +234,8 @@ const CreateInvoice = () => {
         paymentPolicy: form.paymentPolicy,
         gstInvoiceType: form.gstInvoiceType,
         gstNumber: form.gstInvoiceType === 'with-gst' ? form.gstNumber : '',
+        gstPercentage: form.gstInvoiceType === 'with-gst' ? parseFloat(form.gstPercentage || 0) : 0,
+        gstAmount: form.gstInvoiceType === 'with-gst' ? parseFloat(form.gstAmount || 0) : 0,
         bankId: form.bankId,
         bankName: form.bankName
       }
@@ -238,7 +248,7 @@ const CreateInvoice = () => {
       if (!res.ok) throw new Error(json.message || 'Failed to create invoice')
       alert('Invoice created successfully!')
       // Reset form
-      setForm({ customerId: '', costType: '', paymentMode: '', invoiceNo: '', date: '', amount: '', inclusions: '', termsConditions: '', paymentPolicy: '', gstInvoiceType: '', gstNumber: '', bankId: '', bankName: '' })
+      setForm({ customerId: '', costType: '', paymentMode: '', invoiceNo: '', date: '', amount: '', inclusions: '', termsConditions: '', paymentPolicy: '', gstInvoiceType: '', gstNumber: '', bankId: '', bankName: '', gstPercentage: '', gstAmount: '' })
       setBankSearch('')
       setSelectedCustomer(null)
     } catch (err) {
@@ -348,6 +358,35 @@ const CreateInvoice = () => {
                       onChange={handleChange}
                       className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 placeholder-gray-400"
                       placeholder="e.g., 18AABCT1234H1Z0"
+                    />
+                  </div>
+                )}
+
+                {form.gstInvoiceType === 'with-gst' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">GST (%)</label>
+                    <input
+                      type="number"
+                      name="gstPercentage"
+                      value={form.gstPercentage}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 placeholder-gray-400"
+                      placeholder="e.g., 5"
+                      step="0.01"
+                      min="0"
+                    />
+                  </div>
+                )}
+
+                {form.gstInvoiceType === 'with-gst' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">GST Amount</label>
+                    <input
+                      type="number"
+                      value={form.gstAmount}
+                      readOnly
+                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 bg-gray-50 cursor-not-allowed text-gray-800"
+                      placeholder="0.00"
                     />
                   </div>
                 )}
@@ -585,6 +624,8 @@ const CreateInvoice = () => {
                     gstInvoiceType={form.gstInvoiceType}
                     gstNumber={form.gstNumber}
                     bankName={form.bankName}
+                    gstPercentage={form.gstPercentage}
+                    gstAmount={form.gstAmount}
                   />
                 </div>
               ) : (

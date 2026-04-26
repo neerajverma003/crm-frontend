@@ -307,6 +307,8 @@ const InvoiceList = () => {
                   gstInvoiceType={selectedInvoice.gstInvoiceType}
                   gstNumber={selectedInvoice.gstNumber}
                   bankName={selectedInvoice.bankName}
+                  gstPercentage={selectedInvoice.gstPercentage}
+                  gstAmount={selectedInvoice.gstAmount}
                 />
               )}
             </div>

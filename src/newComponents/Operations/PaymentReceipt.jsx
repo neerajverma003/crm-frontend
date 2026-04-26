@@ -1,7 +1,7 @@
 import { Bold } from 'lucide-react'
 import React from 'react'
 
-const PaymentReceipt = ({ customer, invoiceNo, date, endDate, amount, advancePayment, paymentMode, costType, inclusions, termsConditions, paymentPolicy, isB2B, referenceId, gstInvoiceType, gstNumber, bankName }) => {
+const PaymentReceipt = ({ customer, invoiceNo, date, endDate, amount, advancePayment, paymentMode, costType, inclusions, termsConditions, paymentPolicy, isB2B, referenceId, gstInvoiceType, gstNumber, bankName, gstPercentage, gstAmount }) => {
   const formatDate = (dateStr) => {
     if (!dateStr) return 'N/A'
     const d = new Date(dateStr)
@@ -263,13 +263,26 @@ const PaymentReceipt = ({ customer, invoiceNo, date, endDate, amount, advancePay
                 )}
               </td>
               <td className="main-cell">
-                <div style={{ fontSize: '12px', lineHeight: '1.6' }}>
-                  {paymentMode && <div>{paymentMode}</div>}
-                  {bankName && bankName.trim() && <div style={{ marginTop: '4px', color: '#555' }}>{bankName}</div>}
+                <div style={{ fontSize: '12px', lineHeight: '1.8' }}>
+                  <div>{paymentMode || ''}</div>
+                  <div>{bankName && bankName.trim() ? bankName : ''}</div>
+                  <div>{gstInvoiceType === 'with-gst' && gstPercentage ? `GST (${gstPercentage}%)` : ''}</div>
                 </div>
               </td>
-              <td className="main-cell">{totalQty}</td>
-              <td className="main-cell">₹ {totalQty > 0 ? (amount / totalQty).toFixed(2) : '0'}</td>
+              <td className="main-cell">
+                <div style={{ fontSize: '12px', lineHeight: '1.8' }}>
+                  <div>{totalQty}</div>
+                  <div></div>
+                  <div></div>
+                </div>
+              </td>
+              <td className="main-cell">
+                <div style={{ fontSize: '12px', lineHeight: '2.2' }}>
+                  <div style={{ minHeight: '24px' }}>{`₹ ${totalQty > 0 ? (amount / totalQty).toFixed(2) : '0'}`}</div>
+                  <div style={{ minHeight: '24px' }}></div>
+                  <div style={{ minHeight: '24px' }}>{gstInvoiceType === 'with-gst' && gstPercentage ? `₹ ${parseFloat(gstAmount || 0).toFixed(2)}` : ''}</div>
+                </div>
+              </td>
               <td className="main-cell">₹ {amount || '0'}</td>
             </tr>
 
