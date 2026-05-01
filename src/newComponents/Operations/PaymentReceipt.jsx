@@ -1,7 +1,7 @@
 import { Bold } from 'lucide-react'
 import React from 'react'
 
-const PaymentReceipt = ({ customer, invoiceNo, date, endDate, amount, advancePayment, paymentMode, costType, inclusions, termsConditions, paymentPolicy, isB2B, referenceId, gstInvoiceType, gstNumber, bankName, gstPercentage, gstAmount }) => {
+const PaymentReceipt = ({ customer, invoiceNo, date, endDate, amount, advancePayment, paymentMode, costType, inclusions, termsConditions, paymentPolicy, isB2B, referenceId, gstInvoiceType, gstNumber, bankName, gstPercentage, gstAmount, totalPreviousAdvancePayment = 0 }) => {
   const formatDate = (dateStr) => {
     if (!dateStr) return 'N/A'
     const d = new Date(dateStr)
@@ -303,13 +303,18 @@ const PaymentReceipt = ({ customer, invoiceNo, date, endDate, amount, advancePay
             </tr>
 
             <tr className="summary-row">
+              <td colSpan="5"><strong>Total Previous Advance Payment</strong></td>
+              <td>₹ {parseFloat(totalPreviousAdvancePayment || 0).toFixed(2)}</td>
+            </tr>
+
+            <tr className="summary-row">
               <td colSpan="5"><strong>Advance Payment</strong></td>
-              <td>₹ {advancePayment}</td>
+              <td>₹ {parseFloat(advancePayment || 0).toFixed(2)}</td>
             </tr>
 
             <tr className="summary-row">
               <td colSpan="5"><strong>Balance Due</strong></td>
-              <td>₹ {Math.max(0, (parseFloat(amount || 0) + parseFloat(gstInvoiceType === 'with-gst' ? gstAmount || 0 : 0) - parseFloat(advancePayment || 0)).toFixed(2))}</td>
+              <td>₹ {Math.max(0, (parseFloat(amount || 0) + parseFloat(gstInvoiceType === 'with-gst' ? gstAmount || 0 : 0) - parseFloat(totalPreviousAdvancePayment || 0) - parseFloat(advancePayment || 0)).toFixed(2))}</td>
             </tr>
           </tbody>
         </table>

@@ -17,6 +17,8 @@ const CreateInvoice = () => {
   const [bankSearch, setBankSearch] = useState('')
   const [filteredBanks, setFilteredBanks] = useState([])
   const [showBankDropdown, setShowBankDropdown] = useState(false);
+  const [customerAdvanceInvoices, setCustomerAdvanceInvoices] = useState([])
+  const [selectedAdvanceInvoiceIds, setSelectedAdvanceInvoiceIds] = useState([])
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -141,6 +143,8 @@ const CreateInvoice = () => {
       updatedForm.gstNumber = ''
       updatedForm.gstPercentage = ''
       updatedForm.gstAmount = ''
+      setCustomerAdvanceInvoices([])
+      setSelectedAdvanceInvoiceIds([])
 
       // Auto-populate amount and advance payment for land cost type
       if (normalizedCustomer) {
@@ -165,6 +169,11 @@ const CreateInvoice = () => {
             setForm((prevForm) => ({ ...prevForm, invoiceNo }))
           }
         })
+      }
+
+      // Fetch previous advance invoices for this customer
+      if (value) {
+        fetchCustomerAdvanceInvoices(value)
       }
     }
 
@@ -199,6 +208,41 @@ const CreateInvoice = () => {
     setForm(updatedForm)
   }
 
+  const fetchCustomerAdvanceInvoices = async (customerId) => {
+    try {
+      const res = await fetch(`http://localhost:4000/invoice/customer/${customerId}`)
+      if (!res.ok) throw new Error('Failed to fetch customer invoices')
+      const json = await res.json()
+      const invoices = Array.isArray(json.data) ? json.data : []
+      const advanceInvoices = invoices.filter((inv) => parseFloat(inv.advancePayment || 0) > 0)
+      setCustomerAdvanceInvoices(advanceInvoices)
+      setSelectedAdvanceInvoiceIds([])
+    } catch (err) {
+      console.error('Error fetching customer advance invoices:', err)
+      setCustomerAdvanceInvoices([])
+      setSelectedAdvanceInvoiceIds([])
+    }
+  }
+
+  const handleAdvanceInvoiceToggle = (invoiceId) => {
+    setSelectedAdvanceInvoiceIds((prevIds) => {
+      const nextIds = prevIds.includes(invoiceId)
+        ? prevIds.filter((id) => id !== invoiceId)
+        : [...prevIds, invoiceId]
+
+      const selectedTotal = customerAdvanceInvoices
+        .filter((inv) => nextIds.includes(inv._id))
+        .reduce((sum, inv) => sum + parseFloat(inv.advancePayment || 0), 0)
+
+      setForm((prevForm) => ({
+        ...prevForm,
+        advancePayment: selectedTotal.toFixed(2)
+      }))
+
+      return nextIds
+    })
+  }
+
   const handleRefIdChange = (e) => {
     setFormRefId(e.target.value)
   }
@@ -208,6 +252,10 @@ const CreateInvoice = () => {
     setBankSearch(bank.bankName)
     setShowBankDropdown(false)
   }
+
+  const selectedAdvanceTotal = customerAdvanceInvoices
+    .filter((inv) => selectedAdvanceInvoiceIds.includes(inv._id))
+    .reduce((sum, inv) => sum + parseFloat(inv.advancePayment || 0), 0)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -238,6 +286,7 @@ const CreateInvoice = () => {
         gstNumber: form.gstInvoiceType === 'with-gst' ? form.gstNumber : '',
         gstPercentage: form.gstInvoiceType === 'with-gst' ? parseFloat(form.gstPercentage || 0) : 0,
         gstAmount: form.gstInvoiceType === 'with-gst' ? parseFloat(form.gstAmount || 0) : 0,
+        totalPreviousAdvancePayment: parseFloat(selectedAdvanceTotal || 0),
         bankId: form.bankId,
         bankName: form.bankName
       }
@@ -526,6 +575,43 @@ const CreateInvoice = () => {
                   />
                 </div>
 
+                {selectedAdvanceInvoiceIds.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">Total Previous Advance Payment</label>
+                    <input
+                      type="number"
+                      value={selectedAdvanceTotal.toFixed(2)}
+                      readOnly
+                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 bg-gray-50 cursor-not-allowed text-gray-800"
+                      placeholder="0.00"
+                    />
+                  </div>
+                )}
+
+                {customerAdvanceInvoices.length > 0 && (
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-gray-600">Previous Advance Payments</p>
+                      <p className="text-xs text-gray-500">Selected: ₹ {selectedAdvanceTotal.toFixed(2)}</p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {customerAdvanceInvoices.map((inv) => {
+                        const selected = selectedAdvanceInvoiceIds.includes(inv._id)
+                        return (
+                          <button
+                            key={inv._id}
+                            type="button"
+                            onClick={() => handleAdvanceInvoiceToggle(inv._id)}
+                            className={`px-3 py-2 rounded-full border text-sm font-semibold transition ${selected ? 'bg-blue-600 border-blue-600 text-white' : 'bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200'}`}
+                          >
+                            ₹ {parseFloat(inv.advancePayment || 0).toFixed(2)} {inv.invoiceNo ? `- ${inv.invoiceNo}` : ''}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-2">Advance Payment</label>
                   <input
@@ -634,6 +720,7 @@ const CreateInvoice = () => {
                     bankName={form.bankName}
                     gstPercentage={form.gstPercentage}
                     gstAmount={form.gstAmount}
+                    totalPreviousAdvancePayment={selectedAdvanceTotal}
                   />
                 </div>
               ) : (
