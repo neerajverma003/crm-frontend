@@ -32,7 +32,7 @@ const EmployeeDataTable = ({ searchText = "", refreshTrigger = 0, onRefresh }) =
       });
 
       const response = await fetch(
-        `http://localhost:4000/employeedata/?${params.toString()}`
+        `${import.meta.env.VITE_API_URL}/employeedata/?${params.toString()}`
       );
       const result = await response.json();
 
@@ -50,7 +50,7 @@ const EmployeeDataTable = ({ searchText = "", refreshTrigger = 0, onRefresh }) =
   const handleEdit = async (employee) => {
     try {
       // Fetch complete employee data including all fields
-      const response = await fetch(`http://localhost:4000/employeedata/${employee._id}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/employeedata/${employee._id}`);
       const result = await response.json();
       
       if (result.success) {
@@ -68,7 +68,7 @@ const EmployeeDataTable = ({ searchText = "", refreshTrigger = 0, onRefresh }) =
   const handleView = async (employee) => {
     try {
       // Fetch complete employee data for full details view
-      const response = await fetch(`http://localhost:4000/employeedata/${employee._id}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/employeedata/${employee._id}`);
       const result = await response.json();
       
       if (result.success) {
@@ -88,7 +88,7 @@ const EmployeeDataTable = ({ searchText = "", refreshTrigger = 0, onRefresh }) =
       return;
 
     try {
-      const response = await fetch(`http://localhost:4000/employeedata/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/employeedata/${id}`, {
         method: "DELETE",
       });
       const result = await response.json();

@@ -15,7 +15,7 @@ const AddRole = () => {
   // ✅ Fetch all roles
   const fetchRoles = async () => {
     try {
-      const res = await fetch("http://localhost:4000/role/getrole");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/role/getrole`);
       const data = await res.json();
       console.log(data)
       const fetchedRoles = Array.isArray(data.data) ? data.data : [];
@@ -28,7 +28,7 @@ const AddRole = () => {
   // ✅ Fetch all employee roles
   const fetchEmployeeRoles = async () => {
     try {
-      const res = await fetch("http://localhost:4000/employeerole/getemployeerole");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/employeerole/getemployeerole`);
       const data = await res.json();
       const fetchedRoles = Array.isArray(data.data) ? data.data : [];
       setEmployeeRoles(fetchedRoles);
@@ -92,8 +92,8 @@ const AddRole = () => {
       
       // Determine endpoint based on active tab
       const endpoint = activeTab === "admin" 
-        ? "http://localhost:4000/role/role"
-        : "http://localhost:4000/employeerole/employeerole";
+        ? `${import.meta.env.VITE_API_URL}/role/role`
+        : `${import.meta.env.VITE_API_URL}/employeerole/employeerole`;
         
       const res = await fetch(endpoint, {
         method: "POST",
@@ -131,8 +131,8 @@ const AddRole = () => {
     if (window.confirm("Are you sure you want to delete this role?")) {
       try {
         const endpoint = activeTab === "admin"
-          ? `http://localhost:4000/role/deleterole/${roleId}`
-          : `http://localhost:4000/employeerole/deleteemployeerole/${roleId}`;
+          ? `${import.meta.env.VITE_API_URL}/role/deleterole/${roleId}`
+          : `${import.meta.env.VITE_API_URL}/employeerole/deleteemployeerole/${roleId}`;
           
         const res = await fetch(endpoint, {
           method: "DELETE",
@@ -178,8 +178,8 @@ const AddRole = () => {
         }));
 
       const endpoint = activeTab === "admin"
-        ? `http://localhost:4000/role/updaterole/${editingId}`
-        : `http://localhost:4000/employeerole/updateemployeerole/${editingId}`;
+        ? `${import.meta.env.VITE_API_URL}/role/updaterole/${editingId}`
+        : `${import.meta.env.VITE_API_URL}/employeerole/updateemployeerole/${editingId}`;
         
       const res = await fetch(endpoint, {
         method: "PUT",

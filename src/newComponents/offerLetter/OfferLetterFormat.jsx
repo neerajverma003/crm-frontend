@@ -107,7 +107,7 @@ const OfferLetterFormat = () => {
   const fetchFormats = async (companyId = null) => {
     try {
       setLoading(true);
-      let url = "http://localhost:4000/offer-letter-format";
+      let url = `${import.meta.env.VITE_API_URL}/offer-letter-format`;
       if (companyId) {
         url += `?companyId=${encodeURIComponent(companyId)}`;
       }
@@ -165,7 +165,7 @@ const OfferLetterFormat = () => {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const res = await fetch("http://localhost:4000/company/all");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/company/all`);
         if (!res.ok) throw new Error("Failed to fetch companies");
         const data = await res.json();
         const list = Array.isArray(data.companies) ? data.companies : data.companies || data;
@@ -241,13 +241,13 @@ const OfferLetterFormat = () => {
 
       let res;
       if (selectedFormatId) {
-        res = await fetch(`http://localhost:4000/offer-letter-format/${selectedFormatId}`, {
+        res = await fetch(`${import.meta.env.VITE_API_URL}/offer-letter-format/${selectedFormatId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
       } else {
-        res = await fetch("http://localhost:4000/offer-letter-format", {
+        res = await fetch(`${import.meta.env.VITE_API_URL}/offer-letter-format`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),

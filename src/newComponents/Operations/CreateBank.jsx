@@ -12,7 +12,7 @@ const CreateBank = () => {
   // ✅ Fetch banks from backend
   const fetchBanks = async () => {
     try {
-      const res = await fetch("http://localhost:4000/bank/");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/bank/`);
       if (!res.ok) throw new Error("Failed to fetch banks");
       const data = await res.json();
       setBanks(data);
@@ -36,7 +36,7 @@ const CreateBank = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:4000/bank/", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/bank/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ bankName: bankName.trim() }),
@@ -72,7 +72,7 @@ const CreateBank = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:4000/bank/${editingBankId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/bank/${editingBankId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ bankName: editBankName.trim() }),
@@ -101,7 +101,7 @@ const CreateBank = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:4000/bank/${bankId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/bank/${bankId}`, {
         method: "DELETE",
       });
 

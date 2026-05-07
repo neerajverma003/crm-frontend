@@ -25,7 +25,7 @@
 //         setLoading(true);
 //         setError("");
 
-//         const res = await axios.get("http://localhost:4000/company/all");
+//         const res = await axios.get(`${import.meta.env.VITE_API_URL}/company/all`);
 //         const data = res?.data?.companies || [];
 //         setCompanies(data);
 //         setFilteredCompanies(data); // initial list
@@ -207,7 +207,7 @@ const MainAllCompanies = () => {
         setLoading(true);
         setError("");
 
-        const res = await axios.get("http://localhost:4000/company/all");
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/company/all`);
         const data = res?.data?.companies || [];
         setCompanies(data);
         setFilteredCompanies(data); // initial list

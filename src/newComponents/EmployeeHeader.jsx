@@ -32,9 +32,9 @@ const EmployeeHeader = () => {
                 const r = role.toLowerCase();
                 let url = "";
 
-                if (r === "superadmin") url = `http://localhost:4000/AddSuperAdmin/super/${id}`;
-                else if (r === "admin") url = `http://localhost:4000/getAdmin/${id}`;
-                else if (r === "employee") url = `http://localhost:4000/employee/getEmployee/${id}`;
+                if (r === "superadmin") url = `${import.meta.env.VITE_API_URL}/AddSuperAdmin/super/${id}`;
+                else if (r === "admin") url = `${import.meta.env.VITE_API_URL}/getAdmin/${id}`;
+                else if (r === "employee") url = `${import.meta.env.VITE_API_URL}/employee/getEmployee/${id}`;
 
                 const res = await fetch(url);
                 const data = await res.json();

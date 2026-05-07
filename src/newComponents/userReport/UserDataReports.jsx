@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Eye, X, Users, CheckCircle, XCircle } from "lucide-react";
 
-const API_URL = "http://localhost:4000";
+const API_URL = `${import.meta.env.VITE_API_URL}`;
 
 // Helper component to display detail fields
 const DetailField = ({ label, value, isPassword = false }) => {

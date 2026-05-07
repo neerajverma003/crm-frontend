@@ -12,7 +12,7 @@
 //   useEffect(() => {
 //     const fetchEmployees = async () => {
 //       try {
-//         const { data } = await axios.get("http://localhost:4000/employee/allEmployee");
+//         const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/employee/allEmployee`);
 
 //         if (data.success && Array.isArray(data.employees)) {
 //           // Filter BDEs for leaders
@@ -146,7 +146,7 @@ const CreateTeam = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const { data } = await axios.get("http://localhost:4000/employee/allEmployee");
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/employee/allEmployee`);
 
         if (data.success && Array.isArray(data.employees)) {
           const bdeLeaders = data.employees.filter(
@@ -190,7 +190,7 @@ const CreateTeam = () => {
 
     try {
       setSubmitting(true);
-      const response = await axios.post("http://localhost:4000/teams/", {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/teams/`, {
         teamLeaderId: selectedLeader,
         memberIds: selectedEmployees,
       });

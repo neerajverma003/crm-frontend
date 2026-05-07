@@ -429,7 +429,7 @@ const EmployeeLeads = () => {
   const fetchAllEmployees = async () => {
     setEmployeesLoading(true);
     try {
-      const res = await fetch("http://localhost:4000/employee/allEmployee");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/employee/allEmployee`);
       if (res.ok) {
         const data = await res.json();
         // Use data.employees like AssignLead does
@@ -494,7 +494,7 @@ const EmployeeLeads = () => {
     if (userRole && userRole.toLowerCase() === "superadmin") {
       // Superadmin fetches from superadminmylead
       try {
-        const res = await fetch(`http://localhost:4000/superadminmylead/${userId}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/superadminmylead/${userId}`);
         if (!res.ok) throw new Error(`Server Error: ${res.status}`);
         const data = await res.json();
         console.log("📥 Superadmin leads from API:", data.data);
@@ -512,7 +512,7 @@ const EmployeeLeads = () => {
         return;
       }
       try {
-        const res = await fetch(`http://localhost:4000/employeelead/employee/${employeeId}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/employee/${employeeId}`);
         if (!res.ok) throw new Error(`Server Error: ${res.status}`);
         const data = await res.json();
         console.log("📥 All leads from API:", data.leads);
@@ -537,7 +537,7 @@ const EmployeeLeads = () => {
     if (!employeeId) return;
     setAssignedLoading(true);
     try {
-      const res = await fetch(`http://localhost:4000/assignlead/${employeeId}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/assignlead/${employeeId}`);
       const data = await res.json();
       if (res.ok) {
         setAssignedLeads(data.data || []);
@@ -581,10 +581,10 @@ const EmployeeLeads = () => {
     try {
       let endpoint = ""
       if (userRole && userRole.toLowerCase() === "superadmin") {
-        endpoint = `http://localhost:4000/superadminmylead/transfer/admin`;
+        endpoint = `${import.meta.env.VITE_API_URL}/superadminmylead/transfer/admin`;
       }
       else {
-        endpoint = `http://localhost:4000/employeelead/transfer/employee/${employeeId}`;
+        endpoint = `${import.meta.env.VITE_API_URL}/employeelead/transfer/employee/${employeeId}`;
       }
       const res = await fetch(endpoint);
       const data = await res.json().catch(() => ({}));
@@ -609,11 +609,11 @@ const EmployeeLeads = () => {
       let endpoint;
       if (userRole && userRole.toLowerCase() === 'superadmin') {
         // Superadmin sees ALL special leads
-        endpoint = `http://localhost:4000/superadminmylead/${userId}`;
+        endpoint = `${import.meta.env.VITE_API_URL}/superadminmylead/${userId}`;
       } else {
         // Employees see only leads assigned to them
         if (!employeeId) return;
-        endpoint = `http://localhost:4000/superadminmylead/assigned-to/${employeeId}`;
+        endpoint = `${import.meta.env.VITE_API_URL}/superadminmylead/assigned-to/${employeeId}`;
       }
 
       const res = await fetch(endpoint);
@@ -802,7 +802,7 @@ const EmployeeLeads = () => {
   const handleAddDetails = async (lead) => {
     // Determine if this is a special lead or regular lead
     const isSpecialLead = specialLeads.some(specialLead => specialLead._id === lead._id);
-    const endpoint = isSpecialLead || role === "superAdmin" ? `http://localhost:4000/superadminmylead/lead/${lead._id}` : `http://localhost:4000/employeelead/${lead._id}`;
+    const endpoint = isSpecialLead || role === "superAdmin" ? `${import.meta.env.VITE_API_URL}/superadminmylead/lead/${lead._id}` : `${import.meta.env.VITE_API_URL}/employeelead/${lead._id}`;
     console.log(isSpecialLead);
     console.log(endpoint);
 
@@ -876,8 +876,8 @@ const EmployeeLeads = () => {
     setStatusSavingId(leadId);
     try {
 
-      const endpoint = isSpecialLead || role === "superAdmin" ? `http://localhost:4000/superadminmylead/${leadId}` : `http://localhost:4000/employeelead/${leadId}`;
-      // const endpoint =`http://localhost:4000/employeelead/${leadId}`;
+      const endpoint = isSpecialLead || role === "superAdmin" ? `${import.meta.env.VITE_API_URL}/superadminmylead/${leadId}` : `${import.meta.env.VITE_API_URL}/employeelead/${leadId}`;
+      // const endpoint =`${import.meta.env.VITE_API_URL}/employeelead/${leadId}`;
       const res = await fetch(endpoint, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -909,8 +909,8 @@ const EmployeeLeads = () => {
     const isSpecialLead = specialLeads.some(lead => lead._id === leadId);
     console.log(isSpecialLead);
 
-    // const endpoint = isSpecialLead ? `http://localhost:4000/superadminmylead/${leadId}/message` : `http://localhost:4000/employeelead/${leadId}/message`;
-    const endpoint = `http://localhost:4000/employeelead/${leadId}/message`;
+    // const endpoint = isSpecialLead ? `${import.meta.env.VITE_API_URL}/superadminmylead/${leadId}/message` : `${import.meta.env.VITE_API_URL}/employeelead/${leadId}/message`;
+    const endpoint = `${import.meta.env.VITE_API_URL}/employeelead/${leadId}/message`;
     console.log(endpoint);
 
     try {
@@ -951,8 +951,8 @@ const EmployeeLeads = () => {
       if (pendingStatus && pendingStatus.leadId === leadId) {
         setStatusSavingId(leadId);
         try {
-          const statusEndpoint = isSpecialLead || role === "superAdmin" ? `http://localhost:4000/superadminmylead/${leadId}` : `http://localhost:4000/employeelead/${leadId}`;
-          // const statusEndpoint = `http://localhost:4000/superadminmylead/${leadId}` 
+          const statusEndpoint = isSpecialLead || role === "superAdmin" ? `${import.meta.env.VITE_API_URL}/superadminmylead/${leadId}` : `${import.meta.env.VITE_API_URL}/employeelead/${leadId}`;
+          // const statusEndpoint = `${import.meta.env.VITE_API_URL}/superadminmylead/${leadId}` 
           const r2 = await fetch(statusEndpoint, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -983,7 +983,7 @@ const EmployeeLeads = () => {
       // try to save pending status even if message endpoint missing
       if (pendingStatus && pendingStatus.leadId === leadId) {
         try {
-          const statusEndpoint = isSpecialLead ? `http://localhost:4000/superadminmylead/${leadId}` : `http://localhost:4000/employeelead/${leadId}`;
+          const statusEndpoint = isSpecialLead ? `${import.meta.env.VITE_API_URL}/superadminmylead/${leadId}` : `${import.meta.env.VITE_API_URL}/employeelead/${leadId}`;
           const r2 = await fetch(statusEndpoint, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -1011,8 +1011,8 @@ const EmployeeLeads = () => {
     setMessagesLoading(true);
     try {
       const endpoint = ``;
-      // const res = await fetch(`http://localhost:4000/employeelead/${leadId}/messages?page=${page}&limit=${messagesLimit}`);
-      const res = await fetch(`http://localhost:4000/superadminmylead/${leadId}/messages?page=${page}&limit=${messagesLimit}`);
+      // const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/${leadId}/messages?page=${page}&limit=${messagesLimit}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/superadminmylead/${leadId}/messages?page=${page}&limit=${messagesLimit}`);
       if (!res.ok) throw new Error('Failed to fetch messages');
       const json = await res.json();
       const fetched = json.data || [];
@@ -1041,7 +1041,7 @@ const EmployeeLeads = () => {
     console.log("handleEditDestAssigned called with lead:", lead);
     // Mark lead as actioned when employee takes action on routed lead
     try {
-      await fetch(`http://localhost:4000/employeelead/action/${lead._id}`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/employeelead/action/${lead._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
       });
@@ -1092,7 +1092,7 @@ const EmployeeLeads = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:4000/superadminmylead/assign/${assignEmployeeModal.lead._id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/superadminmylead/assign/${assignEmployeeModal.lead._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ employeeId: selectedEmployeeForAssign }),
@@ -1138,7 +1138,7 @@ const EmployeeLeads = () => {
       // Not routed, add to My Leads
       console.log("➡️ Lead not routed, adding to My Leads");
       const payload = { ...leadData, employee: employeeId, employeeId };
-      const res = await fetch("http://localhost:4000/employeelead", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -1155,7 +1155,7 @@ const EmployeeLeads = () => {
     // 2. Remove from assigned leads (happens whether routed or not)
     console.log("🗑️ Deleting from assigned leads:", assignedLeadId);
     try {
-      const deleteRes = await fetch(`http://localhost:4000/assignlead/${assignedLeadId}`, {
+      const deleteRes = await fetch(`${import.meta.env.VITE_API_URL}/assignlead/${assignedLeadId}`, {
         method: "DELETE",
       });
       if (!deleteRes.ok) {
@@ -1197,7 +1197,7 @@ const EmployeeLeads = () => {
     if (userRole && userRole.toLowerCase() === "superadmin") {
       // Superadmin saves to superadminmylead
       const payload = { ...data };
-      const res = await fetch(`http://localhost:4000/superadminmylead/${userId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/superadminmylead/${userId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -1221,7 +1221,7 @@ const EmployeeLeads = () => {
       } else {
         // Save to current employee
         const payload = { ...data, employee: employeeId, employeeId ,companyId};
-        const res = await fetch("http://localhost:4000/employeelead", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -1247,7 +1247,7 @@ const EmployeeLeads = () => {
 
     if (isSpecialLead) {
       // Special leads are always in superadminmylead collection
-      const res = await fetch(`http://localhost:4000/superadminmylead/${editLead._id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/superadminmylead/${editLead._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -1260,7 +1260,7 @@ const EmployeeLeads = () => {
       setSpecialLeads((prev) => prev.map((lead) => (lead._id === editLead._id ? { ...lead, ...data } : lead)));
     } else if (userRole && userRole.toLowerCase() === "superadmin") {
       // Superadmin updating regular leads
-      const res = await fetch(`http://localhost:4000/superadminmylead/${editLead._id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/superadminmylead/${editLead._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -1282,7 +1282,7 @@ const EmployeeLeads = () => {
       } else {
         // Update current employee's lead
         const payload = { ...data, employee: employeeId, employeeId };
-        const res = await fetch(`http://localhost:4000/employeelead/${editLead._id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/${editLead._id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -1333,7 +1333,7 @@ const EmployeeLeads = () => {
             isActioned: false,
           };
 
-          const res = await fetch(`http://localhost:4000/employeelead/${editDestAssignedLead._id}`, {
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/${editDestAssignedLead._id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
@@ -1363,7 +1363,7 @@ const EmployeeLeads = () => {
             isActioned: false,
           };
 
-          const res = await fetch(`http://localhost:4000/employeelead/${editDestAssignedLead._id}`, {
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/${editDestAssignedLead._id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
@@ -1402,7 +1402,7 @@ const EmployeeLeads = () => {
           isActioned: false,
         };
 
-        const res = await fetch(`http://localhost:4000/employeelead/${editDestAssignedLead._id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/${editDestAssignedLead._id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -1437,7 +1437,7 @@ const EmployeeLeads = () => {
 
     try {
       // Call backend transfer endpoint which moves the document into Operation collection
-      const res = await fetch(`http://localhost:4000/superadminmylead/transfer/${lead._id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/superadminmylead/transfer/${lead._id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
@@ -1467,9 +1467,9 @@ const EmployeeLeads = () => {
       // Call backend transfer endpoint which moves the document into Operation collection
       let endpoint = ""
       if (userRole && userRole.toLowerCase() === "superadmin") {
-        endpoint = `http://localhost:4000/superadminmylead/transfer/${lead._id}`
+        endpoint = `${import.meta.env.VITE_API_URL}/superadminmylead/transfer/${lead._id}`
       } else {
-        endpoint = `http://localhost:4000/employeelead/transfer/${lead._id}`
+        endpoint = `${import.meta.env.VITE_API_URL}/employeelead/transfer/${lead._id}`
       }
       const res = await fetch(endpoint, {
         method: "POST",
@@ -1502,7 +1502,7 @@ const EmployeeLeads = () => {
     if (lead.employee && typeof lead.employee === 'string') {
       console.log("Fetching employee details for ID:", lead.employee);
       try {
-        const res = await fetch(`http://localhost:4000/employee/${lead.employee}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/employee/${lead.employee}`);
         console.log("Employee fetch response:", res.status);
         if (res.ok) {
           const employeeData = await res.json();
@@ -1514,7 +1514,7 @@ const EmployeeLeads = () => {
         } else {
           console.log("Employee fetch failed, trying alternate endpoint");
           // Try alternate endpoint
-          const res2 = await fetch(`http://localhost:4000/employees/${lead.employee}`);
+          const res2 = await fetch(`${import.meta.env.VITE_API_URL}/employees/${lead.employee}`);
           if (res2.ok) {
             const employeeData = await res2.json();
             console.log("Employee data from alternate endpoint:", employeeData);
@@ -2837,8 +2837,8 @@ const EmployeeLeads = () => {
               e.preventDefault();
               try {
                 const endpoint = leadSource === "b2b-transfer"
-                  ? `http://localhost:4000/b2b-operation-leads/${selectedLead._id}`
-                  : `http://localhost:4000/employeelead/transfer/${selectedLead._id}`;
+                  ? `${import.meta.env.VITE_API_URL}/b2b-operation-leads/${selectedLead._id}`
+                  : `${import.meta.env.VITE_API_URL}/employeelead/transfer/${selectedLead._id}`;
 
                 const payload = {
                   ...(leadSource === "b2b-transfer" ? {
@@ -3198,7 +3198,7 @@ const EmployeeLeads = () => {
                             console.log(key, value);
                           }
 
-                          const res = await fetch("http://localhost:4000/upload", {
+                          const res = await fetch(`${import.meta.env.VITE_API_URL}/upload`, {
                             method: "POST",
                             body: formData,
                           });
@@ -3463,7 +3463,7 @@ const EmployeeLeads = () => {
                   const isSpecialLead = specialLeads.some(lead => lead._id === detailsModal.lead._id);
                   console.log(isSpecialLead);
 
-                  const endpoint = isSpecialLead || role === "superAdmin" ? `http://localhost:4000/superadminmylead/${detailsModal.lead._id}/details` : `http://localhost:4000/employeelead/${detailsModal.lead._id}/details`;
+                  const endpoint = isSpecialLead || role === "superAdmin" ? `${import.meta.env.VITE_API_URL}/superadminmylead/${detailsModal.lead._id}/details` : `${import.meta.env.VITE_API_URL}/employeelead/${detailsModal.lead._id}/details`;
                   console.log(endpoint);
                   console.log(detailsForm);
 

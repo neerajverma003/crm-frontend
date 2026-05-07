@@ -14,7 +14,7 @@ const CompanySearchBox = ({ value = "", onChange, name = "companyName", placehol
     const fetchCompanies = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch("http://localhost:4000/b2bcompany");
+        const res = await fetch("http://:4000/b2bcompany");
         const data = await res.json();
         if (Array.isArray(data)) {
           const list = data.map((c) => ({
@@ -132,9 +132,8 @@ const CompanySearchBox = ({ value = "", onChange, name = "companyName", placehol
           onFocus={() => setIsOpen(true)}
           placeholder={placeholder}
           autoComplete="off"
-          className={`w-full px-3 py-1.5 border rounded-lg text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
-            error ? "border-red-300 bg-red-50" : "border-gray-300 hover:border-gray-400"
-          }`}
+          className={`w-full px-3 py-1.5 border rounded-lg text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${error ? "border-red-300 bg-red-50" : "border-gray-300 hover:border-gray-400"
+            }`}
         />
         {isLoading && <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">Loading...</span>}
 

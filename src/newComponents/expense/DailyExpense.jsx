@@ -16,7 +16,7 @@ const DailyExpense = () => {
     // Fetch all expenses
     const fetchExpenses = async () => {
         try {
-            const response = await fetch("http://localhost:4000/expense/all");
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/expense/all`);
             const data = await response.json();
             if (response.ok) {
                 setExpenses(data);
@@ -54,7 +54,7 @@ const DailyExpense = () => {
                 data.append("bill", formData.bill);
             }
 
-            const response = await fetch("http://localhost:4000/expense", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/expense`, {
                 method: "POST",
                 body: data,
             });

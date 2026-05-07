@@ -10,8 +10,8 @@
 //     const fetchData = async () => {
 //         try {
 //             const [employeeRes, adminRes] = await Promise.all([
-//                 fetch("http://localhost:4000/employee/allEmployee"),
-//                 fetch("http://localhost:4000/getAdmins"),
+//                 fetch(`${import.meta.env.VITE_API_URL}/employee/allEmployee`),
+//                 fetch(`${import.meta.env.VITE_API_URL}/getAdmins`),
 //             ]);
 
 //             const employeeData = await employeeRes.json();
@@ -147,8 +147,8 @@ const UserCard = () => {
     const fetchData = async () => {
         try {
             const [employeeRes, adminRes] = await Promise.all([
-                fetch("http://localhost:4000/employee/allEmployee"),
-                fetch("http://localhost:4000/getAdmins"),
+                fetch(`${import.meta.env.VITE_API_URL}/employee/allEmployee`),
+                fetch(`${import.meta.env.VITE_API_URL}/getAdmins`),
             ]);
 
             const employeeData = await employeeRes.json();

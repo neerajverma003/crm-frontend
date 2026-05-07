@@ -17,7 +17,7 @@
 //   // Fetch admins
 //   const getAllAdmins = async () => {
 //     try {
-//       const res = await fetch("http://localhost:4000/getAdmin");
+//       const res = await fetch(`${import.meta.env.VITE_API_URL}/getAdmin`);
 //       const data = await res.json();
 //       setAdmins(data || []);
 //     } catch (err) {
@@ -28,7 +28,7 @@
 //   // Fetch roles
 //   const getAllRoles = async () => {
 //     try {
-//       const res = await fetch("http://localhost:4000/role/getrole");
+//       const res = await fetch(`${import.meta.env.VITE_API_URL}/role/getrole`);
 //       const data = await res.json();
 //       setRoles(data.data || []);
 //     } catch (err) {
@@ -39,7 +39,7 @@
 //   // Fetch companies
 //   const getAllCompanies = async () => {
 //     try {
-//       const res = await fetch("http://localhost:4000/company/all");
+//       const res = await fetch(`${import.meta.env.VITE_API_URL}/company/all`);
 //       const data = await res.json();
 //       setCompanies(data.companies || []);
 //     } catch (err) {
@@ -100,7 +100,7 @@
 //       points: selectedPoints,        // array of points
 //     };
 
-//     const res = await fetch("http://localhost:4000/assign", {
+//     const res = await fetch(`${import.meta.env.VITE_API_URL}/assign`, {
 //       method: "POST",
 //       headers: { "Content-Type": "application/json" },
 //       body: JSON.stringify(payload),
@@ -262,7 +262,7 @@
 //   // 🔹 Fetch Admins
 //   const getAllAdmins = async () => {
 //     try {
-//       const res = await fetch("http://localhost:4000/getAdmins");
+//       const res = await fetch(`${import.meta.env.VITE_API_URL}/getAdmins`);
 //       const data = await res.json();
 //       setAdmins(data || []);
 //     } catch (err) {
@@ -273,7 +273,7 @@
 //   // 🔹 Fetch Roles
 //   const getAllRoles = async () => {
 //     try {
-//       const res = await fetch("http://localhost:4000/role/getrole");
+//       const res = await fetch(`${import.meta.env.VITE_API_URL}/role/getrole`);
 //       const data = await res.json();
 //       setRoles(data.data || []);
 //     } catch (err) {
@@ -284,7 +284,7 @@
 //   // 🔹 Fetch Companies
 //   const getAllCompanies = async () => {
 //     try {
-//       const res = await fetch("http://localhost:4000/company/all");
+//       const res = await fetch(`${import.meta.env.VITE_API_URL}/company/all`);
 //       const data = await res.json();
 //       setCompanies(data.companies || []);
 //     } catch (err) {
@@ -295,7 +295,7 @@
 //   // 🔹 Fetch Companies for specific Admin
 //   const getCompaniesByAdmin = async (adminId) => {
 //     try {
-//       const res = await fetch(`http://localhost:4000/getCompanyByAdminId/${adminId}`);
+//       const res = await fetch(`${import.meta.env.VITE_API_URL}/getCompanyByAdminId/${adminId}`);
 //       const data = await res.json();
       
 //       if (res.ok && data.success) {
@@ -377,7 +377,7 @@
 //       console.log("📤 Sending Payload to Backend:");
 //       console.log(JSON.stringify(payload, null, 2));
 
-//       const res = await fetch("http://localhost:4000/assignrole", {
+//       const res = await fetch(`${import.meta.env.VITE_API_URL}/assignrole`, {
 //         method: "POST",
 //         headers: { "Content-Type": "application/json" },
 //         body: JSON.stringify(payload),
@@ -549,7 +549,7 @@ const AssignRoleToAdmin = () => {
   // 🔹 Fetch Admins (only active)
   const getAllAdmins = async () => {
     try {
-      const res = await fetch("http://localhost:4000/getAdmins");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/getAdmins`);
       const data = await res.json();
       setAdmins(data || []);
     } catch (err) {
@@ -561,7 +561,7 @@ const AssignRoleToAdmin = () => {
   const getAssignedRolesByAdminAndCompany = async (adminId, companyId) => {
     try {
       console.log(`📡 Fetching assigned roles for admin: ${adminId}, company: ${companyId}`);
-      const res = await fetch(`http://localhost:4000/getAssignedRoles/${adminId}/${companyId}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/getAssignedRoles/${adminId}/${companyId}`);
       const data = await res.json();
       console.log("📥 Response from getAssignedRoles:", data);
 
@@ -627,7 +627,7 @@ const AssignRoleToAdmin = () => {
   // 🔹 Fetch Roles
   const getAllRoles = async () => {
     try {
-      const res = await fetch("http://localhost:4000/role/getrole");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/role/getrole`);
       const data = await res.json();
       setRoles(data.data || []);
     } catch (err) {
@@ -638,7 +638,7 @@ const AssignRoleToAdmin = () => {
   // 🔹 Fetch Companies
   const getAllCompanies = async () => {
     try {
-      const res = await fetch("http://localhost:4000/company/all");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/company/all`);
       const data = await res.json();
       setCompanies(data.companies || []);
     } catch (err) {
@@ -649,7 +649,7 @@ const AssignRoleToAdmin = () => {
   // 🔹 Fetch Companies for specific Admin
   const getCompaniesByAdmin = async (adminId) => {
     try {
-      const res = await fetch(`http://localhost:4000/getCompanyByAdminId/${adminId}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/getCompanyByAdminId/${adminId}`);
       const data = await res.json();
 
       if (res.ok && data.success) {
@@ -749,7 +749,7 @@ const AssignRoleToAdmin = () => {
 
       console.log("📤 Sending Payload:", JSON.stringify(payload, null, 2));
 
-      const res = await fetch("http://localhost:4000/assignrole", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/assignrole`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

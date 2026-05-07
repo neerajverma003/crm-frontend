@@ -48,7 +48,7 @@ const CreateHotel = () => {
 
   const fetchStates = async () => {
     try {
-      const res = await fetch("http://localhost:4000/state/");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/state/`);
       const data = await res.json();
       setStates(data);
     } catch (err) {
@@ -58,7 +58,7 @@ const CreateHotel = () => {
 
   const fetchDestinations = async () => {
     try {
-      const res = await fetch("http://localhost:4000/destination/");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/destination/`);
       const data = await res.json();
       setDestinations(data);
     } catch (err) {
@@ -68,7 +68,7 @@ const CreateHotel = () => {
 
   const fetchHotels = async () => {
     try {
-      const res = await fetch("http://localhost:4000/hotel/");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/hotel/`);
       const data = await res.json();
       setHotels(data);
     } catch (err) {
@@ -177,7 +177,7 @@ const CreateHotel = () => {
     });
 
     try {
-      let res = await fetch("http://localhost:4000/hotel/", {
+      let res = await fetch(`${import.meta.env.VITE_API_URL}/hotel/`, {
         method: "POST",
         body: formData,
       });
@@ -205,7 +205,7 @@ const CreateHotel = () => {
 
   const onView = async (hotelId) => {
     try {
-      const res = await fetch(`http://localhost:4000/hotel/${hotelId}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/hotel/${hotelId}`);
       if (!res.ok) throw new Error("Failed to fetch hotel details");
       const data = await res.json();
       console.log("Hotel view data:", data); // Debug log
@@ -221,7 +221,7 @@ const CreateHotel = () => {
     setViewData(null);
     
     try {
-      const res = await fetch(`http://localhost:4000/hotel/${hotelId}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/hotel/${hotelId}`);
       if (!res.ok) throw new Error("Failed to fetch hotel for edit");
 
       const data = await res.json();
@@ -251,7 +251,7 @@ const CreateHotel = () => {
     if (!window.confirm("Are you sure you want to delete this hotel?")) return;
 
     try {
-      const res = await fetch(`http://localhost:4000/hotel/delete/${hotelId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/hotel/delete/${hotelId}`, {
         method: "DELETE",
       });
 
@@ -298,7 +298,7 @@ const CreateHotel = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:4000/hotel/update/${editingHotelId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/hotel/update/${editingHotelId}`, {
         method: "PUT",
         body: formData,
       });

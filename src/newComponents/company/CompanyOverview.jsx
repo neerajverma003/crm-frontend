@@ -16,7 +16,7 @@ const CompanyOverview = () => {
         setLoading(true);
         setError('');
         
-        const res = await axios.get('http://localhost:4000/company/all');
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/company/all`);
         const allCompanies = res?.data?.companies || [];
         
         setCompanies(allCompanies);

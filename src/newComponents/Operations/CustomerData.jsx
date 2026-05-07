@@ -14,7 +14,7 @@ const CustomerData = () => {
   const fetchCustomers = async () => {
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:4000/customer/all');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/customer/all`);
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       setCustomers(Array.isArray(data) ? data : (data.data || []));
@@ -39,7 +39,7 @@ const CustomerData = () => {
   const handleDeleteCustomer = async (customerId) => {
     if (!window.confirm('Are you sure you want to delete this customer?')) return;
     try {
-      const res = await fetch(`http://localhost:4000/customer/${customerId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/customer/${customerId}`, {
         method: 'DELETE',
       });
       if (res.ok) {

@@ -179,7 +179,7 @@ export default function LeadReport() {
   useEffect(() => {
     const fetchLeads = async () => {
       try {
-        const response = await fetch('http://localhost:4000/leads/');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/leads/`);
         const result = await response.json();
         if (result.success) {
           setLeads(result.data || []);

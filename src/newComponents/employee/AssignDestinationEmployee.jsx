@@ -15,7 +15,7 @@ function AssignDestination() {
   // Fetch all employees
   const fetchEmployees = async () => {
     try {
-      const res = await fetch("http://localhost:4000/employee/allEmployee", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/employee/allEmployee`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -39,7 +39,7 @@ function AssignDestination() {
   // Fetch all departments
   const fetchDepartments = async () => {
     try {
-      const res = await fetch("http://localhost:4000/department/department");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/department/department`);
       const data = await res.json();
       console.log("DEPARTMENTS RESPONSE:", data);
 
@@ -59,7 +59,7 @@ function AssignDestination() {
   // Fetch all destinations
   const fetchDestinations = async () => {
     try {
-      const res = await fetch("http://localhost:4000/employeedestination");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/employeedestination`);
 
       const data = await res.json();
       console.log("DESTINATIONS RESPONSE:", data);
@@ -92,7 +92,7 @@ function AssignDestination() {
   // Fetch employees that have assigned destinations (populated)
   const fetchAssignedEmployees = async () => {
     try {
-      const res = await fetch("http://localhost:4000/employee/allEmployee");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/employee/allEmployee`);
       const data = await res.json();
       const all = Array.isArray(data.employees) ? data.employees : [];
 
@@ -103,7 +103,7 @@ function AssignDestination() {
       const detailed = await Promise.all(
         withDest.map(async (e) => {
           try {
-            const r = await fetch(`http://localhost:4000/employee/${e._id}`);
+            const r = await fetch(`${import.meta.env.VITE_API_URL}/employee/${e._id}`);
             const jd = await r.json();
             if (jd && jd.employee) return jd.employee;
             return e;
@@ -146,7 +146,7 @@ function AssignDestination() {
 
     try {
       // Call backend assignDestination API
-      const res = await fetch("http://localhost:4000/employeedestination/assign-destination", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/employeedestination/assign-destination`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -193,7 +193,7 @@ function AssignDestination() {
   const handleDelete = async (emp) => {
     if (!confirm(`Remove all assigned destinations for ${emp.fullName}?`)) return;
     try {
-      const res = await fetch(`http://localhost:4000/employeedestination/remove-destinations/${emp._id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/employeedestination/remove-destinations/${emp._id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });

@@ -8,7 +8,7 @@ function CreateDestinationEmployee() {
   // GET ALL destinations
   const fetchDestinations = async () => {
     try {
-      const res = await fetch("http://localhost:4000/employeedestination/");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/employeedestination/`);
       const data = await res.json();
 
       if (Array.isArray(data.destinations)) {
@@ -38,7 +38,7 @@ function CreateDestinationEmployee() {
     }
 
     try {
-      const res = await fetch("http://localhost:4000/employeedestination/", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/employeedestination/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -65,7 +65,7 @@ function CreateDestinationEmployee() {
 
     try {
       const res = await fetch(
-        `http://localhost:4000/employeedestination/${id}`,
+        `${import.meta.env.VITE_API_URL}/employeedestination/${id}`,
         {
           method: "DELETE",
         }

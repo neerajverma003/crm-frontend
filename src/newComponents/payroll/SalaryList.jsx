@@ -57,8 +57,8 @@ const SalaryList = () => {
             console.log("📡 Fetching admins and employees...");
             
             const [adminRes, employeeRes] = await Promise.all([
-                axios.get("http://localhost:4000/getAdmins"),
-                axios.get("http://localhost:4000/employee/allEmployee"),
+                axios.get(`${import.meta.env.VITE_API_URL}/getAdmins`),
+                axios.get(`${import.meta.env.VITE_API_URL}/employee/allEmployee`),
             ]);
 
             console.log("✅ Admin Response:", adminRes?.data);
@@ -108,7 +108,7 @@ const SalaryList = () => {
             // Only fetch working days for active users
             for (const user of activeUsers) {
                 try {
-                    const res = await axios.get(`http://localhost:4000/salary/history?employeeId=${user._id}`);
+                    const res = await axios.get(`${import.meta.env.VITE_API_URL}/salary/history?employeeId=${user._id}`);
                     const salaryData = res?.data?.data || res?.data || [];
                     
                     if (Array.isArray(salaryData) && salaryData.length > 0) {
@@ -165,7 +165,7 @@ const SalaryList = () => {
             // Fetch salary data for selected month/year
             for (const user of activeUsers) {
                 try {
-                    const res = await axios.get(`http://localhost:4000/salary/history?employeeId=${user._id}`);
+                    const res = await axios.get(`${import.meta.env.VITE_API_URL}/salary/history?employeeId=${user._id}`);
                     const salaryData = res?.data?.data || res?.data || [];
                     
                     if (Array.isArray(salaryData) && salaryData.length > 0) {
@@ -262,7 +262,7 @@ const SalaryList = () => {
         
         try {
             // Fetch all salary history for this user using the correct endpoint
-            const res = await axios.get(`http://localhost:4000/salary/history?employeeId=${user._id}`);
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/salary/history?employeeId=${user._id}`);
             console.log("📊 Full API Response:", res?.data);
             
             // The API returns { success: true, data: [...] }
@@ -381,7 +381,7 @@ const SalaryList = () => {
             
             // Call API to update on backend using the correct endpoint
             const res = await axios.patch(
-                `http://localhost:4000/salary/${salary._id}/status`,
+                `${import.meta.env.VITE_API_URL}/salary/${salary._id}/status`,
                 { status: newStatus },
                 {
                     headers: {

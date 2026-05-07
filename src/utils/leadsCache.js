@@ -57,8 +57,8 @@ class LeadsCache {
 
     // Create new fetch request
     const endpoint = type === "normal" 
-      ? "http://localhost:4000/leads" 
-      : "http://localhost:4000/employeelead/all";
+      ? `${import.meta.env.VITE_API_URL}/leads` 
+      : `${import.meta.env.VITE_API_URL}/employeelead/all`;
 
     const queryString = new URLSearchParams(params).toString();
     const url = `${endpoint}?${queryString}`;

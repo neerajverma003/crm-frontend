@@ -33,7 +33,7 @@ const MyLeadCard = () => {
         let res;
         if (userRole && userRole.toLowerCase() === 'superadmin') {
           // Fetch stats from superadmin mylead endpoint
-          res = await fetch(`http://localhost:4000/superadminmylead/stats/${userId}`);
+          res = await fetch(`${import.meta.env.VITE_API_URL}/superadminmylead/stats/${userId}`);
           const data = await res.json();
           console.log('Superadmin stats:', data);
 
@@ -44,7 +44,7 @@ const MyLeadCard = () => {
           }
         } else {
           // Fetch stats from employee lead endpoint
-          res = await fetch(`http://localhost:4000/employeelead/employee/${userId}`);
+          res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/employee/${userId}`);
           const data = await res.json();
           console.log(data);
           console.log(Array.isArray(data.data), data.data);

@@ -9,7 +9,7 @@
 //   useEffect(() => {
 //     const fetchTutorials = async () => {
 //       try {
-//         const res = await fetch("http://localhost:4000/tutorials/all");
+//         const res = await fetch(`${import.meta.env.VITE_API_URL}/tutorials/all`);
 //         const data = await res.json();
 //         setTutorials(data.tutorials || []);
 
@@ -109,7 +109,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Search, Image, Video, FileText, File, Download, ExternalLink, X } from "lucide-react";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || `${import.meta.env.VITE_API_URL}`;
 
 /**
  * TrainingMaterial

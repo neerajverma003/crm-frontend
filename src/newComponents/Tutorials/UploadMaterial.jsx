@@ -13,7 +13,7 @@
 //   useEffect(() => {
 //     const fetchCompanies = async () => {
 //       try {
-//         const res = await fetch("http://localhost:4000/company/all");
+//         const res = await fetch(`${import.meta.env.VITE_API_URL}/company/all`);
 //         const data = await res.json();
 //         const list = Array.isArray(data.companies)
 //           ? data.companies
@@ -36,7 +36,7 @@
 //     }
 
 //     try {
-//       const url = `http://localhost:4000/department/department?company=${companyId}`;
+//       const url = `${import.meta.env.VITE_API_URL}/department/department?company=${companyId}`;
 //       const response = await fetch(url);
 //       if (!response.ok) throw new Error("Failed to fetch departments");
 
@@ -75,7 +75,7 @@
 //       formData.append("fileType", fileType);
 //       formData.append("file", file);
 
-//       const res = await fetch("http://localhost:4000/tutorials", {
+//       const res = await fetch(`${import.meta.env.VITE_API_URL}/tutorials`, {
 //         method: "POST",
 //         body: formData,
 //       });
@@ -230,7 +230,7 @@ const UploadMaterial = () => {
   const fileInputRef = useRef(null);
 
   // Get API URL - static approach
-  const API_BASE_URL = "http://localhost:4000";
+  const API_BASE_URL = `${import.meta.env.VITE_API_URL}`;
 
   console.log("API_BASE_URL:", API_BASE_URL);
 

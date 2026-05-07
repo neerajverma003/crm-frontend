@@ -16,7 +16,7 @@ const EmployeeCompanyOverview = () => {
                 setLoading(true);
                 setError('');
 
-                const res = await axios.get(`http://localhost:4000/employee/getCompanyByEmployeeId/${id}`);
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/employee/getCompanyByEmployeeId/${id}`);
                 // console.log(res);
 
                 const companyId = res?.data?.assignedCompanies._id || [];
@@ -26,7 +26,7 @@ const EmployeeCompanyOverview = () => {
                 // : Object.values(allCompanies);
                 
                 // console.log(companyId);
-                const response = await axios.get(`http://localhost:4000/company/${companyId}`);
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/company/${companyId}`);
                 // const companyId = res?.data?.assignedCompanies._id || [];
                 const allCompanies = response?.data?.company || [];
                 // console.log(companiesArray);

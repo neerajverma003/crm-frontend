@@ -25,7 +25,7 @@ const CreateInvoice = () => {
       setLoading(true)
       setError('')
       try {
-        const url = activeTab === 'b2b' ? 'http://localhost:4000/b2b-operation-leads/' : 'http://localhost:4000/employeelead/transfer/all'
+        const url = activeTab === 'b2b' ? `${import.meta.env.VITE_API_URL}/b2b-operation-leads/` : `${import.meta.env.VITE_API_URL}/employeelead/transfer/all`
         const res = await fetch(url)
         if (!res.ok) throw new Error('Failed to fetch leads')
         const json = await res.json()
@@ -54,7 +54,7 @@ const CreateInvoice = () => {
   useEffect(() => {
     const fetchBanks = async () => {
       try {
-        const res = await fetch('http://localhost:4000/bank/')
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/bank/`)
         if (!res.ok) throw new Error('Failed to fetch banks')
         const json = await res.json()
         const bankList = Array.isArray(json) ? json : (json.data ? json.data : [])
@@ -96,7 +96,7 @@ const CreateInvoice = () => {
       const yearSuffix = `${String(currentYear).slice(-2)}-${String(nextYear).slice(-2)}`
 
       // Fetch the last invoice number from the backend
-      const res = await fetch('http://localhost:4000/invoice/last-number')
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/invoice/last-number`)
       let nextNumber = 1
 
       if (res.ok) {
@@ -210,7 +210,7 @@ const CreateInvoice = () => {
 
   const fetchCustomerAdvanceInvoices = async (customerId) => {
     try {
-      const res = await fetch(`http://localhost:4000/invoice/customer/${customerId}`)
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/invoice/customer/${customerId}`)
       if (!res.ok) throw new Error('Failed to fetch customer invoices')
       const json = await res.json()
       const invoices = Array.isArray(json.data) ? json.data : []
@@ -290,7 +290,7 @@ const CreateInvoice = () => {
         bankId: form.bankId,
         bankName: form.bankName
       }
-      const res = await fetch('http://localhost:4000/invoice/create', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/invoice/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

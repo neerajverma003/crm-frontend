@@ -10,7 +10,7 @@
 // //   useEffect(() => {
 // //     const fetchTeams = async () => {
 // //       try {
-// //         const res = await axios.get("http://localhost:4000/teams/");
+// //         const res = await axios.get(`${import.meta.env.VITE_API_URL}/teams/`);
 // //         setTeams(res.data || []);
 // //       } catch (err) {
 // //         console.error(err);
@@ -128,7 +128,7 @@
 //   useEffect(() => {
 //     const fetchTeams = async () => {
 //       try {
-//         const res = await axios.get("http://localhost:4000/teams/");
+//         const res = await axios.get(`${import.meta.env.VITE_API_URL}/teams/`);
 //         setTeams(res.data || []);
 //       } catch (err) {
 //         console.error(err);
@@ -368,7 +368,7 @@
 //   useEffect(() => {
 //     const fetchTeams = async () => {
 //       try {
-//         const res = await axios.get("http://localhost:4000/teams/");
+//         const res = await axios.get(`${import.meta.env.VITE_API_URL}/teams/`);
 //         setTeams(res.data || []);
 //       } catch (err) {
 //         console.error(err);
@@ -756,7 +756,7 @@
 //   useEffect(() => {
 //     const fetchTeams = async () => {
 //       try {
-//         const res = await axios.get("http://localhost:4000/teams/");
+//         const res = await axios.get(`${import.meta.env.VITE_API_URL}/teams/`);
 //         setTeams(res.data);
 //       } catch (error) {
 //         console.error("Error fetching teams:", error);
@@ -942,7 +942,7 @@ const AllTeam = () => {
   useEffect(() => {
     const fetchTeams = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/teams/");
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/teams/`);
         setTeams(res.data);
       } catch (error) {
         console.error("Error fetching teams:", error);
@@ -971,7 +971,7 @@ const AllTeam = () => {
   const handleDelete = async (teamId) => {
     if (window.confirm('Are you sure you want to delete this team?')) {
       try {
-        await axios.delete(`http://localhost:4000/teams/${teamId}`);
+        await axios.delete(`${import.meta.env.VITE_API_URL}/teams/${teamId}`);
         setTeams(teams.filter(team => team._id !== teamId));
         console.log('Team deleted:', teamId);
       } catch (error) {

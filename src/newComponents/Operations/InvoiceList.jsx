@@ -19,7 +19,7 @@ const InvoiceList = () => {
     setLoading(true)
     setError('')
     try {
-      const res = await fetch('http://localhost:4000/invoice/all')
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/invoice/all`)
       if (!res.ok) throw new Error('Failed to fetch invoices')
       const json = await res.json()
       setInvoices(json.data || [])
@@ -40,7 +40,7 @@ const InvoiceList = () => {
   const handleView = async (invoiceId) => {
     setModalLoading(true)
     try {
-      const res = await fetch(`http://localhost:4000/invoice/${invoiceId}`)
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/invoice/${invoiceId}`)
       if (!res.ok) throw new Error('Failed to fetch invoice')
       const json = await res.json()
       setSelectedInvoice(json.data || null)

@@ -16,7 +16,7 @@ const Ledger = () => {
     // fetch existing ledgers
     const fetchLedgers = async () => {
         try {
-            const res = await fetch("http://localhost:4000/ledger/all");
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/ledger/all`);
             if (res.ok) {
                 const data = await res.json();
                 setLedgers(data);
@@ -44,7 +44,7 @@ const Ledger = () => {
             return;
         }
         try {
-            const res = await fetch("http://localhost:4000/ledger", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/ledger`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
@@ -73,7 +73,7 @@ const Ledger = () => {
     const loadEntries = async () => {
         if (!viewLedger) return;
         try {
-            const res = await fetch(`http://localhost:4000/ledger/${viewLedger._id}/entries`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/ledger/${viewLedger._id}/entries`);
             if (res.ok) {
                 const data = await res.json();
                 setEntries(data);
@@ -143,7 +143,7 @@ const Ledger = () => {
     const removeEntry = async (entryId) => {
         if (!window.confirm("Delete this entry?")) return;
         try {
-            const res = await fetch(`http://localhost:4000/ledger/${viewLedger._id}/entry/${entryId}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/ledger/${viewLedger._id}/entry/${entryId}`, {
                 method: "DELETE",
             });
             if (res.ok) {
@@ -438,8 +438,8 @@ const Ledger = () => {
                                         const isEditing = !!editingEntry;
                                         const method = isEditing ? "PUT" : "POST";
                                         const url = isEditing 
-                                            ? `http://localhost:4000/ledger/${viewLedger._id}/entry/${editingEntry._id}`
-                                            : `http://localhost:4000/ledger/${viewLedger._id}/entry`;
+                                            ? `${import.meta.env.VITE_API_URL}/ledger/${viewLedger._id}/entry/${editingEntry._id}`
+                                            : `${import.meta.env.VITE_API_URL}/ledger/${viewLedger._id}/entry`;
 
                                         try {
                                             const res = await fetch(url, {

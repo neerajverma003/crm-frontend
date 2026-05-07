@@ -58,7 +58,7 @@ const ChequeExpense = () => {
     const fetchCheques = async () => {
         try {
             setLoading(true);
-            const res = await fetch("http://localhost:4000/cheque/get");
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/cheque/get`);
             if (!res.ok) throw new Error("Failed to fetch cheques");
             const data = await res.json();
             console.log(data);
@@ -273,7 +273,7 @@ const ChequeExpense = () => {
     const updateStatus = async (id, payload = {}) => {
         try {
             // Call API to update status and any additional data supplied
-            const res = await fetch(`http://localhost:4000/cheque/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/cheque/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -369,7 +369,7 @@ const ChequeExpense = () => {
         }
 
         try {
-            const url = editingChequeId ? `http://localhost:4000/cheque/${editingChequeId}` : "http://localhost:4000/cheque";
+            const url = editingChequeId ? `${import.meta.env.VITE_API_URL}/cheque/${editingChequeId}` : `${import.meta.env.VITE_API_URL}/cheque`;
             const method = editingChequeId ? "PUT" : "POST";
 
             const res = await fetch(url, {

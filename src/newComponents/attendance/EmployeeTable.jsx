@@ -45,7 +45,7 @@
 //             // If in employee view, only fetch current employee's data
 //             if (isEmployeeView && userId) {
 //                 try {
-//                     const employeeRes = await axios.get(`http://localhost:4000/employee/getEmployee/${userId}`);
+//                     const employeeRes = await axios.get(`${import.meta.env.VITE_API_URL}/employee/getEmployee/${userId}`);
 //                     const currentEmployee = employeeRes?.data?.employee || {};
 
 //                     const enrichedEmployee = {
@@ -71,8 +71,8 @@
 //             }
 
 //             const [adminRes, employeeRes] = await Promise.all([
-//                 axios.get("http://localhost:4000/getAdmins"),
-//                 axios.get("http://localhost:4000/employee/allEmployee"),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/getAdmins`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/employee/allEmployee`),
 //             ]);
 
 //             const adminData = adminRes?.data?.admins || adminRes?.data || [];
@@ -122,8 +122,8 @@
 //             const today = new Date().toISOString().split("T")[0];
 
 //             const [adminAttendanceRes, employeeAttendanceRes] = await Promise.all([
-//                 axios.get(`http://localhost:4000/adminAttendance/getAllAttendance?date=${today}`),
-//                 axios.get(`http://localhost:4000/attendance/getAllAttendance?date=${today}`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance?date=${today}`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/attendance/getAllAttendance?date=${today}`),
 //             ]);
 
 //             // Both endpoints return arrays directly
@@ -238,13 +238,13 @@
 //             if (user.userType === "Admin") {
 //                 // Fetch only this admin's attendance for the current month
 //                 const res = await axios.get(
-//                     `http://localhost:4000/adminAttendance/getAllAttendance?adminId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`
+//                     `${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance?adminId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`
 //                 );
 //                 attendanceData = Array.isArray(res?.data) ? res.data : [];
 //             } else {
 //                 // Fetch only this employee's attendance for the current month
 //                 const res = await axios.get(
-//                     `http://localhost:4000/attendance/getAllAttendance?employeeId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`
+//                     `${import.meta.env.VITE_API_URL}/attendance/getAllAttendance?employeeId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`
 //                 );
 //                 attendanceData = Array.isArray(res?.data) ? res.data : [];
 //             }
@@ -277,7 +277,7 @@
 //             if (selectedDateForEdit.records && selectedDateForEdit.records.length > 0) {
 //                 // Update existing record
 //                 const attendance = selectedDateForEdit.records[0];
-//                 const res = await fetch(`http://localhost:4000/attendance/${attendance._id}`, {
+//                 const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/${attendance._id}`, {
 //                     method: "PATCH",
 //                     headers: {
 //                         "Content-Type": "application/json",
@@ -295,7 +295,7 @@
 //                 }
 //             } else {
 //                 // Create new record
-//                 const res = await fetch(`http://localhost:4000/attendance`, {
+//                 const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance`, {
 //                     method: "POST",
 //                     headers: {
 //                         "Content-Type": "application/json",
@@ -1514,7 +1514,7 @@
 //             // If in employee view, only fetch current employee's data
 //             if (isEmployeeView && userId) {
 //                 try {
-//                     const employeeRes = await axios.get(`http://localhost:4000/employee/getEmployee/${userId}`);
+//                     const employeeRes = await axios.get(`${import.meta.env.VITE_API_URL}/employee/getEmployee/${userId}`);
 //                     const currentEmployee = employeeRes?.data?.employee || {};
 
 //                     const enrichedEmployee = {
@@ -1540,8 +1540,8 @@
 //             }
 
 //             const [adminRes, employeeRes] = await Promise.all([
-//                 axios.get("http://localhost:4000/getAdmins"),
-//                 axios.get("http://localhost:4000/employee/allEmployee"),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/getAdmins`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/employee/allEmployee`),
 //             ]);
 
 //             const adminData = adminRes?.data?.admins || adminRes?.data || [];
@@ -1591,8 +1591,8 @@
 //             const today = new Date().toISOString().split("T")[0];
 
 //             const [adminAttendanceRes, employeeAttendanceRes] = await Promise.all([
-//                 axios.get(`http://localhost:4000/adminAttendance/getAllAttendance?date=${today}`),
-//                 axios.get(`http://localhost:4000/attendance/getAllAttendance?date=${today}`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance?date=${today}`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/attendance/getAllAttendance?date=${today}`),
 //             ]);
 
 //             // Both endpoints return arrays directly
@@ -1726,13 +1726,13 @@
 //             if (user.userType === "Admin") {
 //                 // Fetch only this admin's attendance for the current month
 //                 const res = await axios.get(
-//                     `http://localhost:4000/adminAttendance/getAllAttendance?adminId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
+//                     `${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance?adminId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
 //                 );
 //                 attendanceData = Array.isArray(res?.data) ? res.data : [];
 //             } else {
 //                 // Fetch only this employee's attendance for the current month
 //                 const res = await axios.get(
-//                     `http://localhost:4000/attendance/getAllAttendance?employeeId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
+//                     `${import.meta.env.VITE_API_URL}/attendance/getAllAttendance?employeeId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
 //                 );
 //                 attendanceData = Array.isArray(res?.data) ? res.data : [];
 //             }
@@ -1766,7 +1766,7 @@
 //             if (selectedDateForEdit.records && selectedDateForEdit.records.length > 0) {
 //                 // Update existing record
 //                 const attendance = selectedDateForEdit.records[0];
-//                 const res = await fetch(`http://localhost:4000/attendance/${attendance._id}`, {
+//                 const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/${attendance._id}`, {
 //                     method: "PATCH",
 //                     headers: {
 //                         "Content-Type": "application/json",
@@ -1784,7 +1784,7 @@
 //                 }
 //             } else {
 //                 // Create new record
-//                 const res = await fetch(`http://localhost:4000/attendance`, {
+//                 const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance`, {
 //                     method: "POST",
 //                     headers: {
 //                         "Content-Type": "application/json",
@@ -3060,7 +3060,7 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
             // If in employee view, only fetch current employee's data
             if (isEmployeeView && userId) {
                 try {
-                    const employeeRes = await axios.get(`http://localhost:4000/employee/getEmployee/${userId}`);
+                    const employeeRes = await axios.get(`${import.meta.env.VITE_API_URL}/employee/getEmployee/${userId}`);
                     const currentEmployee = employeeRes?.data?.employee || {};
 
                     const enrichedEmployee = {
@@ -3086,8 +3086,8 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
             }
 
             const [adminRes, employeeRes] = await Promise.all([
-                axios.get("http://localhost:4000/getAdmins"),
-                axios.get("http://localhost:4000/employee/allEmployee"),
+                axios.get(`${import.meta.env.VITE_API_URL}/getAdmins`),
+                axios.get(`${import.meta.env.VITE_API_URL}/employee/allEmployee`),
             ]);
 
             const adminData = adminRes?.data?.admins || adminRes?.data || [];
@@ -3137,8 +3137,8 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
             const today = new Date().toISOString().split("T")[0];
 
             const [adminAttendanceRes, employeeAttendanceRes] = await Promise.all([
-                axios.get(`http://localhost:4000/adminAttendance/getAllAttendance?date=${today}`),
-                axios.get(`http://localhost:4000/attendance/getAllAttendance?date=${today}`),
+                axios.get(`${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance?date=${today}`),
+                axios.get(`${import.meta.env.VITE_API_URL}/attendance/getAllAttendance?date=${today}`),
             ]);
 
             // Both endpoints return arrays directly
@@ -3271,13 +3271,13 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
             if (user.userType === "Admin") {
                 // Fetch only this admin's attendance for the current month
                 const res = await axios.get(
-                    `http://localhost:4000/adminAttendance/getAllAttendance?adminId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
+                    `${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance?adminId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
                 );
                 attendanceData = Array.isArray(res?.data) ? res.data : [];
             } else {
                 // Fetch only this employee's attendance for the current month
                 const res = await axios.get(
-                    `http://localhost:4000/attendance/getAllAttendance?employeeId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
+                    `${import.meta.env.VITE_API_URL}/attendance/getAllAttendance?employeeId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
                 );
                 attendanceData = Array.isArray(res?.data) ? res.data : [];
             }
@@ -3310,7 +3310,7 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
             if (selectedDateForEdit.records && selectedDateForEdit.records.length > 0) {
                 // Update existing record
                 const attendance = selectedDateForEdit.records[0];
-                const res = await fetch(`http://localhost:4000/attendance/${attendance._id}`, {
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/${attendance._id}`, {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
@@ -3328,7 +3328,7 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                 }
             } else {
                 // Create new record
-                const res = await fetch(`http://localhost:4000/attendance`, {
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

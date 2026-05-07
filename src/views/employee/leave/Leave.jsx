@@ -20,17 +20,17 @@ const Leave = () => {
   // Format date to "9th, Mar, 2024" format
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
-    
+
     const date = new Date(dateString);
     const day = date.getDate();
     const month = date.toLocaleString('default', { month: 'short' });
     const year = date.getFullYear();
-    
+
     // Add ordinal suffix to day
-    const dayWithSuffix = day + (day % 10 === 1 && day !== 11 ? 'st' : 
-                          day % 10 === 2 && day !== 12 ? 'nd' : 
-                          day % 10 === 3 && day !== 13 ? 'rd' : 'th');
-    
+    const dayWithSuffix = day + (day % 10 === 1 && day !== 11 ? 'st' :
+      day % 10 === 2 && day !== 12 ? 'nd' :
+        day % 10 === 3 && day !== 13 ? 'rd' : 'th');
+
     return `${dayWithSuffix}, ${month}, ${year}`;
   };
 
@@ -55,7 +55,7 @@ const Leave = () => {
     const mappedLeaveType = leaveTypeMap[formData.leaveType];
 
     try {
-      const res = await fetch("http://localhost:5000/apply-leave", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/employee/apply`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -120,8 +120,8 @@ const Leave = () => {
     <div className="leave-container">
       <div className="leave-header">
         <h1>Leave Management</h1>
-        <button 
-          className={`toggle-btn ${showForm ? 'cancel' : 'apply'}`} 
+        <button
+          className={`toggle-btn ${showForm ? 'cancel' : 'apply'}`}
           onClick={() => setShowForm(!showForm)}
         >
           {showForm ? '✕ Cancel' : '➕ Apply for Leave'}
@@ -129,9 +129,9 @@ const Leave = () => {
       </div>
 
       {showForm && (
-        <LeaveForm 
-          onSubmit={handleLeaveSubmit} 
-          onCancel={() => setShowForm(false)} 
+        <LeaveForm
+          onSubmit={handleLeaveSubmit}
+          onCancel={() => setShowForm(false)}
           leaveBalance={leaveBalance}
         />
       )}
@@ -158,7 +158,7 @@ const Leave = () => {
             <span>Rejected: {history.filter(h => h.status === 'Rejected').length}</span>
           </div>
         </div>
-        
+
         {history.length === 0 ? (
           <div className="no-history">No leave history found</div>
         ) : (

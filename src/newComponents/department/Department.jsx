@@ -17,7 +17,7 @@ const Department = () => {
   // Fetch companies
   const getData = async () => {
     try {
-      const response = await fetch("http://localhost:4000/company/all");
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/company/all`);
       const data = await response.json();
       setCompanies(data.companies || []);
     } catch (error) {
@@ -28,7 +28,7 @@ const Department = () => {
   // Fetch departments
   const getTable = async () => {
     try {
-      const response = await fetch("http://localhost:4000/department/department");
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/department/department`);
       const result = await response.json();
 
       const departmentsArray = result.departments || result;
@@ -74,7 +74,7 @@ const Department = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:4000/department", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/department`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -99,7 +99,7 @@ const Department = () => {
     if (!window.confirm("Are you sure you want to delete this department?")) return;
 
     try {
-      const response = await fetch(`http://localhost:4000/department/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/department/${id}`, {
         method: "DELETE",
       });
 

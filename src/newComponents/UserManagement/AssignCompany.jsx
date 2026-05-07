@@ -15,7 +15,7 @@ const AssignCompany = () => {
   // Fetch all companies
   const getAllCompany = async () => {
     try {
-      const response = await fetch("http://localhost:4000/company/all");
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/company/all`);
       const result = await response.json();
       setCompanyList(result.companies || []);
     } catch (error) {
@@ -26,7 +26,7 @@ const AssignCompany = () => {
   // Fetch all admins
   const getAllAdmin = async () => {
     try {
-      const response = await fetch("http://localhost:4000/getAdmins");
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getAdmins`);
       const result = await response.json();
       setAdminList(result || []);
     } catch (error) {
@@ -42,7 +42,7 @@ const AssignCompany = () => {
   // Fetch pre-assigned companies for selected admin
   const getAdminAssignedCompanies = async (adminId) => {
     try {
-      const response = await fetch(`http://localhost:4000/getCompanyByAdminId/${adminId}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getCompanyByAdminId/${adminId}`);
       const result = await response.json();
       
       if (result.success && result.assignedCompanies) {
@@ -115,7 +115,7 @@ const AssignCompany = () => {
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:4000/assign", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/assign`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

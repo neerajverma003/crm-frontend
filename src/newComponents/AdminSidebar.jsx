@@ -54,7 +54,7 @@
 //   const fetchAdminRolesAndCompanies = async (userId) => {
 //     setLoadingCompanies(true);
 //     try {
-//       const response = await fetch(`http://localhost:4000/getassignedroles/${userId}`);
+//       const response = await fetch(`${import.meta.env.VITE_API_URL}/getassignedroles/${userId}`);
 //       const data = await response.json();
 //       console.log(data);
 //       if (data.admin) {
@@ -823,7 +823,7 @@ const AdminSidebar = () => {
     if (storedRole) {
       const lowerRole = storedRole.toLowerCase();
       setRole(lowerRole);
-      console.log("Role set to:", lowerRole);
+      // console.log("Role set to:", lowerRole);
     }
     if (userId && storedRole) {
       fetchDepartment(userId, storedRole.toLowerCase());
@@ -835,7 +835,7 @@ const AdminSidebar = () => {
     // 🔹 Listen for visibility changes to refetch when user returns to this tab
     const handleVisibilityChange = () => {
       if (!document.hidden && userId && storedRole?.toLowerCase() === "admin") {
-        console.log("Page became visible, refetching admin roles...");
+        // console.log("Page became visible, refetching admin roles...");
         fetchAdminRolesAndCompanies(userId);
       }
     };
@@ -869,7 +869,7 @@ const AdminSidebar = () => {
   const fetchAdminRolesAndCompanies = async (userId) => {
     setLoadingCompanies(true);
     try {
-      const response = await fetch(`http://localhost:4000/getassignedroles/${userId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/getassignedroles/${userId}`, {
         cache: "no-store"  // 🔹 Force fresh fetch, bypass browser cache
       });
       const data = await response.json();

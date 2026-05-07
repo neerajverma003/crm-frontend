@@ -43,7 +43,7 @@
 //     const fetchAllEmployees = useCallback(async () => {
 //         try {
 //             // Fetch all employee leads to extract unique employee names
-//             const response = await fetch("http://localhost:4000/employeelead/all");
+//             const response = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/all`);
 //             const result = await response.json();
 
 //             console.log("Employee leads response:", result);
@@ -93,8 +93,8 @@
 
 //                 // Fetch both normal and employee leads in parallel
 //                 const [normalRes, empRes] = await Promise.all([
-//                     fetch(`http://localhost:4000/leads?${normalParams.toString()}`),
-//                     fetch(`http://localhost:4000/employeelead/all?${empParams.toString()}`),
+//                     fetch(`${import.meta.env.VITE_API_URL}/leads?${normalParams.toString()}`),
+//                     fetch(`${import.meta.env.VITE_API_URL}/employeelead/all?${empParams.toString()}`),
 //                 ]);
 
 //                 const normalJson = await normalRes.json();
@@ -229,7 +229,7 @@
 //     const handleDelete = async (lead) => {
 //         if (!window.confirm(`Delete lead ${lead.name}?`)) return;
 //         try {
-//             await fetch(`http://localhost:4000/leads/${lead._id}`, { method: "DELETE" });
+//             await fetch(`${import.meta.env.VITE_API_URL}/leads/${lead._id}`, { method: "DELETE" });
 //             setLeads((prev) => prev.filter((l) => l._id !== lead._id));
 //         } catch (e) {
 //             console.log(e);
@@ -239,7 +239,7 @@
 //     const handleUpdateLead = async (updatedLead) => {
 //         try {
 //             const isEmployeeLead = updatedLead?.type === "employee" || currentLead?.type === "employee";
-//             const url = isEmployeeLead ? `http://localhost:4000/employeelead/${updatedLead._id}` : `http://localhost:4000/leads/${updatedLead._id}`;
+//             const url = isEmployeeLead ? `${import.meta.env.VITE_API_URL}/employeelead/${updatedLead._id}` : `${import.meta.env.VITE_API_URL}/leads/${updatedLead._id}`;
 //             const method = isEmployeeLead ? "PUT" : "PATCH";
 
 //             const response = await fetch(url, {
@@ -1036,7 +1036,7 @@ const LeadTable = ({ searchText = "", searchType = "name", selectedStatus = "All
   // Fetch all employees
   const fetchAllEmployees = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:4000/employeelead/all");
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/all`);
       const result = await response.json();
 
       if (result.success && result.leads && Array.isArray(result.leads)) {
@@ -1080,8 +1080,8 @@ const LeadTable = ({ searchText = "", searchType = "name", selectedStatus = "All
         console.log("Normal Params:", normalParams.toString());
 
         const [normalRes, empRes] = await Promise.all([
-          fetch(`http://localhost:4000/leads/recentleads?${normalParams.toString()}`),
-          fetch(`http://localhost:4000/employeelead/all?${empParams.toString()}`),
+          fetch(`${import.meta.env.VITE_API_URL}/leads/recentleads?${normalParams.toString()}`),
+          fetch(`${import.meta.env.VITE_API_URL}/employeelead/all?${empParams.toString()}`),
         ]);
 
         const normalJson = await normalRes.json();
@@ -1180,8 +1180,8 @@ const LeadTable = ({ searchText = "", searchType = "name", selectedStatus = "All
     try {
       const isEmployeeLead = lead?.type === "employee";
       const url = isEmployeeLead
-        ? `http://localhost:4000/employeelead/${lead._id}`
-        : `http://localhost:4000/leads/${lead._id}`;
+        ? `${import.meta.env.VITE_API_URL}/employeelead/${lead._id}`
+        : `${import.meta.env.VITE_API_URL}/leads/${lead._id}`;
 
       const response = await fetch(url, { method: "DELETE" });
       const result = await response.json();
@@ -1204,8 +1204,8 @@ const LeadTable = ({ searchText = "", searchType = "name", selectedStatus = "All
     try {
       const isEmployeeLead = updatedLead?.type === "employee" || currentLead?.type === "employee";
       const url = isEmployeeLead
-        ? `http://localhost:4000/employeelead/${updatedLead._id}`
-        : `http://localhost:4000/leads/${updatedLead._id}`;
+        ? `${import.meta.env.VITE_API_URL}/employeelead/${updatedLead._id}`
+        : `${import.meta.env.VITE_API_URL}/leads/${updatedLead._id}`;
       const method = isEmployeeLead ? "PUT" : "PATCH";
 
       const response = await fetch(url, {
@@ -1561,7 +1561,7 @@ const EditModal = ({ lead, onClose, onSave }) => {
   const [destinationList, setDestinationList] = useState([]);
   const fetchDestinations = async () => {
     try {
-      const response = await fetch("http://localhost:4000/employeedestination");
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/employeedestination`);
       const result = await response.json();
       console.log(result.destinations);
       let destinations = [];

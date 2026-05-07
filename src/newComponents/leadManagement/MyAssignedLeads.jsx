@@ -341,7 +341,7 @@
 //       }
 
 //       try {
-//         const res = await fetch(`http://localhost:4000/assignlead/${employeeId}`);
+//         const res = await fetch(`${import.meta.env.VITE_API_URL}/assignlead/${employeeId}`);
 //         const data = await res.json();
 //         if (res.ok) {
 //           const arr = data.data || [];
@@ -438,7 +438,7 @@
           
 //           console.log("📤 Sending employee lead payload:", employeeLeadPayload);
           
-//           const res = await fetch("http://localhost:4000/employeelead", {
+//           const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead`, {
 //             method: "POST",
 //             headers: { "Content-Type": "application/json" },
 //             body: JSON.stringify(employeeLeadPayload),
@@ -464,7 +464,7 @@
 //           console.log("✅ Same employee assigned to destination, updating normally");
           
 //           const payload = { ...data };
-//           const res = await fetch(`http://localhost:4000/assignlead/${editLead._id}`, {
+//           const res = await fetch(`${import.meta.env.VITE_API_URL}/assignlead/${editLead._id}`, {
 //             method: "PUT",
 //             headers: { "Content-Type": "application/json" },
 //             body: JSON.stringify(payload),
@@ -491,7 +491,7 @@
 //         // DESTINATION NOT CHANGED → Just update normally
 //         console.log("📝 No destination change, updating normally...");
 //         const payload = { ...data };
-//         const res = await fetch(`http://localhost:4000/assignlead/${editLead._id}`, {
+//         const res = await fetch(`${import.meta.env.VITE_API_URL}/assignlead/${editLead._id}`, {
 //           method: "PUT",
 //           headers: { "Content-Type": "application/json" },
 //           body: JSON.stringify(payload),
@@ -991,7 +991,7 @@ export default function MyAssignedLeads() {
       }
 
       try {
-        const res = await fetch(`http://localhost:4000/assignlead/${employeeId}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/assignlead/${employeeId}`);
         const data = await res.json();
         if (res.ok) {
           const arr = data.data || [];
@@ -1088,7 +1088,7 @@ export default function MyAssignedLeads() {
           
           console.log("📤 Sending employee lead payload:", employeeLeadPayload);
           
-          const res = await fetch("http://localhost:4000/employeelead", {
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(employeeLeadPayload),
@@ -1114,7 +1114,7 @@ export default function MyAssignedLeads() {
           console.log("✅ Same employee assigned to destination, updating normally");
           
           const payload = { ...data };
-          const res = await fetch(`http://localhost:4000/assignlead/${editLead._id}`, {
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/assignlead/${editLead._id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
@@ -1141,7 +1141,7 @@ export default function MyAssignedLeads() {
         // DESTINATION NOT CHANGED → Just update normally
         console.log("📝 No destination change, updating normally...");
         const payload = { ...data };
-        const res = await fetch(`http://localhost:4000/assignlead/${editLead._id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/assignlead/${editLead._id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),

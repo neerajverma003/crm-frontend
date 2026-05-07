@@ -42,7 +42,7 @@ const MainAttendance = () => {
 
         const fetchTodayAttendance = async () => {
             try {
-                const url = role === "admin" ? `http://localhost:4000/adminAttendance/${userId}` : `http://localhost:4000/attendance/${userId}`;
+                const url = role === "admin" ? `${import.meta.env.VITE_API_URL}/adminAttendance/${userId}` : `${import.meta.env.VITE_API_URL}/attendance/${userId}`;
 
                 const res = await fetch(url);
                 if (!res.ok) throw new Error("Failed to fetch attendance");
@@ -114,7 +114,7 @@ const MainAttendance = () => {
                 timestamp: new Date().toISOString(),
             });
 
-            const res = await fetch(`http://localhost:4000/${endpoint}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/${endpoint}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body),

@@ -27,7 +27,7 @@ const BusinessProfileCard = ({
     if (!window.confirm(`Are you sure you want to delete ${displayName}?`)) return;
 
     try {
-      const res = await axios.delete(`http://localhost:4000/company/delete/${_id}`);
+      const res = await axios.delete(`${import.meta.env.VITE_API_URL}/company/delete/${_id}`);
       if (res.status === 200) {
         alert("Company deleted successfully ✅");
         if (onDelete) onDelete(_id);

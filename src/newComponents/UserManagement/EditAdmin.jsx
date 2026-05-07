@@ -64,7 +64,7 @@ const EditAdmin = ({ user, isOpen, onClose, onSave }) => {
 
       if (formData.password) payload.password = formData.password;
 
-      const res = await axios.put(`http://localhost:4000/editAdmin/${user._id}`, payload);
+      const res = await axios.put(`${import.meta.env.VITE_API_URL}/editAdmin/${user._id}`, payload);
 
       alert(res.data?.message || "Admin updated successfully");
       if (onSave) onSave(res.data.admin || res.data);

@@ -22,7 +22,7 @@ function EmployeeSidebar() {
             if (!id) return;
 
             try {
-                const res = await fetch(`http://localhost:4000/employee/${id}`);
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/employee/${id}`);
                 const data = await res.json();
                 if (data.success && data.employee) {
                     setSelectedEmployee(data.employee);
@@ -40,7 +40,7 @@ function EmployeeSidebar() {
 
     const fetchSubRoleName = async (subRoleId) => {
         try {
-            const res = await fetch(`http://localhost:4000/employee/getSubRoleName/${subRoleId}`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/employee/getSubRoleName/${subRoleId}`);
             const data = await res.json();
             return data.success ? data.subRoleName : subRoleId;
         } catch (err) {
@@ -100,7 +100,7 @@ function EmployeeSidebar() {
         const fetchRoles = async () => {
             setLoading(true);
             try {
-                const res = await fetch(`http://localhost:4000/employee/getAssignedRoles/${userId}`);
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/employee/getAssignedRoles/${userId}`);
                 const data = await res.json();
                 console.log("📥 Assigned Roles for Employee:", data);
                 

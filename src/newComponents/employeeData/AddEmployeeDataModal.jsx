@@ -61,7 +61,7 @@ const AddEmployeeDataModal = ({ isOpen, onClose, onSave, initialData = null }) =
   // ✅ Fetch companies
   const getCompanies = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/company/all");
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/company/all`);
       setCompanies(response.data.companies || []);
     } catch (error) {
       console.error("Failed to fetch companies:", error);
@@ -77,7 +77,7 @@ const AddEmployeeDataModal = ({ isOpen, onClose, onSave, initialData = null }) =
     }
 
     try {
-      const url = `http://localhost:4000/department/department?company=${companyId}`;
+      const url = `${import.meta.env.VITE_API_URL}/department/department?company=${companyId}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch departments");
       
@@ -101,7 +101,7 @@ const AddEmployeeDataModal = ({ isOpen, onClose, onSave, initialData = null }) =
     }
 
     try {
-      const url = `http://localhost:4000/designation?company=${companyId}&department=${departmentId}`;
+      const url = `${import.meta.env.VITE_API_URL}/designation?company=${companyId}&department=${departmentId}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch designations");
       
@@ -174,8 +174,8 @@ const AddEmployeeDataModal = ({ isOpen, onClose, onSave, initialData = null }) =
 
     try {
       const url = initialData
-        ? `http://localhost:4000/employeedata/${initialData._id}`
-        : "http://localhost:4000/employeedata";
+        ? `${import.meta.env.VITE_API_URL}/employeedata/${initialData._id}`
+        : `${import.meta.env.VITE_API_URL}/employeedata`;
       const method = initialData ? "PUT" : "POST";
 
       const response = await fetch(url, {

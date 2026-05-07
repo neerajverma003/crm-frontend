@@ -5,7 +5,7 @@ const MyCards = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:4000/company/all");
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/company/all`);
       const result = await response.json();
       console.log(result);
 

@@ -12,7 +12,7 @@ const AssignEmployeeCompany = () => {
 
     const getAllCompany = async () => {
         try {
-            const response = await fetch("http://localhost:4000/company/all");
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/company/all`);
             const result = await response.json();
             setCompanyList(result.companies || []);
         } catch (error) {
@@ -22,7 +22,7 @@ const AssignEmployeeCompany = () => {
 
     const getAllEmployees = async () => {
         try {
-            const response = await fetch("http://localhost:4000/employee/allEmployee");
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/employee/allEmployee`);
             const result = await response.json();
             setEmployeeList(result.employees || []);
         } catch (error) {
@@ -58,7 +58,7 @@ const AssignEmployeeCompany = () => {
 
         setLoading(true);
         try {
-            const res = await fetch("http://localhost:4000/employee/assign", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/employee/assign`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),

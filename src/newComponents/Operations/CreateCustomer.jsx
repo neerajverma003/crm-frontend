@@ -53,7 +53,7 @@ const CreateCustomer = () => {
     setError(null);
     try {
       // Fetch all transfer leads
-      const response = await fetch(`http://localhost:4000/employeelead/transfer/all`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/transfer/all`);
       
       if (!response.ok) {
         throw new Error(`Server error: ${response.status}`);
@@ -76,7 +76,7 @@ const CreateCustomer = () => {
     setError(null);
     try {
       // Fetch all B2B operation leads
-      const response = await fetch(`http://localhost:4000/b2b-operation-leads/`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/b2b-operation-leads/`);
       
       if (!response.ok) {
         throw new Error(`Server error: ${response.status}`);
@@ -114,7 +114,7 @@ const CreateCustomer = () => {
     if (lead.employee && typeof lead.employee === 'string') {
       console.log("Fetching employee details for ID:", lead.employee);
       try {
-        const res = await fetch(`http://localhost:4000/employee/${lead.employee}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/employee/${lead.employee}`);
         console.log("Employee fetch response:", res.status);
         if (res.ok) {
           const employeeData = await res.json();
@@ -126,7 +126,7 @@ const CreateCustomer = () => {
         } else {
           console.log("Employee fetch failed, trying alternate endpoint");
           // Try alternate endpoint
-          const res2 = await fetch(`http://localhost:4000/employees/${lead.employee}`);
+          const res2 = await fetch(`${import.meta.env.VITE_API_URL}/employees/${lead.employee}`);
           if (res2.ok) {
             const employeeData = await res2.json();
             console.log("Employee data from alternate endpoint:", employeeData);
@@ -149,7 +149,7 @@ const CreateCustomer = () => {
     // Fetch the full operation lead (including documents) before opening modal
     (async () => {
       try {
-        const res = await fetch('http://localhost:4000/employeelead/transfer/all');
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/transfer/all`);
         if (!res.ok) {
           console.warn('Could not fetch full transfer leads, opening modal with provided lead');
           setSelectedLead(lead);
@@ -166,7 +166,7 @@ const CreateCustomer = () => {
         // If employee is an id, try to fetch employee details (reuse logic from view)
         if (opLead.employee && typeof opLead.employee === 'string') {
           try {
-            const empRes = await fetch(`http://localhost:4000/employee/${opLead.employee}`);
+            const empRes = await fetch(`${import.meta.env.VITE_API_URL}/employee/${opLead.employee}`);
             if (empRes.ok) {
               const empData = await empRes.json();
               opLead.employee = empData.data || empData;
@@ -235,7 +235,7 @@ const CreateCustomer = () => {
     try {
       console.log('Fetching existing operation lead documents for lead:', lead._id);
       // Fetch all transfer leads and find this one (no GET by id route available)
-      const res = await fetch(`http://localhost:4000/employeelead/transfer/all`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/transfer/all`);
       if (!res.ok) {
         console.warn('Could not fetch transfer leads, opening empty upload modal');
         setUploadModalOpen(true);
@@ -360,7 +360,7 @@ const CreateCustomer = () => {
         if (!confirmDel) return;
 
         try {
-          const res = await fetch('http://localhost:4000/employeelead/document', {
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/document`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ leadId, cloudinaryPublicId }),
@@ -530,7 +530,7 @@ const CreateCustomer = () => {
 
         // Delete each existing document on server (fire in parallel)
         await Promise.all(existingIds.map(id =>
-          fetch('http://localhost:4000/employeelead/document', {
+          fetch(`${import.meta.env.VITE_API_URL}/employeelead/document`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ leadId, cloudinaryPublicId: id }),
@@ -591,7 +591,7 @@ const CreateCustomer = () => {
 
       // Use AbortController to time out the request and add a retry with a ping check
       const makeMoveRequest = async (signal) => {
-        return fetch(`http://localhost:4000/employeelead/move-to-customer/${leadId}`, {
+        return fetch(`${import.meta.env.VITE_API_URL}/employeelead/move-to-customer/${leadId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           signal,
@@ -600,7 +600,7 @@ const CreateCustomer = () => {
 
       const pingServer = async () => {
         try {
-          const r = await fetch('http://localhost:4000/ping', { method: 'GET', mode: 'cors' });
+          const r = await fetch(`${import.meta.env.VITE_API_URL}/ping`, { method: 'GET', mode: 'cors' });
           return r.ok;
         } catch (e) {
           return false;
@@ -667,7 +667,7 @@ const CreateCustomer = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:4000/customer", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/customer`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1359,8 +1359,8 @@ const CreateCustomer = () => {
               e.preventDefault();
               try {
                 const endpoint = leadSource === "b2b-transfer" 
-                  ? `http://localhost:4000/b2b-operation-leads/${selectedLead._id}`
-                  : `http://localhost:4000/employeelead/transfer/${selectedLead._id}`;
+                  ? `${import.meta.env.VITE_API_URL}/b2b-operation-leads/${selectedLead._id}`
+                  : `${import.meta.env.VITE_API_URL}/employeelead/transfer/${selectedLead._id}`;
 
                 const payload = {
                   ...(leadSource === "b2b-transfer" ? {
@@ -2153,7 +2153,7 @@ const CreateCustomer = () => {
                     };
 
                     console.log('Sending JSON payload to backend');
-                    const res = await fetch('http://localhost:4000/employeelead/upload-documents', {
+                    const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/upload-documents`, {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',

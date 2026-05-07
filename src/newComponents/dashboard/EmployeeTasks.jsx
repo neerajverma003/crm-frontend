@@ -53,7 +53,7 @@ const EmployeeTasks = () => {
         const fetchTasksForEmployee = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get(`http://localhost:4000/tasks/tasks/assignee/${id}?limit=1000`);
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/tasks/tasks/assignee/${id}?limit=1000`);
                 const tasks = res.data?.data || [];
 
                 const today = new Date();
@@ -155,7 +155,7 @@ const EmployeeTasks = () => {
 
         setSavingTaskId(task._id);
         try {
-            const res = await axios.put(`http://localhost:4000/tasks/task/${task._id}`, {
+            const res = await axios.put(`${import.meta.env.VITE_API_URL}/tasks/task/${task._id}`, {
                 numberData: payloadRows,
             });
 
@@ -195,7 +195,7 @@ const EmployeeTasks = () => {
 
         try {
             setUpdatingStatusId(taskId);
-            const res = await axios.put(`http://localhost:4000/tasks/task/${taskId}/status`, {
+            const res = await axios.put(`${import.meta.env.VITE_API_URL}/tasks/task/${taskId}/status`, {
                 taskStatus: newStatus,
                 statusChangeReason: reason,
             });

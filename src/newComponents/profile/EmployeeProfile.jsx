@@ -27,7 +27,7 @@ export default function EmployeeProfile() {
     // console.log(userId);
     const fetchcompany=async()=>{
         try{
-            const res=await fetch(`http://localhost:4000/employee/getCompanyByEmployeeId/${userId}`);
+            const res=await fetch(`${import.meta.env.VITE_API_URL}/employee/getCompanyByEmployeeId/${userId}`);
             // const res = await fetch(url);
             const data = await res.json();
             console.log(data);
@@ -48,7 +48,7 @@ export default function EmployeeProfile() {
         
         setLoading(true);
         try {
-            const res = await fetch("http://localhost:4000/send-otp", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/send-otp`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, userId })
@@ -77,7 +77,7 @@ export default function EmployeeProfile() {
         
         setLoading(true);
         try {
-            const res = await fetch("http://localhost:4000/verify-otp", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/verify-otp`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, otp, userId })
@@ -111,7 +111,7 @@ export default function EmployeeProfile() {
         
         setLoading(true);
         try {
-            const res = await fetch("http://localhost:4000/reset-password", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/reset-password`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, newPassword, userId })
@@ -151,9 +151,9 @@ export default function EmployeeProfile() {
             const r = role.toLowerCase();
             let url = "";
 
-            // if (r === "superadmin") url = `http://localhost:4000/AddSuperAdmin/super/${id}`;
-            // else if (r === "employee") url = `http://localhost:4000/employee/getEmployee/${id}`;
-             if (r === "employee") url = `http://localhost:4000/employee/getEmployee/${userId}`;
+            // if (r === "superadmin") url = `${import.meta.env.VITE_API_URL}/AddSuperAdmin/super/${id}`;
+            // else if (r === "employee") url = `${import.meta.env.VITE_API_URL}/employee/getEmployee/${id}`;
+             if (r === "employee") url = `${import.meta.env.VITE_API_URL}/employee/getEmployee/${userId}`;
              
 
             const res = await fetch(url);

@@ -24,7 +24,7 @@
 //   // ✅ Fetch all companies
 //   const fetchCompanies = async () => {
 //     try {
-//       const res = await axios.get("http://localhost:4000/company/all");
+//       const res = await axios.get(`${import.meta.env.VITE_API_URL}/company/all`);
 //       setCompanies(res.data?.companies || res.data);
 //     } catch (err) {
 //       toast.error("Failed to fetch companies");
@@ -34,7 +34,7 @@
 //   // ✅ Fetch all leaves, employees, and companies
 //   const fetchLeaves = async () => {
 //     try {
-//       const res = await axios.get("http://localhost:4000/admin/all-leaves");
+//       const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/all-leaves`);
 //       const leaveData = res.data?.leaves || res.data;
 //       setLeaves(leaveData);
 
@@ -46,14 +46,14 @@
 //         try {
 //           // 🔹 First try to fetch as an Employee
 //           const empRes = await axios.get(
-//             `http://localhost:4000/employee/getEmployee/${empId}`
+//             `${import.meta.env.VITE_API_URL}/employee/getEmployee/${empId}`
 //           );
 //           return { empId, data: empRes.data.employee };
 //         } catch (error) {
 //           // 🔹 If not found as Employee, try to fetch as an Admin (for admin-applied leaves)
 //           try {
 //             const adminRes = await axios.get(
-//               `http://localhost:4000/getAdmin/${empId}`
+//               `${import.meta.env.VITE_API_URL}/getAdmin/${empId}`
 //             );
 //             const admin = adminRes.data?.admin;
 //             if (!admin) return null;
@@ -107,7 +107,7 @@
 
 //       // 🏢 Fetch company details using proper ObjectId strings
 //       const companyPromises = [...companyIds].map(async (companyId) => {
-//         const compRes = await axios.get(`http://localhost:4000/company/${companyId}`);
+//         const compRes = await axios.get(`${import.meta.env.VITE_API_URL}/company/${companyId}`);
 //         return { companyId, data: compRes.data.company };
 //       });
 
@@ -136,7 +136,7 @@
 //       const adminRemark =
 //         status === "Approved" ? "Leave approved by admin" : "Leave rejected by admin";
 
-//       await axios.put(`http://localhost:4000/admin/update-leave/${leaveId}`, {
+//       await axios.put(`${import.meta.env.VITE_API_URL}/admin/update-leave/${leaveId}`, {
 //         status,
 //         adminRemark,
 //       });
@@ -417,7 +417,7 @@ export const LeaveAdmin = () => {
   // ✅ Fetch all companies
   const fetchCompanies = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/company/all");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/company/all`);
       setCompanies(res.data?.companies || res.data);
     } catch (err) {
       toast.error("Failed to fetch companies");
@@ -427,7 +427,7 @@ export const LeaveAdmin = () => {
   // ✅ Fetch all leaves, employees, and companies
   const fetchLeaves = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/admin/all-leaves");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/all-leaves`);
       const leaveData = res.data?.leaves || res.data;
       setLeaves(leaveData);
 
@@ -439,14 +439,14 @@ export const LeaveAdmin = () => {
         try {
           // 🔹 First try to fetch as an Employee
           const empRes = await axios.get(
-            `http://localhost:4000/employee/getEmployee/${empId}`
+            `${import.meta.env.VITE_API_URL}/employee/getEmployee/${empId}`
           );
           return { empId, data: empRes.data.employee };
         } catch (error) {
           // 🔹 If not found as Employee, try to fetch as an Admin (for admin-applied leaves)
           try {
             const adminRes = await axios.get(
-              `http://localhost:4000/getAdmin/${empId}`
+              `${import.meta.env.VITE_API_URL}/getAdmin/${empId}`
             );
             const admin = adminRes.data?.admin;
             if (!admin) return null;
@@ -500,7 +500,7 @@ export const LeaveAdmin = () => {
 
       // 🏢 Fetch company details using proper ObjectId strings
       const companyPromises = [...companyIds].map(async (companyId) => {
-        const compRes = await axios.get(`http://localhost:4000/company/${companyId}`);
+        const compRes = await axios.get(`${import.meta.env.VITE_API_URL}/company/${companyId}`);
         return { companyId, data: compRes.data.company };
       });
 
@@ -529,7 +529,7 @@ export const LeaveAdmin = () => {
       const adminRemark =
         status === "Approved" ? "Leave approved by admin" : "Leave rejected by admin";
 
-      await axios.put(`http://localhost:4000/admin/update-leave/${leaveId}`, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/admin/update-leave/${leaveId}`, {
         status,
         adminRemark,
       });

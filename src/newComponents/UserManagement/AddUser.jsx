@@ -31,7 +31,7 @@
 //   }, []);
 //   const getCompanies = async () => {
 //     try {
-//       const response = await axios.get("http://localhost:4000/company/all");
+//       const response = await axios.get(`${import.meta.env.VITE_API_URL}/company/all`);
 //       setCompanies(response.data.companies || []);
 //     } catch (error) {
 //       console.error("Failed to fetch companies:", error);
@@ -42,7 +42,7 @@
 //     if (!companyId) return;
 
 //     try {
-//       const url = `http://localhost:4000/department/department?company=${companyId}`;
+//       const url = `${import.meta.env.VITE_API_URL}/department/department?company=${companyId}`;
 
 //       const response = await fetch(url);
 //       if (!response.ok) throw new Error("Failed to fetch departments");
@@ -61,7 +61,7 @@
 //     if (!companyId || !departmentId) return;
 
 //     try {
-//       const url = `http://localhost:4000/designation?company=${companyId}&department=${departmentId}`;
+//       const url = `${import.meta.env.VITE_API_URL}/designation?company=${companyId}&department=${departmentId}`;
 
 //       const response = await fetch(url);
 //       if (!response.ok) throw new Error("Failed to fetch designations");
@@ -90,8 +90,8 @@
 //     setIsSubmitting(true);
 //     const endpoint =
 //       formData.role === "Admin"
-//         ? "http://localhost:4000/addAdmin"
-//         : "http://localhost:4000/employee/addEmployee";
+//         ? `${import.meta.env.VITE_API_URL}/addAdmin`
+//         : `${import.meta.env.VITE_API_URL}/employee/addEmployee`;
 
 //     try {
 //       await axios.post(endpoint, {
@@ -403,7 +403,7 @@ const AddUser = () => {
 
     const getCompanies = async () => {
         try {
-            const response = await axios.get("http://localhost:4000/company/all");
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/company/all`);
             setCompanies(response.data.companies || []);
         } catch (error) {
             console.error("Failed to fetch companies:", error);
@@ -415,7 +415,7 @@ const AddUser = () => {
         if (!companyId) return;
 
         try {
-            const url = `http://localhost:4000/department/department?company=${companyId}`;
+            const url = `${import.meta.env.VITE_API_URL}/department/department?company=${companyId}`;
 
             const response = await fetch(url);
             if (!response.ok) throw new Error("Failed to fetch departments");
@@ -435,7 +435,7 @@ const AddUser = () => {
         if (!companyId || !departmentId) return;
 
         try {
-            const url = `http://localhost:4000/designation?company=${companyId}&department=${departmentId}`;
+            const url = `${import.meta.env.VITE_API_URL}/designation?company=${companyId}&department=${departmentId}`;
 
             const response = await fetch(url);
             if (!response.ok) throw new Error("Failed to fetch designations");
@@ -464,7 +464,7 @@ const AddUser = () => {
             return;
         }
         setIsSubmitting(true);
-        const endpoint = formData.role === "Admin" ? "http://localhost:4000/addAdmin" : "http://localhost:4000/employee/addEmployee";
+        const endpoint = formData.role === "Admin" ? `${import.meta.env.VITE_API_URL}/addAdmin` : `${import.meta.env.VITE_API_URL}/employee/addEmployee`;
 
         try {
             await axios.post(endpoint, {

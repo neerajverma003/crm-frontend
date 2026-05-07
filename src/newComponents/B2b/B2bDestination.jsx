@@ -14,7 +14,7 @@ const B2bDestination = () => {
     // -------------------------------------------------------------------
     const fetchB2bStates = async () => {
         try {
-            const res = await fetch("http://localhost:4000/b2bstate");
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/b2bstate`);
             const data = await res.json();
             setB2bStates(data);
         } catch (error) {
@@ -50,7 +50,7 @@ const B2bDestination = () => {
         };
 
         try {
-            const res = await fetch("http://localhost:4000/b2bstate", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/b2bstate`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -79,7 +79,7 @@ const B2bDestination = () => {
     const handleDelete = async (id) => {
         if (window.confirm("Are you sure you want to delete this state?")) {
             try {
-                const res = await fetch(`http://localhost:4000/b2bstate/${id}`, {
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/b2bstate/${id}`, {
                     method: "DELETE",
                 });
 

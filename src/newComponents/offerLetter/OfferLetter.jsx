@@ -95,7 +95,7 @@ const OfferLetter = () => {
   const fetchOfferLetters = async () => {
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:4000/offer-letter");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/offer-letter`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to load offer letters");
       setOfferLetters(data.data || []);
@@ -110,7 +110,7 @@ const OfferLetter = () => {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const res = await fetch("http://localhost:4000/company/all");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/company/all`);
         if (!res.ok) throw new Error("Failed to fetch companies");
         const data = await res.json();
         const list = Array.isArray(data.companies) ? data.companies : data.companies || data;
@@ -155,7 +155,7 @@ const OfferLetter = () => {
         companyId: selectedCompany?._id || "",
         companyName: selectedCompany?.companyName || "",
       };
-      const res = await fetch("http://localhost:4000/offer-letter", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/offer-letter`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -191,7 +191,7 @@ const OfferLetter = () => {
     if (!window.confirm("Are you sure you want to delete this offer letter?")) return;
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:4000/offer-letter/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/offer-letter/${id}`, {
         method: "DELETE",
       });
       const data = await res.json();

@@ -96,7 +96,7 @@ const UploadDocumentsModal = ({ isOpen, onClose, employeeId, onUploaded }) => {
 
     try {
       setIsUploading(true);
-      const res = await fetch(`http://localhost:4000/employeedata/${employeeId}/upload`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/employeedata/${employeeId}/upload`, {
         method: "POST",
         body: formData,
       });

@@ -4,7 +4,7 @@
 // import EditUser from "./EditUser";
 // import EditAdmin from "./EditAdmin";
 
-// const API_URL = "http://localhost:4000";
+// const API_URL = `${import.meta.env.VITE_API_URL}`;
 
 // const UserTable = ({ onlyAdmins = false }) => {
 //     const [users, setUsers] = useState([]);
@@ -482,7 +482,7 @@
 // import EditUser from "./EditUser";
 // import EditAdmin from "./EditAdmin";
 
-// const API_URL = "http://localhost:4000";
+// const API_URL = `${import.meta.env.VITE_API_URL}`;
 
 // const UserTable = ({ onlyAdmins = false, searchTerm, roleFilter }) => {
 //     const [users, setUsers] = useState([]);
@@ -1012,7 +1012,7 @@ import { Eye, Edit2, Trash2, X } from "lucide-react";
 import EditUser from "./EditUser";
 import EditAdmin from "./EditAdmin";
 
-const API_URL = "http://localhost:4000";
+const API_URL = `${import.meta.env.VITE_API_URL}`;
 
 const UserTable = ({ onlyAdmins = false, searchTerm, roleFilter, filterStatus = "all", onCounts }) => {
     const [users, setUsers] = useState([]);

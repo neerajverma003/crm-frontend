@@ -16,7 +16,7 @@ export default function AllItinerary() {
     const fetchItineraries = async () => {
         try {
             setLoading(true);
-            const response = await fetch("http://localhost:4000/itinerary/");
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/itinerary/`);
             if (!response.ok) throw new Error("Failed to fetch itineraries");
             const result = await response.json();
             if (result.success && result.data) {

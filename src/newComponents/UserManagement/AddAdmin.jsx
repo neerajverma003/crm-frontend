@@ -31,7 +31,7 @@ const AddAdmin = () => {
   setIsSubmitting(true);
 
   try {
-    const response = await fetch("http://localhost:4000/addAdmin", {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/addAdmin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

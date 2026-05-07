@@ -39,7 +39,7 @@ const B2bAddCompany = () => {
   // useEffect(() => {
   //   const fetchCompanyDetails = async () => {
   //     try {
-  //       const res = await fetch(`http://localhost:4000/company/companybyname?name=${activeTab}`);
+  //       const res = await fetch(`${import.meta.env.VITE_API_URL}/company/companybyname?name=${activeTab}`);
   //       if (!res.ok) throw new Error("Failed to fetch company details");
   //       const data = await res.json();
   //       setCompany(data.companies || []); // Assuming the response has a 'companies' array
@@ -54,7 +54,7 @@ const B2bAddCompany = () => {
     useEffect(() => {
       const fetchEmployeeCompany = async () => {
         try {
-          const res = await fetch(`http://localhost:4000/company/${companyId}`);
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/company/${companyId}`);
           if (!res.ok) throw new Error("Failed to fetch company details");
           const data = await res.json();
           console.log(data.company.companyName);
@@ -72,7 +72,7 @@ const B2bAddCompany = () => {
   useEffect(() => {
     const fetchCompanyDetails = async () => {
       try {
-        const res = await fetch("http://localhost:4000/company/all");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/company/all`);
         if (!res.ok) throw new Error("Failed to fetch company details");
         const data = await res.json();
         if (role === "superAdmin" || role === "admin") {
@@ -93,7 +93,7 @@ const B2bAddCompany = () => {
   useEffect(() => {
     const fetchStates = async () => {
       try {
-        const res = await fetch("http://localhost:4000/b2bstate/");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/b2bstate/`);
         if (!res.ok) throw new Error("Failed to fetch states");
         const data = await res.json();
         setStates(data);
@@ -110,13 +110,13 @@ const B2bAddCompany = () => {
       try {
         let endpoint = "";
         if (role === "employee") {
-          endpoint = `http://localhost:4000/b2bcompany/employee/${employeeId}`;
+          endpoint = `${import.meta.env.VITE_API_URL}/b2bcompany/employee/${employeeId}`;
           if (employeeCompany) endpoint += `?companyName=${encodeURIComponent(employeeCompany)}`;
         }
         else if (activeTab === "All") {
-          endpoint = "http://localhost:4000/b2bcompany";
+          endpoint = `${import.meta.env.VITE_API_URL}/b2bcompany`;
         } else {
-          endpoint = `http://localhost:4000/b2bcompany/${activeTab}`;
+          endpoint = `${import.meta.env.VITE_API_URL}/b2bcompany/${activeTab}`;
         }
         const res = await fetch(endpoint);
         if (!res.ok) throw new Error("Failed to fetch companies");
@@ -139,7 +139,7 @@ const B2bAddCompany = () => {
   // useEffect(() => {
   //   const fetchCompanies = async () => {
   //     try {
-  //       const res = await fetch("http://localhost:4000/b2bcompany");
+  //       const res = await fetch(`${import.meta.env.VITE_API_URL}/b2bcompany`);
   //       if (!res.ok) throw new Error("Failed to fetch companies");
   //       const data = await res.json();
   //       setCompanies(data);
@@ -185,7 +185,7 @@ const B2bAddCompany = () => {
       }
       console.log("[b2b] submitting company:", submitData);
       
-      const res = await fetch("http://localhost:4000/b2bcompany", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/b2bcompany`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(submitData),
@@ -226,7 +226,7 @@ const B2bAddCompany = () => {
   const handleDelete = async (index, id) => {
     if (window.confirm("Are you sure to delete this company?")) {
       try {
-        const res = await fetch(`http://localhost:4000/b2bcompany/${id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/b2bcompany/${id}`, {
           method: "DELETE",
         });
         if (!res.ok) {
@@ -260,7 +260,7 @@ const B2bAddCompany = () => {
   // Fetch the latest company list for all users
   const fetchCompanies = async () => {
     try {
-      const res = await fetch("http://localhost:4000/b2bcompany");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/b2bcompany`);
       const data = await res.json();
       setCompanies(data);
     } catch (err) {
@@ -271,7 +271,7 @@ const B2bAddCompany = () => {
   // Fetch the latest company list for employees (only their own)
   const fetchCompaniesByEmployee = async () => {
     try {
-      let url = `http://localhost:4000/b2bcompany/employee/${employeeId}`;
+      let url = `${import.meta.env.VITE_API_URL}/b2bcompany/employee/${employeeId}`;
       if (employeeCompany) url += `?companyName=${encodeURIComponent(employeeCompany)}`;
       const res = await fetch(url);
       const data = await res.json();
@@ -294,7 +294,7 @@ const B2bAddCompany = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:4000/b2bcompany/${_id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/b2bcompany/${_id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(companyData),

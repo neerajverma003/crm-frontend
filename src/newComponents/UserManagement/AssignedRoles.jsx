@@ -10,7 +10,7 @@
 //   useEffect(() => {
 //     const fetchAssignedRoles = async () => {
 //       try {
-//         const response = await fetch('http://localhost:4000/getassignedroles');
+//         const response = await fetch(`${import.meta.env.VITE_API_URL}/getassignedroles`);
 //         const data = await response.json();
 //         console.log(data)
 //         setAssignedRoles(data);
@@ -21,7 +21,7 @@
 
 //     const fetchAllRoles = async () => {
 //       try {
-//         const response = await fetch('http://localhost:4000/roles');
+//         const response = await fetch(`${import.meta.env.VITE_API_URL}/roles`);
 //         const data = await response.json();
 //         setAllRoles(data);
 //       } catch (error) {
@@ -201,7 +201,7 @@
 //   useEffect(() => {
 //     const fetchAssignedRoles = async () => {
 //       try {
-//         const response = await fetch("http://localhost:4000/getassignedroles");
+//         const response = await fetch(`${import.meta.env.VITE_API_URL}/getassignedroles`);
 //         const data = await response.json();
 //         setAssignedRoles(data.admins || []); // 👈 FIX: use data.admins
 //       } catch (error) {
@@ -211,7 +211,7 @@
 
 //     const fetchAllRoles = async () => {
 //       try {
-//         const response = await fetch("http://localhost:4000/roles");
+//         const response = await fetch(`${import.meta.env.VITE_API_URL}/roles`);
 //         const data = await response.json();
 //         setAllRoles(data);
 //       } catch (error) {
@@ -386,7 +386,7 @@
 //   useEffect(() => {
 //     const fetchAssignedRoles = async () => {
 //       try {
-//         const response = await fetch("http://localhost:4000/getassignedroles");
+//         const response = await fetch(`${import.meta.env.VITE_API_URL}/getassignedroles`);
 //         const data = await response.json();
 //         setAssignedRoles(data.admins || []); 
 //       } catch (error) {
@@ -396,7 +396,7 @@
 
 //     const fetchAllRoles = async () => {
 //       try {
-//         const response = await fetch("http://localhost:4000/roles");
+//         const response = await fetch(`${import.meta.env.VITE_API_URL}/roles`);
 //         const data = await response.json();
 //         setAllRoles(data);
 //       } catch (error) {
@@ -432,7 +432,7 @@
 //   // --------------------------------
 //   const handleViewDetails = async (admin) => {
 //     try {
-//       const res = await fetch(`http://localhost:4000/getassignedroles/${admin._id}`);
+//       const res = await fetch(`${import.meta.env.VITE_API_URL}/getassignedroles/${admin._id}`);
 //       const data = await res.json();
 //       console.log(data)
 //       if (!res.ok) throw new Error(data.message);
@@ -591,7 +591,7 @@
 //   useEffect(() => {
 //     const fetchAssignedRoles = async () => {
 //       try {
-//         const response = await fetch("http://localhost:4000/getassignedroles");
+//         const response = await fetch(`${import.meta.env.VITE_API_URL}/getassignedroles`);
 //         const data = await response.json();
 //         setAssignedRoles(data.admins || []); 
 //       } catch (error) {
@@ -617,7 +617,7 @@
 //   // ----------------------------
 //   const handleViewDetails = async (admin) => {
 //     try {
-//       const res = await fetch(`http://localhost:4000/getassignedroles/${admin._id}`);
+//       const res = await fetch(`${import.meta.env.VITE_API_URL}/getassignedroles/${admin._id}`);
 //       const data = await res.json();
 
 //       if (!res.ok) throw new Error(data.message);
@@ -769,7 +769,7 @@ const AssignedRoles = () => {
   useEffect(() => {
     const fetchAssignedRoles = async () => {
       try {
-        const response = await fetch("http://localhost:4000/getassignedroles");
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/getassignedroles`);
         const data = await response.json();
         setAssignedRoles(data.admins || []);
       } catch (error) {
@@ -795,7 +795,7 @@ const AssignedRoles = () => {
   // Fetch full admin details
   const handleViewDetails = async (admin) => {
     try {
-      const res = await fetch(`http://localhost:4000/getassignedroles/${admin._id}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/getassignedroles/${admin._id}`);
 
       if (!res.ok) throw new Error(data.message);
       const data = await res.json();
@@ -824,7 +824,7 @@ const AssignedRoles = () => {
 
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:4000/deleteassignedrole/${selectedAdmin._id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/deleteassignedrole/${selectedAdmin._id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roleId }),
@@ -858,7 +858,7 @@ const AssignedRoles = () => {
 
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:4000/deletesubrole/${selectedAdmin._id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/deletesubrole/${selectedAdmin._id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roleId, subRoleId }),
@@ -904,7 +904,7 @@ const AssignedRoles = () => {
     try {
       setLoading(true);
       // Send adminId in URL so backend removes the point only from this admin's assignedRoles
-      const res = await fetch(`http://localhost:4000/deletepoint/${selectedAdmin._id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/deletepoint/${selectedAdmin._id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roleId, subRoleId, point }),
@@ -981,7 +981,7 @@ const AssignedRoles = () => {
 //   try {
 //     setLoading(true);
 
-//     const res = await fetch(`http://localhost:4000/deletepoint/${selectedAdmin._id}`, {
+//     const res = await fetch(`${import.meta.env.VITE_API_URL}/deletepoint/${selectedAdmin._id}`, {
 //       method: "DELETE",
 //       headers: { "Content-Type": "application/json" },
 //       body: JSON.stringify({ 

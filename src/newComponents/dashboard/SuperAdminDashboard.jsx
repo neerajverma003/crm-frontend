@@ -62,7 +62,7 @@
 //     useEffect(() => {
 //         const fetchAttendance = async () => {
 //             try {
-//                 const res = await fetch("http://localhost:4000/attendance/getAllAttendance");
+//                 const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/getAllAttendance`);
 //                 const data = await res.json();
 //                 console.log("Fetched attendance data:", data);
 
@@ -87,7 +87,7 @@
 //     useEffect(() => {
 //         const fetchLeads = async () => {
 //             try {
-//                 const res = await fetch("http://localhost:4000/leads/");
+//                 const res = await fetch(`${import.meta.env.VITE_API_URL}/leads/`);
 //                 const data = await res.json();
 //                 const leadData = Array.isArray(data) ? data : data.data || [];
 //                 setLead(leadData);
@@ -104,7 +104,7 @@
 //     useEffect(() => {
 //         const fetchCompanies = async () => {
 //             try {
-//                 const response = await axios.get("http://localhost:4000/company/all");
+//                 const response = await axios.get(`${import.meta.env.VITE_API_URL}/company/all`);
 //                 let allCompanies = response.data?.companies || [];
 
 //                 // Filter by admin role
@@ -132,7 +132,7 @@
 //                     const adminId = localStorage.getItem("userId");
 //                     if (!adminId) return;
 
-//                     const res = await axios.get(`http://localhost:4000/getCompanyByAdminId/${adminId}`);
+//                     const res = await axios.get(`${import.meta.env.VITE_API_URL}/getCompanyByAdminId/${adminId}`);
 //                     const data = res.data;
 //                     console.log(data)
 //                     if (data?.assignedCompanies?.length > 0) {
@@ -471,7 +471,7 @@ const SuperAdminDashboard = () => {
 
             try {
                 const dateParam = encodeURIComponent(selectedDate);
-                const res = await fetch(`http://localhost:4000/adminAttendance/getAllAttendance?date=${dateParam}`);
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance?date=${dateParam}`);
                 const data = await res.json();
 
                 if (!res.ok) {
@@ -517,7 +517,7 @@ const SuperAdminDashboard = () => {
 
             try {
                 const dateParam = encodeURIComponent(selectedDate);
-                const res = await fetch(`http://localhost:4000/attendance/getAllAttendance?date=${dateParam}`);
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/getAllAttendance?date=${dateParam}`);
                 const data = await res.json();
 
                 if (!res.ok) {
@@ -543,7 +543,7 @@ const SuperAdminDashboard = () => {
     useEffect(() => {
         const fetchLeads = async () => {
             try {
-                const res = await fetch("http://localhost:4000/leads/recentleads");
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/leads/recentleads`);
                 const data = await res.json();
                 const leadData = Array.isArray(data) ? data : data.data || [];
                 setLead(leadData);
@@ -560,7 +560,7 @@ const SuperAdminDashboard = () => {
     useEffect(() => {
         const fetchCompanies = async () => {
             try {
-                const response = await axios.get("http://localhost:4000/company/all");
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/company/all`);
                 let allCompanies = response.data?.companies || [];
 
                 // Filter by admin role
@@ -588,7 +588,7 @@ const SuperAdminDashboard = () => {
                     const adminId = localStorage.getItem("userId");
                     if (!adminId) return;
 
-                    const res = await axios.get(`http://localhost:4000/getCompanyByAdminId/${adminId}`);
+                    const res = await axios.get(`${import.meta.env.VITE_API_URL}/getCompanyByAdminId/${adminId}`);
                     const data = res.data;
                     console.log(data)
                     if (data?.assignedCompanies?.length > 0) {

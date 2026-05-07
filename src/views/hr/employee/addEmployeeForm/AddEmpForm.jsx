@@ -6,9 +6,9 @@ import { cilBurn, cilCheckCircle, cilInfo, cilWarning } from '@coreui/icons'
 
 const AddEmpForm = ({ onClose, onSubmit, employee }) => {
   const navigate = useNavigate();
-  const [error,setErrorMessage] = useState("");
-    const [success,setSucess] = useState("");
-  
+  const [error, setErrorMessage] = useState("");
+  const [success, setSucess] = useState("");
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -70,12 +70,12 @@ const AddEmpForm = ({ onClose, onSubmit, employee }) => {
       [name]: type === 'file' ? files[0] : value
     });
   };
-   useEffect(() => {
+  useEffect(() => {
     if (success) {
       const timer = setTimeout(() => {
         setSucess(null);
       }, 5000);
-  
+
       return () => clearTimeout(timer);
     }
   }, [success]);
@@ -90,7 +90,7 @@ const AddEmpForm = ({ onClose, onSubmit, employee }) => {
   //   };
   //   onSubmit(employeeData);
   // };
-   const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     alert(1);
     e.preventDefault();
     const employeeData = {
@@ -99,13 +99,13 @@ const AddEmpForm = ({ onClose, onSubmit, employee }) => {
       account: formData.account_access === 'HR' ? 'HR' : formData.account_access === 'Manager' ? 'Manager' : 'Employee',
       status: 'active'
     };
-    console.log(employeeData,'employeeData')
-    const response = await fetch('http://localhost:5000/create-employee',{
+    console.log(employeeData, 'employeeData')
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/employee/addEmployee`, {
       method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      body:JSON.stringify(employeeData)
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(employeeData)
 
     });
     if (!response.ok) {
@@ -113,11 +113,11 @@ const AddEmpForm = ({ onClose, onSubmit, employee }) => {
     }
     const data = await response.json();
     alert(1)
-    
-    setSucess('Employee Added Sucessfully');
-       alert(2)
 
-    console.log(data,'data');
+    setSucess('Employee Added Sucessfully');
+    alert(2)
+
+    console.log(data, 'data');
     setFormData({
       email: '',
       password: '',
@@ -144,11 +144,11 @@ const AddEmpForm = ({ onClose, onSubmit, employee }) => {
     })
     // onSubmit(employeeData);
   };
-  
+
 
   return (
     <div className="mainbar-grid">
-      {success &&   (<CAlert color="success" className="d-flex align-items-center">
+      {success && (<CAlert color="success" className="d-flex align-items-center">
         <CIcon icon={cilCheckCircle} className="flex-shrink-0 me-2" width={24} height={24} />
         <div>{success}</div>
       </CAlert>)}
@@ -164,7 +164,7 @@ const AddEmpForm = ({ onClose, onSubmit, employee }) => {
               {employee ? 'You can edit employee details here.' : 'You can create new user here.'}
             </p>
           </div>
-          
+
           <div className="my-2">
             <form className="row mt-3 row-gap-2 m-0" encType="multipart/form-data" onSubmit={handleSubmit}>
               {/* Email */}
@@ -245,7 +245,7 @@ const AddEmpForm = ({ onClose, onSubmit, employee }) => {
                     onChange={handleChange}
                     required
                   >
-                     <option value="HR">HR</option>
+                    <option value="HR">HR</option>
                     <option value="Employee">Employee</option>
                     <option value="Manager">Manager</option>
                   </select>
@@ -265,14 +265,14 @@ const AddEmpForm = ({ onClose, onSubmit, employee }) => {
                     onChange={handleChange}
                     required
                   >
-                     <option disabled value="">Select Your Option</option>
-<option value="Digital Marketing Intern">Digital Marketing Intern</option>
-<option value="HR Manager">HR Manager</option>
-<option value="HR">HR</option>
-<option value="Software Engineer">Software Engineer</option>
-<option value="Office Assistant">Office Assistant</option>
-<option value="UI/UX">UI/UX</option>
-<option value="W">W</option>
+                    <option disabled value="">Select Your Option</option>
+                    <option value="Digital Marketing Intern">Digital Marketing Intern</option>
+                    <option value="HR Manager">HR Manager</option>
+                    <option value="HR">HR</option>
+                    <option value="Software Engineer">Software Engineer</option>
+                    <option value="Office Assistant">Office Assistant</option>
+                    <option value="UI/UX">UI/UX</option>
+                    <option value="W">W</option>
                   </select>
                 </div>
               </div>
@@ -287,11 +287,11 @@ const AddEmpForm = ({ onClose, onSubmit, employee }) => {
                     className="d-flex align-items-center gap-2 form-check form-check-inline"
                     style={{ color: 'var(--secondaryDashColorDark)' }}
                   >
-                    <input 
-                      name="gender" 
-                      type="radio" 
-                      className="form-check-input" 
-                      value="male" 
+                    <input
+                      name="gender"
+                      type="radio"
+                      className="form-check-input"
+                      value="male"
                       checked={formData.gender === 'male'}
                       onChange={handleChange}
                     />
@@ -303,11 +303,11 @@ const AddEmpForm = ({ onClose, onSubmit, employee }) => {
                     className="d-flex align-items-center gap-2 form-check form-check-inline"
                     style={{ color: 'var(--secondaryDashColorDark)' }}
                   >
-                    <input 
-                      name="gender" 
-                      type="radio" 
-                      className="form-check-input" 
-                      value="female" 
+                    <input
+                      name="gender"
+                      type="radio"
+                      className="form-check-input"
+                      value="female"
                       checked={formData.gender === 'female'}
                       onChange={handleChange}
                     />
@@ -409,11 +409,11 @@ const AddEmpForm = ({ onClose, onSubmit, employee }) => {
                     <option value="" disabled>
                       Select your option
                     </option>
-                  <option value="Digital Marketing">Digital Marketing</option>
-<option value="Human Resource">Human Resource</option>
-<option value="Software">Software</option>
-<option value="Sales">Sales</option>
-<option value="Research and Development">Research and Development</option>
+                    <option value="Digital Marketing">Digital Marketing</option>
+                    <option value="Human Resource">Human Resource</option>
+                    <option value="Software">Software</option>
+                    <option value="Sales">Sales</option>
+                    <option value="Research and Development">Research and Development</option>
                   </select>
                 </div>
               </div>
@@ -434,20 +434,20 @@ const AddEmpForm = ({ onClose, onSubmit, employee }) => {
                     <option value="" disabled>
                       Select your option
                     </option>
-                  <option value="Digital Marketing Intern">Digital Marketing Intern</option>
-<option value="HR Manager">HR Manager</option>
-<option value="HR">HR</option>
-<option value="Employee">Employee</option>
-<option value="Admin">Admin</option>
-<option value="Office Assistant">Office Assistant</option>
-<option value="Business Manager">Business Manager</option>
-<option value="Digital Marketing Intern">Digital Marketing Intern</option>
-<option value="HR Manager">HR Manager</option>
-<option value="HR">HR</option>
-<option value="Employee">Employee</option>
-<option value="Admin">Admin</option>
-<option value="Office Assistant">Office Assistant</option>
-<option value="Business Manager">Business Manager</option>
+                    <option value="Digital Marketing Intern">Digital Marketing Intern</option>
+                    <option value="HR Manager">HR Manager</option>
+                    <option value="HR">HR</option>
+                    <option value="Employee">Employee</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Office Assistant">Office Assistant</option>
+                    <option value="Business Manager">Business Manager</option>
+                    <option value="Digital Marketing Intern">Digital Marketing Intern</option>
+                    <option value="HR Manager">HR Manager</option>
+                    <option value="HR">HR</option>
+                    <option value="Employee">Employee</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Office Assistant">Office Assistant</option>
+                    <option value="Business Manager">Business Manager</option>
                   </select>
                 </div>
               </div>
@@ -523,13 +523,13 @@ const AddEmpForm = ({ onClose, onSubmit, employee }) => {
                     value={formData.shift}
                     onChange={handleChange}
                   >
-                     <option value="">Select Shift</option>
+                    <option value="">Select Shift</option>
                     <option value="Demo Shift → 9:30 AM → 6:30 PM">Demo Shift → 9:30 AM → 6:30 PM</option>
-<option value="Demo Shift 2 → 4:30 PM → 1:00 AM">Demo Shift 2 → 4:30 PM → 1:00 AM</option>
-<option value="Afternoon Shift → 12:00 PM → 9:00 PM">Afternoon Shift → 12:00 PM → 9:00 PM</option>
-<option value="Lkjnj → 12:20 PM → 7:20 PM">Lkjnj → 12:20 PM → 7:20 PM</option>
-<option value="MUN-C → 12:24 AM → 9:24 PM">MUN-C → 12:24 AM → 9:24 PM</option>
-<option value="UK → 1:50 PM → 10:50 PM">UK → 1:50 PM → 10:50 PM</option>
+                    <option value="Demo Shift 2 → 4:30 PM → 1:00 AM">Demo Shift 2 → 4:30 PM → 1:00 AM</option>
+                    <option value="Afternoon Shift → 12:00 PM → 9:00 PM">Afternoon Shift → 12:00 PM → 9:00 PM</option>
+                    <option value="Lkjnj → 12:20 PM → 7:20 PM">Lkjnj → 12:20 PM → 7:20 PM</option>
+                    <option value="MUN-C → 12:24 AM → 9:24 PM">MUN-C → 12:24 AM → 9:24 PM</option>
+                    <option value="UK → 1:50 PM → 10:50 PM">UK → 1:50 PM → 10:50 PM</option>
 
                   </select>
                 </div>

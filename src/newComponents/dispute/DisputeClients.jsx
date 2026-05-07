@@ -20,7 +20,7 @@ function DisputeClients() {
   };
 
   const [form, setForm] = useState(initialForm);
-  const API_BASE = "http://localhost:4000/dispute-clients";
+  const API_BASE = `${import.meta.env.VITE_API_URL}/dispute-clients`;
 
   // Fetch all dispute clients
   useEffect(() => {

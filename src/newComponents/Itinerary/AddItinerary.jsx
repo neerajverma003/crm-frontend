@@ -19,7 +19,7 @@ function AddItinerary() {
   // ============================================================
   useEffect(() => {
     axios
-      .get("http://localhost:4000/employeeDestination/")
+      .get(`${import.meta.env.VITE_API_URL}/employeeDestination/`)
       .then((res) => {
         console.log("Destination API Response:", res.data);
 
@@ -72,7 +72,7 @@ function AddItinerary() {
 
     try {
       const res = await axios.post(
-        "http://localhost:4000/itinerary/create",
+        `${import.meta.env.VITE_API_URL}/itinerary/create`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

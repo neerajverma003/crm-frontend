@@ -11,7 +11,7 @@ const TodayAttendance = () => {
   useEffect(() => {
     const fetchAttendance = async () => {
       try {
-        const res = await fetch("http://localhost:4000/attendance/getAllAttendance");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/getAllAttendance`);
         const data = await res.json();
         console.log("Fetched attendance data:", data);
 

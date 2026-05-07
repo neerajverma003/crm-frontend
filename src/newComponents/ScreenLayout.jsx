@@ -212,7 +212,7 @@
 
 //   const fetchCompanyDetails = async (companyId) => {
 //     try {
-//       const res = await axios.get(`http://localhost:4000/company/${companyId}`);
+//       const res = await axios.get(`${import.meta.env.VITE_API_URL}/company/${companyId}`);
 //       if (res.data && res.data.company) {
 //         setSelectedCompany(res.data.company);
 //         localStorage.setItem(
@@ -241,7 +241,7 @@
 //   const fetchCompanyRoles = async (adminId, companyId) => {
 //     try {
 //       const res = await axios.get(
-//         `http://localhost:4000/getAssignedRoles/${adminId}/${companyId}`
+//         `${import.meta.env.VITE_API_URL}/getAssignedRoles/${adminId}/${companyId}`
 //       );
 //       if (res.data && res.data.assignedRoles) {
 //         setCompanyRoles(res.data.assignedRoles);
@@ -366,7 +366,7 @@
 
 //   const fetchCompanyDetails = async (companyId) => {
 //     try {
-//       const res = await axios.get(`http://localhost:4000/company/${companyId}`);
+//       const res = await axios.get(`${import.meta.env.VITE_API_URL}/company/${companyId}`);
 //       if (res.data && res.data.company) {
 //         setSelectedCompany(res.data.company);
 //         localStorage.setItem("selectedCompany", JSON.stringify(res.data.company));
@@ -388,7 +388,7 @@
 //   const fetchCompanyRoles = async (adminId, companyId) => {
 //     try {
 //       const res = await axios.get(
-//         `http://localhost:4000/getAssignedRoles/${adminId}/${companyId}`
+//         `${import.meta.env.VITE_API_URL}/getAssignedRoles/${adminId}/${companyId}`
 //       );
 //       setCompanyRoles(res.data?.assignedRoles || []);
 //     } catch (error) {
@@ -500,7 +500,7 @@
 
 //   const fetchCompanyDetails = async (companyId) => {
 //     try {
-//       const res = await axios.get(`http://localhost:4000/company/${companyId}`);
+//       const res = await axios.get(`${import.meta.env.VITE_API_URL}/company/${companyId}`);
 //       if (res.data?.company) {
 //         setSelectedCompany(res.data.company);
 //         localStorage.setItem("selectedCompany", JSON.stringify(res.data.company));
@@ -526,7 +526,7 @@
 //   const fetchCompanyRoles = async (adminId, companyId) => {
 //     try {
 //       const res = await axios.get(
-//         `http://localhost:4000/getAssignedRoles/${adminId}/${companyId}`
+//         `${import.meta.env.VITE_API_URL}/getAssignedRoles/${adminId}/${companyId}`
 //       );
 //       setCompanyRoles(res.data?.assignedRoles || []);
 //     } catch (error) {
@@ -660,7 +660,7 @@
 
 //   const fetchCompanyDetails = async (companyId) => {
 //     try {
-//       const res = await axios.get(`http://localhost:4000/company/${companyId}`);
+//       const res = await axios.get(`${import.meta.env.VITE_API_URL}/company/${companyId}`);
 //       if (res.data?.company) {
 //         setSelectedCompany(res.data.company);
 //         localStorage.setItem("selectedCompany", JSON.stringify(res.data.company));
@@ -682,7 +682,7 @@
 //   const fetchCompanyRoles = async (adminId, companyId) => {
 //     try {
 //       const res = await axios.get(
-//         `http://localhost:4000/getAssignedRoles/${adminId}/${companyId}`
+//         `${import.meta.env.VITE_API_URL}/getAssignedRoles/${adminId}/${companyId}`
 //       );
 //       setCompanyRoles(res.data?.assignedRoles || []);
 //     } catch (error) {
@@ -825,7 +825,7 @@ const ScreenLayout = () => {
 
   const fetchCompanyDetails = async (companyId) => {
     try {
-      const res = await axios.get(`http://localhost:4000/company/${companyId}`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/company/${companyId}`);
       if (res.data?.company) {
         setSelectedCompany(res.data.company);
         localStorage.setItem("selectedCompany", JSON.stringify(res.data.company));
@@ -847,7 +847,7 @@ const ScreenLayout = () => {
   const fetchCompanyRoles = async (adminId, companyId) => {
     try {
       const res = await axios.get(
-        `http://localhost:4000/getAssignedRoles/${adminId}/${companyId}`
+        `${import.meta.env.VITE_API_URL}/getAssignedRoles/${adminId}/${companyId}`
       );
       setCompanyRoles(res.data?.assignedRoles || []);
     } catch (error) {

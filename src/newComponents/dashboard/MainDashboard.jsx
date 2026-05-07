@@ -37,9 +37,9 @@
 //                 const r = role.toLowerCase();
 //                 let url = "";
 
-//                 if (r === "superadmin") url = `http://localhost:4000/AddSuperAdmin/super/${id}`;
-//                 else if (r === "admin") url = `http://localhost:4000/getAdmin/${id}`;
-//                 else if (r === "employee") url = `http://localhost:4000/employee/getEmployee/${id}`;
+//                 if (r === "superadmin") url = `${import.meta.env.VITE_API_URL}/AddSuperAdmin/super/${id}`;
+//                 else if (r === "admin") url = `${import.meta.env.VITE_API_URL}/getAdmin/${id}`;
+//                 else if (r === "employee") url = `${import.meta.env.VITE_API_URL}/employee/getEmployee/${id}`;
 
 //                 const res = await fetch(url);
 //                 const data = await res.json();
@@ -108,7 +108,7 @@
 //     useEffect(() => {
 //         const fetchAttendance = async () => {
 //             try {
-//                 const res = await fetch("http://localhost:4000/attendance/getAllAttendance");
+//                 const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/getAllAttendance`);
 //                 const data = await res.json();
 //                 // console.log("Fetched attendance data:", data);
 
@@ -133,7 +133,7 @@
 //     useEffect(() => {
 //         const fetchLeads = async () => {
 //             try {
-//                 const res = await fetch("http://localhost:4000/leads/");
+//                 const res = await fetch(`${import.meta.env.VITE_API_URL}/leads/`);
 //                 const data = await res.json();
 //                 const leadData = Array.isArray(data) ? data : data.data || [];
 //                 setLead(leadData);
@@ -150,7 +150,7 @@
 //     useEffect(() => {
 //         const fetchCompanies = async () => {
 //             try {
-//                 const response = await axios.get("http://localhost:4000/company/all");
+//                 const response = await axios.get(`${import.meta.env.VITE_API_URL}/company/all`);
 //                 let allCompanies = response.data?.companies || [];
 
 //                 // Filter by admin role
@@ -178,7 +178,7 @@
 //                     const adminId = localStorage.getItem("userId");
 //                     if (!adminId) return;
 
-//                     const res = await axios.get(`http://localhost:4000/getCompanyByAdminId/${adminId}`);
+//                     const res = await axios.get(`${import.meta.env.VITE_API_URL}/getCompanyByAdminId/${adminId}`);
 //                     const data = res.data;
 //                     console.log(data);
 //                     if (data?.assignedCompanies?.length > 0) {
@@ -221,7 +221,7 @@
 //         const fetchTodayAttendance = async () => {
 //             try {
 //                 const freshRole = role?.toLowerCase();
-//                 const url = freshRole === "admin" ? `http://localhost:4000/adminAttendance/${id}` : `http://localhost:4000/attendance/${id}`;
+//                 const url = freshRole === "admin" ? `${import.meta.env.VITE_API_URL}/adminAttendance/${id}` : `${import.meta.env.VITE_API_URL}/attendance/${id}`;
 
 //                 const res = await fetch(url);
 //                 if (!res.ok) throw new Error("Failed to fetch attendance");
@@ -320,7 +320,7 @@
 //                 timestamp: new Date().toISOString(),
 //             });
 
-//             const res = await fetch(`http://localhost:4000/${endpoint}`, {
+//             const res = await fetch(`${import.meta.env.VITE_API_URL}/${endpoint}`, {
 //                 method: "POST",
 //                 headers: { "Content-Type": "application/json" },
 //                 body: JSON.stringify(body),
@@ -769,9 +769,9 @@ const MainDashboard = () => {
                 const r = role.toLowerCase();
                 let url = "";
 
-                if (r === "superadmin") url = `http://localhost:4000/AddSuperAdmin/super/${id}`;
-                else if (r === "admin") url = `http://localhost:4000/getAdmin/${id}`;
-                else if (r === "employee") url = `http://localhost:4000/employee/getEmployee/${id}`;
+                if (r === "superadmin") url = `${import.meta.env.VITE_API_URL}/AddSuperAdmin/super/${id}`;
+                else if (r === "admin") url = `${import.meta.env.VITE_API_URL}/getAdmin/${id}`;
+                else if (r === "employee") url = `${import.meta.env.VITE_API_URL}/employee/getEmployee/${id}`;
 
                 const res = await fetch(url);
                 const data = await res.json();
@@ -840,7 +840,7 @@ const MainDashboard = () => {
     useEffect(() => {
         const fetchAttendance = async () => {
             try {
-                const res = await fetch("http://localhost:4000/attendance/getAllAttendance");
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/getAllAttendance`);
                 const data = await res.json();
                 // console.log("Fetched attendance data:", data);
 
@@ -865,7 +865,7 @@ const MainDashboard = () => {
     useEffect(() => {
         const fetchLeads = async () => {
             try {
-                const res = await fetch("http://localhost:4000/leads/");
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/leads/`);
                 const data = await res.json();
                 const leadData = Array.isArray(data) ? data : data.data || [];
                 setLead(leadData);
@@ -882,7 +882,7 @@ const MainDashboard = () => {
     useEffect(() => {
         const fetchCompanies = async () => {
             try {
-                const response = await axios.get("http://localhost:4000/company/all");
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/company/all`);
                 let allCompanies = response.data?.companies || [];
 
                 // Filter by admin role
@@ -910,7 +910,7 @@ const MainDashboard = () => {
                     const adminId = localStorage.getItem("userId");
                     if (!adminId) return;
 
-                    const res = await axios.get(`http://localhost:4000/getassignedroles/${adminId}`);
+                    const res = await axios.get(`${import.meta.env.VITE_API_URL}/getassignedroles/${adminId}`);
                     const data = res.data;
                     console.log("Admin data with roles:", data);
                     
@@ -1002,7 +1002,7 @@ const MainDashboard = () => {
         const fetchTodayAttendance = async () => {
             try {
                 const freshRole = role?.toLowerCase();
-                const url = freshRole === "admin" ? `http://localhost:4000/adminAttendance/${id}` : `http://localhost:4000/attendance/${id}`;
+                const url = freshRole === "admin" ? `${import.meta.env.VITE_API_URL}/adminAttendance/${id}` : `${import.meta.env.VITE_API_URL}/attendance/${id}`;
 
                 const res = await fetch(url);
                 if (!res.ok) throw new Error("Failed to fetch attendance");
@@ -1119,7 +1119,7 @@ const MainDashboard = () => {
                 timestamp: new Date().toISOString(),
             });
 
-            const res = await fetch(`http://localhost:4000/${endpoint}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/${endpoint}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body),
@@ -1207,7 +1207,7 @@ const MainDashboard = () => {
     useEffect(() => {
         const fetchTasksForDashboard = async () => {
             try {
-                const res = await axios.get("http://localhost:4000/tasks/tasks?limit=1000");
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/tasks/tasks?limit=1000`);
                 const tasks = res.data?.data || [];
 
                 const today = new Date();

@@ -108,7 +108,7 @@
 //           status: formData.status,
 //         };
 
-//         const response = await fetch("http://localhost:4000/company", {
+//         const response = await fetch(`${import.meta.env.VITE_API_URL}/company`, {
 //           method: "POST",
 //           headers: {
 //             "Content-Type": "application/json",
@@ -556,7 +556,7 @@ const AddCompany = ({ isOpen: controlledOpen, onClose: controlledOnClose, initia
         if (logoFile) {
           const fd = new FormData();
           fd.append("logo", logoFile);
-          const uploadRes = await fetch("http://localhost:4000/company/upload-logo", {
+          const uploadRes = await fetch(`${import.meta.env.VITE_API_URL}/company/upload-logo`, {
             method: "POST",
             body: fd,
           });
@@ -589,13 +589,13 @@ const AddCompany = ({ isOpen: controlledOpen, onClose: controlledOnClose, initia
 
         let response;
         if (initialData && initialData._id) {
-          response = await fetch(`http://localhost:4000/company/${initialData._id}`, {
+          response = await fetch(`${import.meta.env.VITE_API_URL}/company/${initialData._id}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(dataToSend),
           });
         } else {
-          response = await fetch("http://localhost:4000/company", {
+          response = await fetch(`${import.meta.env.VITE_API_URL}/company`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(dataToSend),

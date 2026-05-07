@@ -41,7 +41,7 @@
 
 //   const fetchUserName = async (userId, token) => {
 //     try {
-//       const response = await axios.get(`http://localhost:4000/users/${userId}`, {
+//       const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/${userId}`, {
 //         headers: { Authorization: `Bearer ${token}` },
 //       });
 //       if (response.data?.name) {
@@ -62,7 +62,7 @@
 
 //     try {
 //       const response = await axios.post(
-//         "http://localhost:4000/login/login",
+//         `${import.meta.env.VITE_API_URL}/login/login`,
 //         { email, password, role },
 //         { withCredentials: true }
 //       );
@@ -308,7 +308,7 @@
 //   // ✅ Fetch user name (if not included in login response)
 //   const fetchUserName = async (userId, token) => {
 //     try {
-//       const res = await axios.get(`http://localhost:4000/users/${userId}`, {
+//       const res = await axios.get(`${import.meta.env.VITE_API_URL}/users/${userId}`, {
 //         headers: { Authorization: `Bearer ${token}` },
 //       });
 //       if (res.data?.name) {
@@ -331,7 +331,7 @@
 //     try {
 //       const { email, password, role } = formData;
 //       const res = await axios.post(
-//         "http://localhost:4000/login/login",
+//         `${import.meta.env.VITE_API_URL}/login/login`,
 //         { email, password, role },
 //         { withCredentials: true }
 //       );
@@ -587,7 +587,7 @@
 //   // ✅ Fetch username if not returned by login API
 //   const fetchUserName = async (userId, token) => {
 //     try {
-//       const res = await axios.get(`http://localhost:4000/users/${userId}`, {
+//       const res = await axios.get(`${import.meta.env.VITE_API_URL}/users/${userId}`, {
 //         headers: { Authorization: `Bearer ${token}` },
 //       });
 //       if (res.data?.name) {
@@ -611,7 +611,7 @@
 //     try {
 //       const { email, password, role } = formData;
 //       const res = await axios.post(
-//         "http://localhost:4000/login/login",
+//         `${import.meta.env.VITE_API_URL}/login/login`,
 //         { email, password, role },
 //         { withCredentials: true }
 //       );
@@ -882,7 +882,7 @@ const SignIn = () => {
 
         setLoading(true);
         try {
-            const res = await axios.post("http://localhost:4000/login/login", formData, { withCredentials: true });
+            const res = await axios.post(`${import.meta.env.VITE_API_URL}/login/login`, formData, { withCredentials: true });
             console.log(res);
             
             // if(res.status==403){

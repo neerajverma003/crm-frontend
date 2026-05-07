@@ -17,7 +17,7 @@ const CreateDestination = () => {
   // -------------------------------------------------------------------
   const fetchStates = async () => {
     try {
-      const res = await fetch("http://localhost:4000/state/");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/state/`);
       const data = await res.json();
       setStatesList(data);
     } catch (error) {
@@ -30,7 +30,7 @@ const CreateDestination = () => {
   // -------------------------------------------------------------------
   const fetchDestinations = async () => {
     try {
-      const res = await fetch("http://localhost:4000/destination/");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/destination/`);
       const data = await res.json();
       setDestinations(data);
     } catch (error) {
@@ -102,7 +102,7 @@ const CreateDestination = () => {
     };
 
     try {
-      const res = await fetch("http://localhost:4000/destination/", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/destination/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

@@ -142,8 +142,8 @@ const EmailManagement = () => {
     setFetchingUsers(true);
     try {
       const [adminRes, empRes] = await Promise.all([
-        fetch("http://localhost:4000/getAdmins"),
-        fetch("http://localhost:4000/employee/allEmployee")
+        fetch(`${import.meta.env.VITE_API_URL}/getAdmins`),
+        fetch(`${import.meta.env.VITE_API_URL}/employee/allEmployee`)
       ]);
 
       let admins = [];
@@ -175,7 +175,7 @@ const EmailManagement = () => {
   const fetchList = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:4000/inventory/email");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/inventory/email`);
       const json = await res.json();
       if (res.ok && json.success) setList(json.data || []);
       else throw new Error(json.message || "Failed to load");
@@ -205,7 +205,7 @@ const EmailManagement = () => {
 
     setSaving(true);
     try {
-      const res = await fetch("http://localhost:4000/inventory/email", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/inventory/email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim() }),
@@ -230,7 +230,7 @@ const EmailManagement = () => {
     if (!confirm("Delete this email?")) return;
     setDeletingId(id);
     try {
-      const res = await fetch(`http://localhost:4000/inventory/email/${id}`, { method: "DELETE" });
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/inventory/email/${id}`, { method: "DELETE" });
       const json = await res.json();
       if (res.ok && json.success) {
         setList((s) => s.filter((it) => it._id !== id));
@@ -247,7 +247,7 @@ const EmailManagement = () => {
   const handleAssign = async (emailId, userId, userType, userName) => {
     setAssigning(true);
     try {
-      const res = await fetch(`http://localhost:4000/inventory/email/${emailId}/assign`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/inventory/email/${emailId}/assign`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ assignedToId: userId, assignedToType: userType, assignedToName: userName })
@@ -269,7 +269,7 @@ const EmailManagement = () => {
   const handleUnassign = async (emailId) => {
     setAssigning(true);
     try {
-      const res = await fetch(`http://localhost:4000/inventory/email/${emailId}/unassign`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/inventory/email/${emailId}/unassign`, {
         method: "POST",
         headers: { "Content-Type": "application/json" }
       });

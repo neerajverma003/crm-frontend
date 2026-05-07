@@ -9,7 +9,7 @@
  */
 export const fetchEmployeesWithDestinations = async () => {
   try {
-    const res = await fetch("http://localhost:4000/employee/allEmployee");
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/employee/allEmployee`);
     const data = await res.json();
     
     if (Array.isArray(data.employees)) {
@@ -96,8 +96,8 @@ export const handleDestinationBasedRouting = async (leadData, currentEmployeeId,
       // Create or update the lead with the new employee
       const method = leadId ? "PUT" : "POST";
       const url = leadId 
-        ? `http://localhost:4000/employeelead/${leadId}`
-        : "http://localhost:4000/employeelead";
+        ? `${import.meta.env.VITE_API_URL}/employeelead/${leadId}`
+        : `${import.meta.env.VITE_API_URL}/employeelead`;
 
       const payload = {
         ...leadData,
@@ -154,7 +154,7 @@ export const fetchLeadsAssignedByDestination = async (employeeId) => {
   if (!employeeId) return [];
 
   try {
-    const res = await fetch(`http://localhost:4000/employeelead/employee/${employeeId}`);
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/employee/${employeeId}`);
     if (!res.ok) throw new Error("Failed to fetch leads");
     
     const data = await res.json();

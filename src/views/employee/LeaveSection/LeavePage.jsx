@@ -24,7 +24,7 @@
 //   const fetchMyLeaves = async () => {
 //     try {
 //       const res = await axios.get(
-//         `http://localhost:4000/employee/my-leaves/${leaveData.employeeId}`
+//         `${import.meta.env.VITE_API_URL}/employee/my-leaves/${leaveData.employeeId}`
 //       );
 //       const leaves = res.data?.leaves || res.data;
 //       setMyLeaves(leaves);
@@ -46,7 +46,7 @@
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
 //     try {
-//       await axios.post("http://localhost:4000/employee/apply", leaveData);
+//       await axios.post(`${import.meta.env.VITE_API_URL}/employee/apply`, leaveData);
 //       toast.success("Leave applied successfully!");
 //       setLeaveData({
 //         ...leaveData,
@@ -319,7 +319,7 @@ export const LeavePage = () => {
   const fetchMyLeaves = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:4000/employee/my-leaves/${leaveData.employeeId}`
+        `${import.meta.env.VITE_API_URL}/employee/my-leaves/${leaveData.employeeId}`
       );
       const leaves = res.data?.leaves || res.data;
       setMyLeaves(leaves);
@@ -341,7 +341,7 @@ export const LeavePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:4000/employee/apply", leaveData);
+      await axios.post(`${import.meta.env.VITE_API_URL}/employee/apply`, leaveData);
       toast.success("Leave applied successfully!");
       setLeaveData({
         ...leaveData,

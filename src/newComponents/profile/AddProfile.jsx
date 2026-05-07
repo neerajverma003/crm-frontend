@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Save, Edit2, Trash2, Search, User, Calendar, FileText } from 'lucide-react';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || `${import.meta.env.VITE_API_URL}`;
 
 const AddProfile = () => {
   // Form state

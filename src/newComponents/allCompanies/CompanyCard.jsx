@@ -29,7 +29,7 @@
 // //     if (!window.confirm(`Are you sure you want to delete ${displayName}?`)) return;
 
 // //     try {
-// //       const res = await axios.delete(`http://localhost:4000/company/delete/${_id}`);
+// //       const res = await axios.delete(`${import.meta.env.VITE_API_URL}/company/delete/${_id}`);
 // //       if (res.status === 200) {
 // //         alert("Company deleted successfully ✅");
 // //         if (onDelete) onDelete(_id);
@@ -188,7 +188,7 @@
 //     if (!window.confirm(`Are you sure you want to delete ${displayName}?`)) return;
 
 //     try {
-//       const res = await axios.delete(`http://localhost:4000/company/delete/${_id}`);
+//       const res = await axios.delete(`${import.meta.env.VITE_API_URL}/company/delete/${_id}`);
 //       if (res.status === 200) {
 //         alert("Company deleted successfully ✅");
 //         if (onDelete) onDelete(_id);
@@ -681,7 +681,7 @@
 //     if (!window.confirm(`Are you sure you want to delete ${displayName}?`)) return;
 
 //     try {
-//       const res = await axios.delete(`http://localhost:4000/company/delete/${_id}`);
+//       const res = await axios.delete(`${import.meta.env.VITE_API_URL}/company/delete/${_id}`);
 //       if (res.status === 200) {
 //         alert("Company deleted successfully ✅");
 //         if (onDelete) onDelete(_id);
@@ -843,7 +843,7 @@ const CompanyCard = ({
       setLoadingAdmins(true);
       setAdminsError(null);
       try {
-        const res = await axios.get("http://localhost:4000/getAdmins");
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/getAdmins`);
         const allAdmins = res.data || [];
         const filtered = allAdmins.filter((a) => {
           try {
@@ -877,7 +877,7 @@ const CompanyCard = ({
     if (!window.confirm(`Are you sure you want to delete ${displayName}?`)) return;
 
     try {
-      const res = await axios.delete(`http://localhost:4000/company/delete/${_id}`);
+      const res = await axios.delete(`${import.meta.env.VITE_API_URL}/company/delete/${_id}`);
       if (res.status === 200) {
         alert("Company deleted successfully ✅");
         if (onDelete) onDelete(_id);
@@ -1377,7 +1377,7 @@ function AdminAssignSection({ companyId, editData, setEditData }) {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios.get('http://localhost:4000/getAdmins');
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/getAdmins`);
         const admins = res.data || [];
         setAllAdmins(admins);
         // preselect admins that already have this company
@@ -1417,17 +1417,17 @@ function AdminAssignSection({ companyId, editData, setEditData }) {
         const has = Array.isArray(admin.company) && admin.company.some(c => String(c) === String(companyId));
         if (shouldHave && !has) {
           // assign company to admin (post assigns array)
-          promises.push(axios.post('http://localhost:4000/assign', { adminId: admin._id, companyIds: [companyId] }));
+          promises.push(axios.post(`${import.meta.env.VITE_API_URL}/assign`, { adminId: admin._id, companyIds: [companyId] }));
         }
         if (!shouldHave && has) {
           // remove company: send assign with remaining companyIds
           const remaining = (admin.company || []).filter(c => String(c) !== String(companyId));
-          promises.push(axios.post('http://localhost:4000/assign', { adminId: admin._id, companyIds: remaining }));
+          promises.push(axios.post(`${import.meta.env.VITE_API_URL}/assign`, { adminId: admin._id, companyIds: remaining }));
         }
       }
       await Promise.all(promises);
       // refresh list
-      const res = await axios.get('http://localhost:4000/getAdmins');
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/getAdmins`);
       const admins = res.data || [];
       setAllAdmins(admins);
       // update editData.company for parent if needed

@@ -5,7 +5,7 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState('personal');
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({});
-  
+
   // Initialize state with your existing data
   const [profileState, setProfileState] = useState({
     personalInfo: {
@@ -279,16 +279,16 @@ const Profile = () => {
   };
 
   const renderAddForm = () => {
-    switch(activeTab) {
+    switch (activeTab) {
       case 'documents':
         return (
           <form onSubmit={handleAddDocument} className="mb-4 p-3 border rounded">
             <h4>Upload New Document</h4>
             <div className="mb-3">
               <label className="form-label">Document Type</label>
-              <select 
-                name="docType" 
-                className="form-control" 
+              <select
+                name="docType"
+                className="form-control"
                 required
                 onChange={handleInputChange}
                 value={formData.docType || ''}
@@ -304,10 +304,10 @@ const Profile = () => {
             </div>
             <div className="mb-3">
               <label className="form-label">Document Name</label>
-              <input 
-                type="text" 
-                name="docName" 
-                className="form-control" 
+              <input
+                type="text"
+                name="docName"
+                className="form-control"
                 required
                 onChange={handleInputChange}
                 value={formData.docName || ''}
@@ -315,16 +315,16 @@ const Profile = () => {
             </div>
             <div className="mb-3">
               <label className="form-label">Upload File</label>
-              <input 
-                type="file" 
-                className="form-control" 
+              <input
+                type="file"
+                className="form-control"
                 required
               />
             </div>
             <div className="d-flex justify-content-end gap-2">
-              <button 
-                type="button" 
-                className="btn btn-secondary" 
+              <button
+                type="button"
+                className="btn btn-secondary"
                 onClick={() => setShowAddForm(false)}
               >
                 Cancel
@@ -339,10 +339,10 @@ const Profile = () => {
             <h4>Add Family Member</h4>
             <div className="mb-3">
               <label className="form-label">Name</label>
-              <input 
-                type="text" 
-                name="memberName" 
-                className="form-control" 
+              <input
+                type="text"
+                name="memberName"
+                className="form-control"
                 required
                 onChange={handleInputChange}
                 value={formData.memberName || ''}
@@ -350,9 +350,9 @@ const Profile = () => {
             </div>
             <div className="mb-3">
               <label className="form-label">Relationship</label>
-              <select 
-                name="relationship" 
-                className="form-control" 
+              <select
+                name="relationship"
+                className="form-control"
                 required
                 onChange={handleInputChange}
                 value={formData.relationship || ''}
@@ -369,10 +369,10 @@ const Profile = () => {
             </div>
             <div className="mb-3">
               <label className="form-label">Date of Birth</label>
-              <input 
-                type="date" 
-                name="dob" 
-                className="form-control" 
+              <input
+                type="date"
+                name="dob"
+                className="form-control"
                 required
                 onChange={handleInputChange}
                 value={formData.dob || ''}
@@ -380,19 +380,19 @@ const Profile = () => {
             </div>
             <div className="mb-3">
               <label className="form-label">Contact Number</label>
-              <input 
-                type="tel" 
-                name="contact" 
-                className="form-control" 
+              <input
+                type="tel"
+                name="contact"
+                className="form-control"
                 onChange={handleInputChange}
                 value={formData.contact || ''}
               />
             </div>
             <div className="mb-3">
               <label className="form-label">Dependent</label>
-              <select 
-                name="dependent" 
-                className="form-control" 
+              <select
+                name="dependent"
+                className="form-control"
                 required
                 onChange={handleInputChange}
                 value={formData.dependent || 'Yes'}
@@ -402,9 +402,9 @@ const Profile = () => {
               </select>
             </div>
             <div className="d-flex justify-content-end gap-2">
-              <button 
-                type="button" 
-                className="btn btn-secondary" 
+              <button
+                type="button"
+                className="btn btn-secondary"
                 onClick={() => setShowAddForm(false)}
               >
                 Cancel
@@ -419,10 +419,10 @@ const Profile = () => {
             <h4>Add Experience</h4>
             <div className="mb-3">
               <label className="form-label">Designation</label>
-              <input 
-                type="text" 
-                name="designation" 
-                className="form-control" 
+              <input
+                type="text"
+                name="designation"
+                className="form-control"
                 required
                 onChange={handleInputChange}
                 value={formData.designation || ''}
@@ -430,10 +430,10 @@ const Profile = () => {
             </div>
             <div className="mb-3">
               <label className="form-label">Company</label>
-              <input 
-                type="text" 
-                name="company" 
-                className="form-control" 
+              <input
+                type="text"
+                name="company"
+                className="form-control"
                 required
                 onChange={handleInputChange}
                 value={formData.company || ''}
@@ -441,10 +441,10 @@ const Profile = () => {
             </div>
             <div className="mb-3">
               <label className="form-label">Duration</label>
-              <input 
-                type="text" 
-                name="duration" 
-                className="form-control" 
+              <input
+                type="text"
+                name="duration"
+                className="form-control"
                 placeholder="e.g. 2018 - 2023 (5 years)"
                 required
                 onChange={handleInputChange}
@@ -453,9 +453,9 @@ const Profile = () => {
             </div>
             <div className="mb-3">
               <label className="form-label">Key Responsibilities (one per line)</label>
-              <textarea 
-                name="responsibilities" 
-                className="form-control" 
+              <textarea
+                name="responsibilities"
+                className="form-control"
                 rows="4"
                 required
                 onChange={handleInputChange}
@@ -463,9 +463,9 @@ const Profile = () => {
               ></textarea>
             </div>
             <div className="d-flex justify-content-end gap-2">
-              <button 
-                type="button" 
-                className="btn btn-secondary" 
+              <button
+                type="button"
+                className="btn btn-secondary"
                 onClick={() => setShowAddForm(false)}
               >
                 Cancel
@@ -512,7 +512,7 @@ const Profile = () => {
                 <td>{profileState.personalInfo.basicDetails.maritalStatus}</td>
               </tr>
             </tbody>
-            
+
             <thead className="table-dark">
               <tr>
                 <th colSpan="2">Identification Details</th>
@@ -532,7 +532,7 @@ const Profile = () => {
                 <td>{profileState.personalInfo.identification.passport}</td>
               </tr>
             </tbody>
-            
+
             <thead className="table-dark">
               <tr>
                 <th colSpan="2">Contact Information</th>
@@ -552,7 +552,7 @@ const Profile = () => {
                 <td>{profileState.personalInfo.contact.address}</td>
               </tr>
             </tbody>
-            
+
             <thead className="table-dark">
               <tr>
                 <th colSpan="2">Bank Details</th>
@@ -612,7 +612,7 @@ const Profile = () => {
                 <td>{profileState.companyInfo.employment.reportingTo}</td>
               </tr>
             </tbody>
-            
+
             <thead className="table-dark">
               <tr>
                 <th colSpan="2">Work Details</th>
@@ -636,7 +636,7 @@ const Profile = () => {
                 <td><span className="badge bg-success">{profileState.companyInfo.workDetails.status}</span></td>
               </tr>
             </tbody>
-            
+
             <thead className="table-dark">
               <tr>
                 <th colSpan="2">Compensation</th>
@@ -683,7 +683,7 @@ const Profile = () => {
                 </tr>
               ))}
             </tbody>
-            
+
             <thead className="table-dark">
               <tr>
                 <th colSpan="4">Certifications</th>
@@ -696,9 +696,8 @@ const Profile = () => {
                   <td>{cert.issuer}</td>
                   <td>{cert.year}</td>
                   <td>
-                    <span className={`badge ${
-                      cert.status.includes("Valid") ? "bg-success" : "bg-warning text-dark"
-                    }`}>
+                    <span className={`badge ${cert.status.includes("Valid") ? "bg-success" : "bg-warning text-dark"
+                      }`}>
                       {cert.status}
                     </span>
                   </td>
@@ -715,16 +714,16 @@ const Profile = () => {
         <>
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h4>My Documents</h4>
-            <button 
+            <button
               className="btn btn-primary"
               onClick={() => setShowAddForm(true)}
             >
               <i className="fas fa-plus me-1"></i> Upload Document
             </button>
           </div>
-          
+
           {showAddForm && renderAddForm()}
-          
+
           <div className="table-responsive">
             <table className="table table-striped table-bordered">
               <thead className="table-dark">
@@ -743,28 +742,27 @@ const Profile = () => {
                     <td>{doc.name}</td>
                     <td>{doc.date}</td>
                     <td>
-                      <span className={`badge ${
-                        doc.status === "Verified" ? "bg-success" : 
-                        doc.status === "Pending" ? "bg-warning text-dark" : "bg-secondary"
-                      }`}>
+                      <span className={`badge ${doc.status === "Verified" ? "bg-success" :
+                          doc.status === "Pending" ? "bg-warning text-dark" : "bg-secondary"
+                        }`}>
                         {doc.status}
                       </span>
                     </td>
                     <td>
-  <button className="btn btn-sm btn-outline-primary me-1" title="Download">
-    <i className="fas fa-download me-1"></i> Download
-  </button>
-  <button className="btn btn-sm btn-outline-secondary me-1" title="View Document">
-    <i className="fas fa-eye me-1"></i> View
-  </button>
-  <button 
-    className="btn btn-sm btn-outline-danger"
-    onClick={() => handleDelete(doc.id, 'documents')}
-    title="Delete Document"
-  >
-    <i className="fas fa-trash me-1"></i> Delete
-  </button>
-</td>
+                      <button className="btn btn-sm btn-outline-primary me-1" title="Download">
+                        <i className="fas fa-download me-1"></i> Download
+                      </button>
+                      <button className="btn btn-sm btn-outline-secondary me-1" title="View Document">
+                        <i className="fas fa-eye me-1"></i> View
+                      </button>
+                      <button
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => handleDelete(doc.id, 'documents')}
+                        title="Delete Document"
+                      >
+                        <i className="fas fa-trash me-1"></i> Delete
+                      </button>
+                    </td>
 
                   </tr>
                 ))}
@@ -780,16 +778,16 @@ const Profile = () => {
         <>
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h4>Work Experience</h4>
-            <button 
+            <button
               className="btn btn-primary"
               onClick={() => setShowAddForm(true)}
             >
               <i className="fas fa-plus me-1"></i> Add Experience
             </button>
           </div>
-          
+
           {showAddForm && renderAddForm()}
-          
+
           <div className="table-responsive">
             <table className="table table-striped table-bordered">
               <thead className="table-dark">
@@ -815,14 +813,14 @@ const Profile = () => {
                       </ul>
                     </td>
                     <td>
-  <button 
-    className="btn btn-sm btn-outline-danger"
-    onClick={() => handleDelete(exp.id, 'experiences')}
-    title="Delete Experience"
-  >
-    <i className="fas fa-trash me-1"></i> Delete
-  </button>
-</td>
+                      <button
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => handleDelete(exp.id, 'experiences')}
+                        title="Delete Experience"
+                      >
+                        <i className="fas fa-trash me-1"></i> Delete
+                      </button>
+                    </td>
 
                   </tr>
                 ))}
@@ -838,16 +836,16 @@ const Profile = () => {
         <>
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h4>Family Members</h4>
-            <button 
+            <button
               className="btn btn-primary"
               onClick={() => setShowAddForm(true)}
             >
               <i className="fas fa-plus me-1"></i> Add Member
             </button>
           </div>
-          
+
           {showAddForm && renderAddForm()}
-          
+
           <div className="table-responsive">
             <table className="table table-striped table-bordered">
               <thead className="table-dark">
@@ -868,26 +866,25 @@ const Profile = () => {
                     <td>{member.dob}</td>
                     <td>{member.contact}</td>
                     <td>
-                      <span className={`badge ${
-                        member.dependent === "Yes" ? "bg-success" : "bg-secondary"
-                      }`}>
+                      <span className={`badge ${member.dependent === "Yes" ? "bg-success" : "bg-secondary"
+                        }`}>
                         {member.dependent}
                       </span>
                     </td>
                     <td>
-  <button 
-    className="btn btn-sm btn-outline-danger"
-    onClick={() => handleDelete(member.id, 'familyMembers')}
-    title="Delete Family Member"
-  >
-    <i className="fas fa-trash me-1"></i> Delete
-  </button>
-</td>
+                      <button
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => handleDelete(member.id, 'familyMembers')}
+                        title="Delete Family Member"
+                      >
+                        <i className="fas fa-trash me-1"></i> Delete
+                      </button>
+                    </td>
 
                   </tr>
                 ))}
               </tbody>
-              
+
               <thead className="table-dark">
                 <tr>
                   <th colSpan="6">Emergency Contacts</th>
@@ -924,7 +921,7 @@ const Profile = () => {
         <div className="profile-header">
           <div className="profile-image-container">
             <img
-              src="http://localhost:3000/src/assets/images/avatars/8.jpg"
+              src={avatar8}
               alt="ABC XYZ"
               className="profile-img"
             />
@@ -996,7 +993,7 @@ const Profile = () => {
 };
 
 const getTabIcon = (tabKey) => {
-  switch(tabKey) {
+  switch (tabKey) {
     case 'personal': return 'fa-user';
     case 'company': return 'fa-briefcase';
     case 'education': return 'fa-graduation-cap';

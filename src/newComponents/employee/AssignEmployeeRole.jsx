@@ -20,7 +20,7 @@ const AssignEmployeeRole = () => {
     // ============================================
     const getAllEmployees = async () => {
         try {
-            const res = await fetch("http://localhost:4000/employee/allEmployee");
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/employee/allEmployee`);
             const data = await res.json();
             if (res.ok) setEmployees(data.employees || []);
         } catch (err) {
@@ -31,7 +31,7 @@ const AssignEmployeeRole = () => {
     // FETCH ROLES (from EmployeeRole instead of admin Role)
     const getAllRoles = async () => {
         try {
-            const res = await fetch("http://localhost:4000/employeerole/getemployeerole");
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/employeerole/getemployeerole`);
             const data = await res.json();
             if (res.ok) setRoles(data.data || []);
         } catch (err) {
@@ -42,7 +42,7 @@ const AssignEmployeeRole = () => {
     // FETCH ALL COMPANIES
     const getAllCompanies = async () => {
         try {
-            const res = await fetch("http://localhost:4000/company/all");
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/company/all`);
             const data = await res.json();
             if (res.ok) setCompanies(data.companies || []);
         } catch (err) {
@@ -55,7 +55,7 @@ const AssignEmployeeRole = () => {
     // ============================================
     const getCompaniesByEmployee = async (employeeId) => {
         try {
-            const res = await fetch(`http://localhost:4000/employee/getCompanyByEmployeeId/${employeeId}`);
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/employee/getCompanyByEmployeeId/${employeeId}`);
             const data = await res.json();
 
             console.log("🏢 Employee Companies Data:", data);
@@ -79,7 +79,7 @@ const AssignEmployeeRole = () => {
             if (!employeeId || !companyId) return;
 
             try {
-                const res = await fetch(`http://localhost:4000/employee/getAssignedRoles/${employeeId}`);
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/employee/getAssignedRoles/${employeeId}`);
                 const data = await res.json();
                 console.log("👷‍♂️ Employee assigned roles raw:", data);
 
@@ -213,7 +213,7 @@ const AssignEmployeeRole = () => {
 
             console.log("📤 Sending Payload:", payload);
 
-            const res = await fetch("http://localhost:4000/employee/assignRole", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/employee/assignRole`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),

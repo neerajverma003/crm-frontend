@@ -18,7 +18,7 @@
 //     const token = localStorage.getItem("token");
 //     const handleSave = async (updatedData) => {
 //         try {
-//             const res = await fetch(`http://localhost:4000/attendance/${editingAttendance._id}`, {
+//             const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/${editingAttendance._id}`, {
 //                 method: "PATCH",
 //                 headers: {
 //                     "Content-Type": "application/json",
@@ -212,8 +212,8 @@
 //         try {
 //             setLoading(true);
 //             const [adminRes, employeeRes] = await Promise.all([
-//                 axios.get("http://localhost:4000/getAdmins"),
-//                 axios.get("http://localhost:4000/employee/allEmployee"),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/getAdmins`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/employee/allEmployee`),
 //             ]);
 
 //             const adminData = adminRes?.data?.admins || adminRes?.data || [];
@@ -260,8 +260,8 @@
 //     const fetchTodayAttendance = async (allUsers) => {
 //         try {
 //             const [adminAttendanceRes, employeeAttendanceRes] = await Promise.all([
-//                 axios.get("http://localhost:4000/adminAttendance/getAllAttendance"),
-//                 axios.get("http://localhost:4000/attendance/getAllAttendance"),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/attendance/getAllAttendance`),
 //             ]);
 
 //             // Both endpoints return arrays directly
@@ -359,11 +359,11 @@
 //             let attendanceData = [];
 
 //             if (user.userType === "Admin") {
-//                 const res = await axios.get("http://localhost:4000/adminAttendance/getAllAttendance");
+//                 const res = await axios.get(`${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance`);
 //                 attendanceData = Array.isArray(res?.data) ? res.data : [];
 //                 attendanceData = attendanceData.filter((record) => record?.admin?._id === user._id);
 //             } else {
-//                 const res = await axios.get("http://localhost:4000/attendance/getAllAttendance");
+//                 const res = await axios.get(`${import.meta.env.VITE_API_URL}/attendance/getAllAttendance`);
 //                 attendanceData = Array.isArray(res?.data) ? res.data : [];
 //                 attendanceData = attendanceData.filter((record) => record?.employee?._id === user._id);
 //             }
@@ -1384,7 +1384,7 @@
 //     const token = localStorage.getItem("token");
 //     const handleSave = async (updatedData) => {
 //         try {
-//             const res = await fetch(`http://localhost:4000/attendance/${editingAttendance._id}`, {
+//             const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/${editingAttendance._id}`, {
 //                 method: "PATCH",
 //                 headers: {
 //                     "Content-Type": "application/json",
@@ -1426,7 +1426,7 @@
 //             if (selectedDateForEdit.records && selectedDateForEdit.records.length > 0) {
 //                 // Update existing record
 //                 const attendance = selectedDateForEdit.records[0];
-//                 const res = await fetch(`http://localhost:4000/attendance/${attendance._id}`, {
+//                 const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/${attendance._id}`, {
 //                     method: "PATCH",
 //                     headers: {
 //                         "Content-Type": "application/json",
@@ -1444,7 +1444,7 @@
 //                 }
 //             } else {
 //                 // Create new record
-//                 const res = await fetch(`http://localhost:4000/attendance`, {
+//                 const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance`, {
 //                     method: "POST",
 //                     headers: {
 //                         "Content-Type": "application/json",
@@ -1756,8 +1756,8 @@
 //         try {
 //             setLoading(true);
 //             const [adminRes, employeeRes] = await Promise.all([
-//                 axios.get("http://localhost:4000/getAdmins"),
-//                 axios.get("http://localhost:4000/employee/allEmployee"),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/getAdmins`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/employee/allEmployee`),
 //             ]);
 
 //             const adminData = adminRes?.data?.admins || adminRes?.data || [];
@@ -1804,8 +1804,8 @@
 //     const fetchTodayAttendance = async (allUsers) => {
 //         try {
 //             const [adminAttendanceRes, employeeAttendanceRes] = await Promise.all([
-//                 axios.get("http://localhost:4000/adminAttendance/getAllAttendance"),
-//                 axios.get("http://localhost:4000/attendance/getAllAttendance"),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/attendance/getAllAttendance`),
 //             ]);
 
 //             // Both endpoints return arrays directly
@@ -1905,11 +1905,11 @@
 //             let attendanceData = [];
 
 //             if (user.userType === "Admin") {
-//                 const res = await axios.get("http://localhost:4000/adminAttendance/getAllAttendance");
+//                 const res = await axios.get(`${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance`);
 //                 attendanceData = Array.isArray(res?.data) ? res.data : [];
 //                 attendanceData = attendanceData.filter((record) => record?.admin?._id === user._id);
 //             } else {
-//                 const res = await axios.get("http://localhost:4000/attendance/getAllAttendance");
+//                 const res = await axios.get(`${import.meta.env.VITE_API_URL}/attendance/getAllAttendance`);
 //                 attendanceData = Array.isArray(res?.data) ? res.data : [];
 //                 attendanceData = attendanceData.filter((record) => record?.employee?._id === user._id);
 //             }
@@ -2961,7 +2961,7 @@
 
 //     const handleSave = async (updatedData) => {
 //         try {
-//             const res = await fetch(`http://localhost:4000/attendance/${editingAttendance._id}`, {
+//             const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/${editingAttendance._id}`, {
 //                 method: "PATCH",
 //                 headers: {
 //                     "Content-Type": "application/json",
@@ -3003,7 +3003,7 @@
 //             if (selectedDateForEdit.records && selectedDateForEdit.records.length > 0) {
 //                 // Update existing record
 //                 const attendance = selectedDateForEdit.records[0];
-//                 const res = await fetch(`http://localhost:4000/attendance/${attendance._id}`, {
+//                 const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/${attendance._id}`, {
 //                     method: "PATCH",
 //                     headers: {
 //                         "Content-Type": "application/json",
@@ -3021,7 +3021,7 @@
 //                 }
 //             } else {
 //                 // Create new record
-//                 const res = await fetch(`http://localhost:4000/attendance`, {
+//                 const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance`, {
 //                     method: "POST",
 //                     headers: {
 //                         "Content-Type": "application/json",
@@ -3333,8 +3333,8 @@
 //         try {
 //             setLoading(true);
 //             const [adminRes, employeeRes] = await Promise.all([
-//                 axios.get("http://localhost:4000/getAdmins"),
-//                 axios.get("http://localhost:4000/employee/allEmployee"),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/getAdmins`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/employee/allEmployee`),
 //             ]);
 
 //             const adminData = adminRes?.data?.admins || adminRes?.data || [];
@@ -3385,8 +3385,8 @@
 
 //             // Fetch only today's attendance data using query parameter
 //             const [adminAttendanceRes, employeeAttendanceRes] = await Promise.all([
-//                 axios.get(`http://localhost:4000/adminAttendance/getAllAttendance?date=${today}`),
-//                 axios.get(`http://localhost:4000/attendance/getAllAttendance?date=${today}`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance?date=${today}`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/attendance/getAllAttendance?date=${today}`),
 //             ]);
 
 //             // Both endpoints return arrays directly
@@ -3492,13 +3492,13 @@
 //             if (user.userType === "Admin") {
 //                 // Fetch only this admin's attendance for the current month
 //                 const res = await axios.get(
-//                     `http://localhost:4000/adminAttendance/getAllAttendance?adminId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`
+//                     `${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance?adminId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`
 //                 );
 //                 attendanceData = Array.isArray(res?.data) ? res.data : [];
 //             } else {
 //                 // Fetch only this employee's attendance for the current month
 //                 const res = await axios.get(
-//                     `http://localhost:4000/attendance/getAllAttendance?employeeId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`
+//                     `${import.meta.env.VITE_API_URL}/attendance/getAllAttendance?employeeId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`
 //                 );
 //                 attendanceData = Array.isArray(res?.data) ? res.data : [];
 //             }
@@ -4546,7 +4546,7 @@
 //     const token = localStorage.getItem("token");
 //     const handleSave = async (updatedData) => {
 //         try {
-//             const res = await fetch(`http://localhost:4000/attendance/${editingAttendance._id}`, {
+//             const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/${editingAttendance._id}`, {
 //                 method: "PATCH",
 //                 headers: {
 //                     "Content-Type": "application/json",
@@ -4588,7 +4588,7 @@
 //             if (selectedDateForEdit.records && selectedDateForEdit.records.length > 0) {
 //                 // Update existing record
 //                 const attendance = selectedDateForEdit.records[0];
-//                 const res = await fetch(`http://localhost:4000/attendance/${attendance._id}`, {
+//                 const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/${attendance._id}`, {
 //                     method: "PATCH",
 //                     headers: {
 //                         "Content-Type": "application/json",
@@ -4606,7 +4606,7 @@
 //                 }
 //             } else {
 //                 // Create new record
-//                 const res = await fetch(`http://localhost:4000/attendance`, {
+//                 const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance`, {
 //                     method: "POST",
 //                     headers: {
 //                         "Content-Type": "application/json",
@@ -4917,8 +4917,8 @@
 //         try {
 //             setLoading(true);
 //             const [adminRes, employeeRes] = await Promise.all([
-//                 axios.get("http://localhost:4000/getAdmins"),
-//                 axios.get("http://localhost:4000/employee/allEmployee"),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/getAdmins`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/employee/allEmployee`),
 //             ]);
 
 //             const adminData = adminRes?.data?.admins || adminRes?.data || [];
@@ -4969,8 +4969,8 @@
 
 //             // Fetch only today's attendance data using query parameter
 //             const [adminAttendanceRes, employeeAttendanceRes] = await Promise.all([
-//                 axios.get(`http://localhost:4000/adminAttendance/getAllAttendance?date=${today}`),
-//                 axios.get(`http://localhost:4000/attendance/getAllAttendance?date=${today}`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance?date=${today}`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/attendance/getAllAttendance?date=${today}`),
 //             ]);
 
 //             // Both endpoints return arrays directly
@@ -5076,13 +5076,13 @@
 //             if (user.userType === "Admin") {
 //                 // Fetch only this admin's attendance for the current month
 //                 const res = await axios.get(
-//                     `http://localhost:4000/adminAttendance/getAllAttendance?adminId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
+//                     `${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance?adminId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
 //                 );
 //                 attendanceData = Array.isArray(res?.data) ? res.data : [];
 //             } else {
 //                 // Fetch only this employee's attendance for the current month
 //                 const res = await axios.get(
-//                     `http://localhost:4000/attendance/getAllAttendance?employeeId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
+//                     `${import.meta.env.VITE_API_URL}/attendance/getAllAttendance?employeeId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
 //                 );
 //                 attendanceData = Array.isArray(res?.data) ? res.data : [];
 //             }
@@ -5180,7 +5180,7 @@
 //                 notes: "",
 //             };
 
-//             const response = await axios.post("http://localhost:4000/salary/save", salaryData);
+//             const response = await axios.post(`${import.meta.env.VITE_API_URL}/salary/save`, salaryData);
 
 //             if (response.data.success) {
 //                 alert("Salary summary saved successfully!");
@@ -6213,7 +6213,7 @@
 //     const token = localStorage.getItem("token");
 //     const handleSave = async (updatedData) => {
 //         try {
-//             const res = await fetch(`http://localhost:4000/attendance/${editingAttendance._id}`, {
+//             const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/${editingAttendance._id}`, {
 //                 method: "PATCH",
 //                 headers: {
 //                     "Content-Type": "application/json",
@@ -6255,7 +6255,7 @@
 //             if (selectedDateForEdit.records && selectedDateForEdit.records.length > 0) {
 //                 // Update existing record
 //                 const attendance = selectedDateForEdit.records[0];
-//                 const res = await fetch(`http://localhost:4000/attendance/${attendance._id}`, {
+//                 const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/${attendance._id}`, {
 //                     method: "PATCH",
 //                     headers: {
 //                         "Content-Type": "application/json",
@@ -6273,7 +6273,7 @@
 //                 }
 //             } else {
 //                 // Create new record
-//                 const res = await fetch(`http://localhost:4000/attendance`, {
+//                 const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance`, {
 //                     method: "POST",
 //                     headers: {
 //                         "Content-Type": "application/json",
@@ -6584,8 +6584,8 @@
 //         try {
 //             setLoading(true);
 //             const [adminRes, employeeRes] = await Promise.all([
-//                 axios.get("http://localhost:4000/getAdmins"),
-//                 axios.get("http://localhost:4000/employee/allEmployee"),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/getAdmins`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/employee/allEmployee`),
 //             ]);
 
 //             const adminData = adminRes?.data?.admins || adminRes?.data || [];
@@ -6636,8 +6636,8 @@
 
 //             // Fetch only today's attendance data using query parameter
 //             const [adminAttendanceRes, employeeAttendanceRes] = await Promise.all([
-//                 axios.get(`http://localhost:4000/adminAttendance/getAllAttendance?date=${today}`),
-//                 axios.get(`http://localhost:4000/attendance/getAllAttendance?date=${today}`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance?date=${today}`),
+//                 axios.get(`${import.meta.env.VITE_API_URL}/attendance/getAllAttendance?date=${today}`),
 //             ]);
 
 //             // Both endpoints return arrays directly
@@ -6743,13 +6743,13 @@
 //             if (user.userType === "Admin") {
 //                 // Fetch only this admin's attendance for the current month
 //                 const res = await axios.get(
-//                     `http://localhost:4000/adminAttendance/getAllAttendance?adminId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
+//                     `${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance?adminId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
 //                 );
 //                 attendanceData = Array.isArray(res?.data) ? res.data : [];
 //             } else {
 //                 // Fetch only this employee's attendance for the current month
 //                 const res = await axios.get(
-//                     `http://localhost:4000/attendance/getAllAttendance?employeeId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
+//                     `${import.meta.env.VITE_API_URL}/attendance/getAllAttendance?employeeId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
 //                 );
 //                 attendanceData = Array.isArray(res?.data) ? res.data : [];
 //             }
@@ -6847,7 +6847,7 @@
 //                 notes: "",
 //             };
 
-//             const response = await axios.post("http://localhost:4000/salary/save", salaryData);
+//             const response = await axios.post(`${import.meta.env.VITE_API_URL}/salary/save`, salaryData);
 
 //             if (response.data.success) {
 //                 alert("Salary summary saved successfully!");
@@ -8040,7 +8040,7 @@ const SuperAdminAttendance = () => {
     const token = localStorage.getItem("token");
     const handleSave = async (updatedData) => {
         try {
-            const res = await fetch(`http://localhost:4000/attendance/${editingAttendance._id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/${editingAttendance._id}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -8086,8 +8086,8 @@ const SuperAdminAttendance = () => {
                 const attendance = selectedDateForEdit.records[0];
                 const isAdmin = selectedUser?.userType === "Admin";
                 const endpoint = isAdmin 
-                    ? `http://localhost:4000/adminAttendance/editAttendance/${attendance._id}`
-                    : `http://localhost:4000/attendance/${attendance._id}`;
+                    ? `${import.meta.env.VITE_API_URL}/adminAttendance/editAttendance/${attendance._id}`
+                    : `${import.meta.env.VITE_API_URL}/attendance/${attendance._id}`;
                 const method = isAdmin ? "PUT" : "PATCH";
                 
                 const res = await fetch(endpoint, {
@@ -8116,7 +8116,7 @@ const SuperAdminAttendance = () => {
                     return;
                 }
                 
-                const res = await fetch(`http://localhost:4000/attendance`, {
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -8431,8 +8431,8 @@ const SuperAdminAttendance = () => {
         try {
             setLoading(true);
             const [adminRes, employeeRes] = await Promise.all([
-                axios.get("http://localhost:4000/getAdmins"),
-                axios.get("http://localhost:4000/employee/allEmployee"),
+                axios.get(`${import.meta.env.VITE_API_URL}/getAdmins`),
+                axios.get(`${import.meta.env.VITE_API_URL}/employee/allEmployee`),
             ]);
 
             const adminData = adminRes?.data?.admins || adminRes?.data || [];
@@ -8483,8 +8483,8 @@ const SuperAdminAttendance = () => {
 
             // Fetch only today's attendance data using query parameter
             const [adminAttendanceRes, employeeAttendanceRes] = await Promise.all([
-                axios.get(`http://localhost:4000/adminAttendance/getAllAttendance?date=${today}`),
-                axios.get(`http://localhost:4000/attendance/getAllAttendance?date=${today}`),
+                axios.get(`${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance?date=${today}`),
+                axios.get(`${import.meta.env.VITE_API_URL}/attendance/getAllAttendance?date=${today}`),
             ]);
 
             // Both endpoints return arrays directly
@@ -8590,13 +8590,13 @@ const SuperAdminAttendance = () => {
             if (user.userType === "Admin") {
                 // Fetch only this admin's attendance for the current month
                 const res = await axios.get(
-                    `http://localhost:4000/adminAttendance/getAllAttendance?adminId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
+                    `${import.meta.env.VITE_API_URL}/adminAttendance/getAllAttendance?adminId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
                 );
                 attendanceData = Array.isArray(res?.data) ? res.data : [];
             } else {
                 // Fetch only this employee's attendance for the current month
                 const res = await axios.get(
-                    `http://localhost:4000/attendance/getAllAttendance?employeeId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
+                    `${import.meta.env.VITE_API_URL}/attendance/getAllAttendance?employeeId=${user._id}&startDate=${firstDay}&endDate=${lastDay}`,
                 );
                 attendanceData = Array.isArray(res?.data) ? res.data : [];
             }
@@ -8723,7 +8723,7 @@ const SuperAdminAttendance = () => {
                 salarySummary,
             };
 
-            const response = await axios.post("http://localhost:4000/salary/save", salaryData);
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/salary/save`, salaryData);
 
             if (response.data.success) {
                 alert("Salary summary saved successfully!");

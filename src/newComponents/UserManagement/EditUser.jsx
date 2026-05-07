@@ -34,7 +34,7 @@
 
 //   const getCompanies = async () => {
 //     try {
-//       const response = await axios.get("http://localhost:4000/company/all");
+//       const response = await axios.get(`${import.meta.env.VITE_API_URL}/company/all`);
 //       setCompanies(response.data.companies || []);
 //     } catch (error) {
 //       console.error("Failed to fetch companies:", error);
@@ -46,7 +46,7 @@
 //     if (!companyId) return;
 
 //     try {
-//       const url = `http://localhost:4000/department/department?company=${companyId}`;
+//       const url = `${import.meta.env.VITE_API_URL}/department/department?company=${companyId}`;
 
 //       const response = await fetch(url);
 //       if (!response.ok) throw new Error("Failed to fetch departments");
@@ -66,7 +66,7 @@
 //     if (!companyId || !departmentId) return;
 
 //     try {
-//       const url = `http://localhost:4000/designation?company=${companyId}&department=${departmentId}`;
+//       const url = `${import.meta.env.VITE_API_URL}/designation?company=${companyId}&department=${departmentId}`;
 
 //       const response = await fetch(url);
 //       if (!response.ok) throw new Error("Failed to fetch designations");
@@ -129,10 +129,10 @@
 
 //     setIsSubmitting(true);
 
-//     let endpoint = `http://localhost:4000/employee/editEmployee/${user._id}`;
+//     let endpoint = `${import.meta.env.VITE_API_URL}/employee/editEmployee/${user._id}`;
 
 //     if (user.role && String(user.role).toLowerCase() === "admin") {
-//       endpoint = `http://localhost:4000/editAdmin/${user._id}`;
+//       endpoint = `${import.meta.env.VITE_API_URL}/editAdmin/${user._id}`;
 //     }
 
 //     try {
@@ -474,7 +474,7 @@ const EditUser = ({ user, isOpen, onClose, onSave }) => {
 
     const getCompanies = async () => {
         try {
-            const response = await axios.get("http://localhost:4000/company/all");
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/company/all`);
             setCompanies(response.data.companies || []);
         } catch (error) {
             console.error("Failed to fetch companies:", error);
@@ -486,7 +486,7 @@ const EditUser = ({ user, isOpen, onClose, onSave }) => {
         if (!companyId) return;
 
         try {
-            const url = `http://localhost:4000/department/department?company=${companyId}`;
+            const url = `${import.meta.env.VITE_API_URL}/department/department?company=${companyId}`;
 
             const response = await fetch(url);
             if (!response.ok) throw new Error("Failed to fetch departments");
@@ -506,7 +506,7 @@ const EditUser = ({ user, isOpen, onClose, onSave }) => {
         if (!companyId || !departmentId) return;
 
         try {
-            const url = `http://localhost:4000/designation?company=${companyId}&department=${departmentId}`;
+            const url = `${import.meta.env.VITE_API_URL}/designation?company=${companyId}&department=${departmentId}`;
 
             const response = await fetch(url);
             if (!response.ok) throw new Error("Failed to fetch designations");
@@ -569,10 +569,10 @@ const EditUser = ({ user, isOpen, onClose, onSave }) => {
 
         setIsSubmitting(true);
 
-        let endpoint = `http://localhost:4000/employee/editEmployee/${user._id}`;
+        let endpoint = `${import.meta.env.VITE_API_URL}/employee/editEmployee/${user._id}`;
 
         if (user.role && String(user.role).toLowerCase() === "admin") {
-            endpoint = `http://localhost:4000/editAdmin/${user._id}`;
+            endpoint = `${import.meta.env.VITE_API_URL}/editAdmin/${user._id}`;
         }
 
         try {

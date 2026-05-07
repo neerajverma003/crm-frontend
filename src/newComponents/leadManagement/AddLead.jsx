@@ -111,7 +111,7 @@
 // //     setApiError("");
 // //     try {
 // //       const payload = { ...formData, phone: formData.phone.split(",").map((p) => p.trim()) };
-// //       const res = await fetch("http://localhost:4000/leads/lead", {
+// //       const res = await fetch(`${import.meta.env.VITE_API_URL}/leads/lead`, {
 // //         method: "POST",
 // //         headers: { "Content-Type": "application/json" },
 // //         body: JSON.stringify(payload),
@@ -142,7 +142,7 @@
 
 // //     // ✅ Upload with progress tracking
 // //     const xhr = new XMLHttpRequest();
-// //     xhr.open("POST", "http://localhost:4000/leads/upload");
+// //     xhr.open("POST", `${import.meta.env.VITE_API_URL}/leads/upload`);
 
 // //     xhr.upload.onprogress = (event) => {
 // //       if (event.lengthComputable) {
@@ -415,7 +415,7 @@
 //         expectedTravelDate: formData.expectedTravelDate ? new Date(formData.expectedTravelDate) : undefined,
 //       };
 
-//       const res = await fetch("http://localhost:4000/leads/lead", {
+//       const res = await fetch(`${import.meta.env.VITE_API_URL}/leads/lead`, {
 //         method: "POST",
 //         headers: { "Content-Type": "application/json" },
 //         body: JSON.stringify(payload),
@@ -659,7 +659,7 @@
 //         expectedTravelDate: formData.expectedTravelDate ? new Date(formData.expectedTravelDate) : undefined,
 //       };
 
-//       const res = await fetch("http://localhost:4000/leads/lead", {
+//       const res = await fetch(`${import.meta.env.VITE_API_URL}/leads/lead`, {
 //         method: "POST",
 //         headers: { "Content-Type": "application/json" },
 //         body: JSON.stringify(payload),
@@ -722,7 +722,7 @@
 //       const formData = new FormData();
 //       formData.append("file", file);
 
-//       const res = await fetch("http://localhost:4000/leads/upload", {
+//       const res = await fetch(`${import.meta.env.VITE_API_URL}/leads/upload`, {
 //         method: "POST",
 //         body: formData,
 //       });
@@ -1002,7 +1002,7 @@
 //         expectedTravelDate: formData.expectedTravelDate ? new Date(formData.expectedTravelDate) : undefined,
 //       };
 
-//       const res = await fetch("http://localhost:4000/leads/lead", {
+//       const res = await fetch(`${import.meta.env.VITE_API_URL}/leads/lead`, {
 //         method: "POST",
 //         headers: { "Content-Type": "application/json" },
 //         body: JSON.stringify(payload),
@@ -1061,7 +1061,7 @@
 //       const formData = new FormData();
 //       formData.append("file", file);
 
-//       const res = await fetch("http://localhost:4000/leads/upload", {
+//       const res = await fetch(`${import.meta.env.VITE_API_URL}/leads/upload`, {
 //         method: "POST",
 //         body: formData,
 //       });
@@ -1357,7 +1357,7 @@ const AddLead = ({ onLeadAdded }) => {
         expectedTravelDate: formData.expectedTravelDate ? new Date(formData.expectedTravelDate) : undefined,
       };
 
-      const res = await fetch("http://localhost:4000/leads/lead", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/leads/lead`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -1496,7 +1496,7 @@ const AddLead = ({ onLeadAdded }) => {
         }
 
         try {
-          const res = await fetch("http://localhost:4000/leads/lead", {
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/leads/lead`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),

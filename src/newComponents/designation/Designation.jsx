@@ -21,7 +21,7 @@ const Designation = () => {
   // ✅ Fetch companies
   const fetchCompanies = async () => {
     try {
-      const res = await fetch("http://localhost:4000/company/all");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/company/all`);
       const data = await res.json();
       setCompanies(data.companies || []);
     } catch (error) {
@@ -38,7 +38,7 @@ const Designation = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:4000/department/department?company=${companyId}`
+        `${import.meta.env.VITE_API_URL}/department/department?company=${companyId}`
       );
       const data = await res.json();
       setDepartments(data.departments || []);
@@ -51,7 +51,7 @@ const Designation = () => {
   // ✅ Fetch all designations
   const fetchDesignations = async () => {
     try {
-      const res = await fetch("http://localhost:4000/designation/");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/designation/`);
       const data = await res.json();
 
       const list = Array.isArray(data.designations)
@@ -70,7 +70,7 @@ const Designation = () => {
   // ✅ Fetch all departments on initial load for table display
   const fetchAllDepartments = async () => {
     try {
-      const res = await fetch("http://localhost:4000/department/department");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/department/department`);
       const data = await res.json();
       setAllDepartments(data.departments || []);
       setDepartments(data.departments || []);
@@ -125,7 +125,7 @@ const Designation = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:4000/designation/", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/designation/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -155,7 +155,7 @@ const Designation = () => {
     if (!window.confirm("Delete?")) return;
 
     try {
-      const res = await fetch(`http://localhost:4000/designation/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/designation/${id}`, {
         method: "DELETE",
       });
 

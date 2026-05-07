@@ -35,7 +35,7 @@ const DestinationSearchBox = ({
     const fetchDestinations = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch("http://localhost:4000/employeedestination/");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/employeedestination/`);
         const data = await res.json();
 
         if (Array.isArray(data.destinations)) {

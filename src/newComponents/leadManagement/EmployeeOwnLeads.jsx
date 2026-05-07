@@ -38,7 +38,7 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
   const fetchActiveEmployees = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:4000/employee/allEmployee");
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/employee/allEmployee`);
       const result = await response.json();
 
       if (result.success && result.employees) {
@@ -83,10 +83,10 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
       console.log(employeeId);
       
       if (!employeeId) {
-        endpoint = `http://localhost:4000/employeelead/getAllEmployeeLead`;
+        endpoint = `${import.meta.env.VITE_API_URL}/employeelead/getAllEmployeeLead`;
       }
       else {
-        endpoint = `http://localhost:4000/employeelead/employee/${employeeId}`;
+        endpoint = `${import.meta.env.VITE_API_URL}/employeelead/employee/${employeeId}`;
       }
       const response = await fetch(endpoint);
       const result = await response.json();
@@ -227,7 +227,7 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
 
     setStatusSavingId(leadId);
     try {
-      const endpoint = `http://localhost:4000/employeelead/${leadId}`;
+      const endpoint = `${import.meta.env.VITE_API_URL}/employeelead/${leadId}`;
       const res = await fetch(endpoint, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -246,7 +246,7 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
   const handleSendMessage = async (leadId) => {
     if (!messageText.trim()) return alert("Please enter a message");
     try {
-      const endpoint = `http://localhost:4000/employeelead/${leadId}/message`;
+      const endpoint = `${import.meta.env.VITE_API_URL}/employeelead/${leadId}/message`;
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -256,7 +256,7 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
 
       // If there was a pending status (Follow Up), save it now
       if (pendingStatus && pendingStatus.leadId === leadId) {
-        await fetch(`http://localhost:4000/employeelead/${leadId}`, {
+        await fetch(`${import.meta.env.VITE_API_URL}/employeelead/${leadId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ leadInterestStatus: pendingStatus.newStatus }),
@@ -624,7 +624,7 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
                   <button onClick={async () => {
                     if (!selectedEmployeeForAssign) return alert('Please select an employee');
                     try {
-                      const res = await fetch(`http://localhost:4000/employeelead/${assignEmployeeModal.lead._id}`, {
+                      const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/${assignEmployeeModal.lead._id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ employee: selectedEmployeeForAssign }),

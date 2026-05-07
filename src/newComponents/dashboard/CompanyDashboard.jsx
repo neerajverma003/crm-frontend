@@ -21,7 +21,7 @@ function CompanyDashboard() {
 
     const fetchCompanyDetails = async (companyId) => {
         try {
-            const res = await axios.get(`http://localhost:4000/company/${companyId}`);
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/company/${companyId}`);
             console.log("Company API Response:", res.data);
             if (res.data && res.data.company) {
                 setCompany(res.data.company);
@@ -39,7 +39,7 @@ function CompanyDashboard() {
 
     const fetchRoles = async (adminId, companyId) => {
         try {
-            const res = await axios.get(`http://localhost:4000/getAssignedRoles/${adminId}/${companyId}`);
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/getAssignedRoles/${adminId}/${companyId}`);
             console.log("Assigned Roles API Response:", res.data);
             if (res.data && res.data.assignedRoles) {
                 setRoles(res.data.assignedRoles);

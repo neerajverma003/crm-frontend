@@ -6,7 +6,7 @@
 //     // Fetch leads from API
 //     const fetchLeadData = async () => {
 //         try {
-//             const response = await fetch("http://localhost:4000/leads/");
+//             const response = await fetch(`${import.meta.env.VITE_API_URL}/leads/`);
 //             const result = await response.json();
 //             console.log(result);
 //             if (result.success) {
@@ -78,8 +78,8 @@
 //     setError(null);
 //     try {
 //       const [normalRes, empRes] = await Promise.all([
-//         fetch("http://localhost:4000/leads/stats"),
-//         fetch("http://localhost:4000/employeelead/stats"),
+//         fetch(`${import.meta.env.VITE_API_URL}/leads/stats`),
+//         fetch(`${import.meta.env.VITE_API_URL}/employeelead/stats`),
 //       ]);
 
 //       const normalStats = await normalRes.json();
@@ -202,7 +202,7 @@ const LeadCards = ({ activeTab, selectedEmployeeId }) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("http://localhost:4000/leads/gettodaysleads");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/leads/gettodaysleads`);
       const json = await res.json();  
       if (json.success) {
         setTodaysLead(json.data || []);
@@ -227,7 +227,7 @@ const LeadCards = ({ activeTab, selectedEmployeeId }) => {
     try {
       // If employee-specific view, fetch that employee's leads and compute counts
       if (activeTab === "employee-own" && selectedEmployeeId) {
-        const res = await fetch(`http://localhost:4000/employeelead/employee/${selectedEmployeeId}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/employee/${selectedEmployeeId}`);
         const json = await res.json();
         let leadsArr = [];
         if (json && Array.isArray(json.leads)) leadsArr = json.leads;
@@ -255,7 +255,7 @@ const LeadCards = ({ activeTab, selectedEmployeeId }) => {
         setStats(prev => ({ ...prev, totalLeads, followUp, interested, connected, notConnected }));
       }
       else if (activeTab === "employee-own" && !selectedEmployeeId) {
-        const res = await fetch(`http://localhost:4000/employeelead/getAllEmployeeLead`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/getAllEmployeeLead`);
         const json = await res.json();
 
         let leadsArr = [];
@@ -278,8 +278,8 @@ const LeadCards = ({ activeTab, selectedEmployeeId }) => {
       }
       else {
         const [normalRes, empRes] = await Promise.all([
-          fetch("http://localhost:4000/leads/stats"),
-          fetch("http://localhost:4000/employeelead/stats"),
+          fetch(`${import.meta.env.VITE_API_URL}/leads/stats`),
+          fetch(`${import.meta.env.VITE_API_URL}/employeelead/stats`),
         ]);
 
         const normalStats = await normalRes.json();

@@ -12,7 +12,7 @@ const CreateState = () => {
   // ✅ Fetch states from backend
   const fetchStates = async () => {
     try {
-      const res = await fetch("http://localhost:4000/state/");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/state/`);
       if (!res.ok) throw new Error("Failed to fetch states");
       const data = await res.json();
       setStates(data); // update state
@@ -55,7 +55,7 @@ const CreateState = () => {
     };
 
     try {
-      const res = await fetch("http://localhost:4000/state/", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/state/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

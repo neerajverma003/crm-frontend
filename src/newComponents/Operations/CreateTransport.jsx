@@ -20,7 +20,7 @@ const CreateTransport = () => {
   // ---------------------------- FETCH APIs ----------------------------
   const fetchStates = async () => {
     try {
-      const res = await fetch("http://localhost:4000/state/");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/state/`);
       const data = await res.json();
       setStates(data);
     } catch (err) {
@@ -30,7 +30,7 @@ const CreateTransport = () => {
 
   const fetchDestinations = async () => {
     try {
-      const res = await fetch("http://localhost:4000/destination/");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/destination/`);
       const data = await res.json();
       setDestinations(data);
     } catch (err) {
@@ -40,7 +40,7 @@ const CreateTransport = () => {
 
   const fetchTransports = async () => {
     try {
-      const res = await fetch("http://localhost:4000/transport/");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/transport/`);
       const data = await res.json();
       setTransports(data);
     } catch (err) {
@@ -102,7 +102,7 @@ const CreateTransport = () => {
     };
 
     try {
-      const res = await fetch("http://localhost:4000/transport/", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/transport/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

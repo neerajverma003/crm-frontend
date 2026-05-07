@@ -43,7 +43,7 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
       }
 
       // Send to backend for PDF generation
-      const response = await fetch("http://localhost:4000/offer-letter-format/generate-pdf", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/offer-letter-format/generate-pdf`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

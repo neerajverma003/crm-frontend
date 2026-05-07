@@ -387,7 +387,7 @@ const B2bCompanyLeads = () => {
   const fetchLeads = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch("http://localhost:4000/b2b-leads/");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/b2b-leads/`);
       if (res.ok) {
         const data = await res.json();
         setLeads(data);
@@ -404,7 +404,7 @@ const B2bCompanyLeads = () => {
   // Fetch operation leads from b2b-operation-leads collection
   const fetchOperationLeads = async () => {
     try {
-      const res = await fetch("http://localhost:4000/b2b-operation-leads/");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/b2b-operation-leads/`);
       if (res.ok) {
         const data = await res.json();
         setOperationLeads(data);
@@ -419,7 +419,7 @@ const B2bCompanyLeads = () => {
   // Fetch a new unique referenceId from backend
   const fetchNewReferenceId = async () => {
     try {
-      const res = await fetch("http://localhost:4000/b2b-leads/generate-ref");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/b2b-leads/generate-ref`);
       if (!res.ok) throw new Error("Failed to generate referenceId");
       const data = await res.json();
       return data.referenceId;
@@ -440,8 +440,8 @@ const B2bCompanyLeads = () => {
     try {
       const method = editingId ? "PUT" : "POST";
       const url = editingId
-        ? `http://localhost:4000/b2b-leads/${editingId}`
-        : "http://localhost:4000/b2b-leads";
+        ? `${import.meta.env.VITE_API_URL}/b2b-leads/${editingId}`
+        : `${import.meta.env.VITE_API_URL}/b2b-leads`;
 
       const res = await fetch(url, {
         method: method,
@@ -481,7 +481,7 @@ const B2bCompanyLeads = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this lead?")) {
       try {
-        const res = await fetch(`http://localhost:4000/b2b-leads/${id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/b2b-leads/${id}`, {
           method: "DELETE",
         });
 
@@ -531,7 +531,7 @@ const B2bCompanyLeads = () => {
         originalLeadId: lead._id,
       };
       
-      const operationLeadRes = await fetch("http://localhost:4000/b2b-operation-leads", {
+      const operationLeadRes = await fetch(`${import.meta.env.VITE_API_URL}/b2b-operation-leads`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(operationLeadData),
@@ -545,7 +545,7 @@ const B2bCompanyLeads = () => {
       }
 
       // Step 2: Delete from b2b-leads collection
-      const deleteRes = await fetch(`http://localhost:4000/b2b-leads/${lead._id}`, {
+      const deleteRes = await fetch(`${import.meta.env.VITE_API_URL}/b2b-leads/${lead._id}`, {
         method: "DELETE",
       });
 
@@ -590,7 +590,7 @@ const B2bCompanyLeads = () => {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:4000/b2b-leads/${leadId}/message`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/b2b-leads/${leadId}/message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: messageText }),
@@ -599,7 +599,7 @@ const B2bCompanyLeads = () => {
       // If there is a pending status (e.g., Follow Up), save it now
       if (pendingStatus && pendingStatus.leadId === leadId) {
         try {
-          const r2 = await fetch(`http://localhost:4000/b2b-leads/${leadId}`, {
+          const r2 = await fetch(`${import.meta.env.VITE_API_URL}/b2b-leads/${leadId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ leadStatus: pendingStatus.newStatus }),
@@ -626,7 +626,7 @@ const B2bCompanyLeads = () => {
     if (!lead) return;
     try {
       // Fetch full lead details if available
-      const res = await fetch(`http://localhost:4000/b2b-leads/${lead._id}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/b2b-leads/${lead._id}`);
       if (res.ok) {
         const data = await res.json();
         const fullLead = data;
@@ -680,7 +680,7 @@ const B2bCompanyLeads = () => {
 
     setStatusSavingId(leadId);
     try {
-      const res = await fetch(`http://localhost:4000/b2b-leads/${leadId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/b2b-leads/${leadId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ leadStatus: newStatus }),
@@ -725,7 +725,7 @@ const B2bCompanyLeads = () => {
   const submitLead = async (payload) => {
     try {
       const method = editingId ? "PUT" : "POST";
-      const url = editingId ? `http://localhost:4000/b2b-leads/${editingId}` : "http://localhost:4000/b2b-leads";
+      const url = editingId ? `${import.meta.env.VITE_API_URL}/b2b-leads/${editingId}` : `${import.meta.env.VITE_API_URL}/b2b-leads`;
       // ensure legacy fields exist for backend compatibility
       const body = {
         ...payload,
@@ -779,7 +779,7 @@ const B2bCompanyLeads = () => {
             onClick={async () => {
               setEditingId(null);
               try {
-                const res = await fetch("http://localhost:4000/b2b-leads/generate-ref");
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/b2b-leads/generate-ref`);
                 if (res.ok) {
                   const data = await res.json();
                   setFormData({ referenceId: data.referenceId });
@@ -1214,7 +1214,7 @@ const B2bCompanyLeads = () => {
                             formData.append("file", file);
                             formData.append("leadName", detailsModal.lead.companyName);
                             
-                            const res = await fetch("http://localhost:4000/upload", {
+                            const res = await fetch(`${import.meta.env.VITE_API_URL}/upload`, {
                               method: "POST",
                               body: formData,
                             });
@@ -1457,7 +1457,7 @@ const B2bCompanyLeads = () => {
                   <button onClick={() => setDetailsModal({ isOpen: false, lead: null })} className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium">Cancel</button>
                   <button onClick={async () => {
                     try {
-                      const res = await fetch(`http://localhost:4000/b2b-leads/${detailsModal.lead._id}`, {
+                      const res = await fetch(`${import.meta.env.VITE_API_URL}/b2b-leads/${detailsModal.lead._id}`, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(detailsForm),

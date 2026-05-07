@@ -142,8 +142,8 @@ const SimManagement = () => {
     setFetchingUsers(true);
     try {
       const [adminRes, empRes] = await Promise.all([
-        fetch("http://localhost:4000/getAdmins"),
-        fetch("http://localhost:4000/employee/allEmployee")
+        fetch(`${import.meta.env.VITE_API_URL}/getAdmins`),
+        fetch(`${import.meta.env.VITE_API_URL}/employee/allEmployee`)
       ]);
 
       let admins = [];
@@ -175,7 +175,7 @@ const SimManagement = () => {
   const fetchList = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:4000/inventory/sim");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/inventory/sim`);
       const json = await res.json();
       if (res.ok && json.success) setList(json.data || []);
       else throw new Error(json.message || "Failed to load");
@@ -205,7 +205,7 @@ const SimManagement = () => {
 
     setSaving(true);
     try {
-      const res = await fetch("http://localhost:4000/inventory/sim", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/inventory/sim`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ number: number.trim() }),
@@ -230,7 +230,7 @@ const SimManagement = () => {
     if (!confirm("Delete this number?")) return;
     setDeletingId(id);
     try {
-      const res = await fetch(`http://localhost:4000/inventory/sim/${id}`, { method: "DELETE" });
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/inventory/sim/${id}`, { method: "DELETE" });
       const json = await res.json();
       if (res.ok && json.success) {
         setList((s) => s.filter((it) => it._id !== id));
@@ -247,7 +247,7 @@ const SimManagement = () => {
   const handleAssign = async (simId, userId, userType, userName) => {
     setAssigning(true);
     try {
-      const res = await fetch(`http://localhost:4000/inventory/sim/${simId}/assign`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/inventory/sim/${simId}/assign`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ assignedToId: userId, assignedToType: userType, assignedToName: userName })
@@ -269,7 +269,7 @@ const SimManagement = () => {
   const handleUnassign = async (simId) => {
     setAssigning(true);
     try {
-      const res = await fetch(`http://localhost:4000/inventory/sim/${simId}/unassign`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/inventory/sim/${simId}/unassign`, {
         method: "POST",
         headers: { "Content-Type": "application/json" }
       });

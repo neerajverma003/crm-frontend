@@ -23,7 +23,7 @@ export default function AssignLeads() {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const res = await fetch("http://localhost:4000/employee/allEmployee");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/employee/allEmployee`);
         const data = await res.json();
         if (data.employees) {
           setEmployees(data.employees);
@@ -45,7 +45,7 @@ export default function AssignLeads() {
   useEffect(() => {
     const fetchLeads = async () => {
       try {
-        const res = await fetch("http://localhost:4000/leads/");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/leads/`);
         const data = await res.json();
         if (data.data) {
           setLeads(data.data);
@@ -92,7 +92,7 @@ export default function AssignLeads() {
     }
 
     try {
-      const res = await fetch("http://localhost:4000/assignlead/", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/assignlead/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -129,7 +129,7 @@ export default function AssignLeads() {
     }
     setLoadingAssigned(true);
     try {
-      const res = await fetch(`http://localhost:4000/assignlead/${employeeId}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/assignlead/${employeeId}`);
       const data = await res.json();
       if (res.ok) {
         const arr = data.data || [];
@@ -234,7 +234,7 @@ export default function AssignLeads() {
     }
 
     try {
-      const res = await fetch("http://localhost:4000/assignlead/reassign", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/assignlead/reassign`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -270,7 +270,7 @@ export default function AssignLeads() {
     }
 
     try {
-      const res = await fetch("http://localhost:4000/leads/bulk-delete", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/leads/bulk-delete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -305,7 +305,7 @@ export default function AssignLeads() {
 
     try {
       console.log("Sending delete request with IDs:", selectedAssignedLeads);
-      const res = await fetch("http://localhost:4000/assignlead/bulk-delete", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/assignlead/bulk-delete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

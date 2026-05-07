@@ -9,7 +9,7 @@ const TaskReport = () => {
   const [currentPageOverdue, setCurrentPageOverdue] = useState(1);
   const [itemsPerPage] = useState(5);
 
-  const API_BASE_URL = "http://localhost:4000";
+  const API_BASE_URL = `${import.meta.env.VITE_API_URL}`;
 
   // Fetch report data
   const fetchReportData = async () => {
