@@ -45,7 +45,8 @@ const UserDataReports = () => {
   const [viewingUser, setViewingUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState("All");
-  const [activeTab, setActiveTab] = useState("active");
+  const [activeTab, setActiveTab] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("All");
 
   // Fetch all users (admins and employees)
   useEffect(() => {
@@ -93,7 +94,7 @@ const UserDataReports = () => {
   const inactiveUsers = users.filter((u) => u.accountActive === false);
 
   // Get users based on active tab
-  const tabUsers = activeTab === "active" ? activeUsers : inactiveUsers;
+  const tabUsers = activeTab === "all" ? users : (activeTab === "active" ? activeUsers : inactiveUsers);
 
   // Filter users based on search and role
   const filteredUsers = tabUsers.filter((user) => {
@@ -111,7 +112,11 @@ const UserDataReports = () => {
       (filterRole === "Admin" && user.userType === "Admin") ||
       (filterRole === "Employee" && user.userType === "Employee");
 
-    return matchesSearch && matchesRole;
+    const matchesStatus =
+      filterStatus === "All" ||
+      (filterStatus === "Active" ? user.accountActive !== false : user.accountActive === false);
+
+    return matchesSearch && matchesRole && matchesStatus;
   });
 
   const handleViewDetails = (user) => {
@@ -151,23 +156,80 @@ const UserDataReports = () => {
         </p>
       </div>
 
-      {/* Statistics Cards - Top of Table */}
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-          <p className="text-gray-600 text-sm">Total Users</p>
-          <p className="text-3xl font-bold text-gray-900">{users.length}</p>
+      {/* Statistics Cards - Premium Look */}
+      <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
+        {/* Total Users Card */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 p-6 text-white shadow-xl transition-transform hover:scale-[1.02]">
+          <div className="relative z-10">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <p className="text-indigo-100 text-sm font-medium">Total Users</p>
+                <div className="mt-1 flex items-baseline gap-2">
+                  <p className="text-5xl font-extrabold tracking-tight">{users.length}</p>
+                </div>
+              </div>
+              <div className="rounded-xl bg-white/20 p-3 backdrop-blur-sm shadow-inner">
+                <Users size={28} className="text-white" />
+              </div>
+            </div>
+            
+            {/* Active/Inactive Status Row */}
+            <div className="mt-6 flex items-center gap-6 border-t border-white/10 pt-4">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]"></div>
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-100">{totalActive} Active</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.6)]"></div>
+                <span className="text-xs font-bold uppercase tracking-wider text-rose-100">{totalInactive} Inactive</span>
+              </div>
+            </div>
+          </div>
+          {/* Decorative background circle */}
+          <div className="absolute -right-10 -top-10 h-48 w-48 rounded-full bg-white/10 blur-3xl"></div>
+          <div className="absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-purple-500/20 blur-2xl"></div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-          <p className="text-gray-600 text-sm">Admins</p>
-          <p className="text-3xl font-bold text-purple-600">
-            {users.filter((u) => u.userType === "Admin").length}
-          </p>
+
+        {/* Employees Card */}
+        <div className="group rounded-2xl bg-white p-6 shadow-md border border-gray-100 transition-all hover:shadow-lg">
+          <div className="flex items-start justify-between mb-6">
+            <div>
+              <p className="text-gray-500 text-sm font-semibold uppercase tracking-wider">Employees</p>
+              <p className="text-emerald-500 text-xs font-bold mt-1 tracking-widest uppercase">
+                {Math.round((users.filter(u => u.userType === "Employee" && u.accountActive !== false).length / (users.filter(u => u.userType === "Employee").length || 1)) * 100)}% ACTIVE
+              </p>
+            </div>
+            <div className="rounded-xl bg-blue-50 p-3 transition-colors group-hover:bg-blue-100">
+              <Users size={24} className="text-blue-600" />
+            </div>
+          </div>
+          <div className="flex items-end justify-between">
+            <p className="text-4xl font-bold text-gray-800">{users.filter(u => u.userType === "Employee").length}</p>
+            <div className="text-right text-xs text-gray-500 font-medium">
+              <p className="text-emerald-600">{users.filter(u => u.userType === "Employee" && u.accountActive !== false).length} Active</p>
+              <p className="text-rose-500">{users.filter(u => u.userType === "Employee" && u.accountActive === false).length} Inactive</p>
+            </div>
+          </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-          <p className="text-gray-600 text-sm">Employees</p>
-          <p className="text-3xl font-bold text-blue-600">
-            {users.filter((u) => u.userType === "Employee").length}
-          </p>
+
+        {/* Admins Card */}
+        <div className="group rounded-2xl bg-white p-6 shadow-md border border-gray-100 transition-all hover:shadow-lg">
+          <div className="flex items-start justify-between mb-6">
+            <div>
+              <p className="text-gray-500 text-sm font-semibold uppercase tracking-wider">Admins</p>
+              <p className="text-orange-500 text-xs font-bold mt-1 tracking-widest uppercase">Privileged Access</p>
+            </div>
+            <div className="rounded-xl bg-purple-50 p-3 transition-colors group-hover:bg-purple-100">
+              <CheckCircle size={24} className="text-purple-600" />
+            </div>
+          </div>
+          <div className="flex items-end justify-between">
+            <p className="text-4xl font-bold text-gray-800">{users.filter(u => u.userType === "Admin").length}</p>
+            <div className="text-right text-xs text-gray-500 font-medium">
+              <p className="text-emerald-600">{users.filter(u => u.userType === "Admin" && u.accountActive !== false).length} Active</p>
+              <p className="text-rose-500">{users.filter(u => u.userType === "Admin" && u.accountActive === false).length} Inactive</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -200,10 +262,20 @@ const UserDataReports = () => {
               <option value="Admin">Admins</option>
               <option value="Employee">Employees</option>
             </select>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="All">All Status</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
             <button
               onClick={() => {
                 setSearchTerm("");
                 setFilterRole("All");
+                setFilterStatus("All");
               }}
               className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-gray-800"
             >
@@ -215,6 +287,20 @@ const UserDataReports = () => {
 
       {/* Tab Navigation */}
       <div className="mb-6 flex flex-wrap gap-3">
+        <button
+          onClick={() => setActiveTab("all")}
+          className={`relative flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 ${
+            activeTab === "all"
+              ? "bg-blue-50 text-blue-600 shadow-md"
+              : "bg-white text-gray-600 hover:bg-gray-50 hover:shadow-sm"
+          }`}
+        >
+          <Users size={18} />
+          All Users ({users.length})
+          {activeTab === "all" && (
+            <span className="absolute -bottom-2 left-4 right-4 h-1 animate-pulse rounded-full bg-blue-600" />
+          )}
+        </button>
         <button
           onClick={() => setActiveTab("active")}
           className={`relative flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 ${

@@ -5,6 +5,12 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
   const contentRef = useRef(null);
   const [isDownloading, setIsDownloading] = useState(false);
 
+  // Calculate dynamic total pages
+  const basePages = 1; // Main letter flows naturally
+  const annexurePages = formatData.annexureA ? 1 : 0;
+  const ndaPages = formatData.nonDisclosureAgreement ? 3 : 0;
+  const totalPages = basePages + annexurePages + ndaPages;
+
   const handlePrint = useReactToPrint({
     contentRef,
     documentTitle: `${company?.companyName || "Offer Letter"}_Preview`,
@@ -18,14 +24,49 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
         margin: 0 !important;
         padding: 0 !important;
         background-color: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
       }
-      html {
+      .offer-letter-section {
         margin: 0 !important;
-        padding: 0 !important;
+        box-shadow: none !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        page-break-after: always !important;
+        display: grid !important;
+        grid-template-rows: auto 1fr auto !important;
+        background-color: white !important;
+        position: relative !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      /* Typography Styles for dangerouslySetInnerHTML */
+      div[dangerouslySetInnerHTML] p {
+        font-size: 11px !important;
+        line-height: 1.7 !important;
+        color: #2d3748 !important;
+        margin: 6px 0 !important;
+        text-align: justify !important;
+      }
+      div[dangerouslySetInnerHTML] h1, 
+      div[dangerouslySetInnerHTML] h2, 
+      div[dangerouslySetInnerHTML] h3 {
+        font-weight: bold !important;
+        color: #1a202c !important;
+        margin-top: 12px !important;
+        margin-bottom: 6px !important;
+      }
+      div[dangerouslySetInnerHTML] ul, 
+      div[dangerouslySetInnerHTML] ol {
+        margin-left: 20px !important;
+        margin-bottom: 10px !important;
+      }
+      div[dangerouslySetInnerHTML] li {
+        margin-bottom: 4px !important;
+        font-size: 11px !important;
       }
       * {
         -webkit-print-color-adjust: exact !important;
-        color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
     `,
@@ -77,6 +118,8 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
     }
   };
 
+  console.log("PreviewOfferLetter Company Prop:", company);
+
   const cleanHtmlContent = (html) => {
     if (!html) return "";
     const temp = document.createElement("div");
@@ -86,43 +129,42 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
 
   const PageHeader = () => (
     <div style={{ 
-      borderBottom: "2px solid #334155",
+      borderBottom: "1.5px solid #3b82f6",
       paddingBottom: "12px",
-      marginBottom: "12px",
+      marginBottom: "20px",
       flexShrink: 0,
       pageBreakInside: "avoid"
     }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
-        {/* Company Logo */}
-        {company?.logo && (
-          <div style={{ width: "70px", height: "70px", flexShrink: 0 }}>
+        {/* Company Logo & Name */}
+        <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+          <div style={{ width: "60px", height: "60px", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
             <img
-              src={company.logo}
-              alt={company.companyName}
-              style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              src={company?.logo || "http://res.cloudinary.com/dv8c2pofx/image/upload/v1741721783/dhc7rhowf682tyfq6l0g.jpg"}
+              alt={company?.companyName || "Company Logo"}
+              style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
             />
           </div>
-        )}
+          <div>
+            <h1 style={{ 
+              fontSize: "22px", 
+              fontWeight: "900", 
+              color: "#1e40af",
+              margin: "0",
+              lineHeight: "1.1"
+            }}>
+              {company?.companyName || "Admire Softech"}
+            </h1>
+          </div>
+        </div>
 
-        {/* Company Info */}
-        <div style={{ flex: 1, textAlign: "right" }}>
-          <h1 style={{ 
-            fontSize: "20px", 
-            fontWeight: "bold", 
-            color: "#1a202c",
-            margin: "0 0 4px 0",
-            letterSpacing: "0.5px"
-          }}>
-            {company?.companyName || "Company Name"}
-          </h1>
-          <p style={{ fontSize: "12px", color: "#4a5568", margin: "2px 0" }}>
-            {company?.email}
+        {/* Ref and Date on Right */}
+        <div style={{ textAlign: "right", minWidth: "150px" }}>
+          <p style={{ fontSize: "10px", color: "#1e293b", margin: "2px 0" }}>
+            <strong>Ref. No:</strong> {formatData.refNumber || "AD/04-2024/0192"}
           </p>
-          <p style={{ fontSize: "12px", color: "#4a5568", margin: "2px 0" }}>
-            {company?.phoneNumber}
-          </p>
-          <p style={{ fontSize: "12px", color: "#4a5568", margin: "2px 0" }}>
-            {company?.address}
+          <p style={{ fontSize: "10px", color: "#1e293b", margin: "2px 0" }}>
+            <strong>Date:</strong> {formatData.offerDate || "22 April 2024"}
           </p>
         </div>
       </div>
@@ -149,22 +191,27 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
   );
 
   const Section = ({ pageNumber, totalPages, children }) => (
-    <div style={{
-      width: "100%",
-      height: "297mm",
-      padding: "0",
-      boxSizing: "border-box",
-      backgroundColor: "#fff",
-      pageBreakAfter: "always",
-      pageBreakInside: "avoid",
-      display: "grid",
-      gridTemplateRows: "auto 1fr auto",
-      gridGap: "0",
-      fontFamily: "Arial, sans-serif",
-      margin: "0",
-    }}>
+    <div 
+      className="offer-letter-section"
+      style={{
+        width: "210mm",
+        minHeight: "297mm",
+        height: "auto",
+        padding: "0",
+        boxSizing: "border-box",
+        backgroundColor: "#fff",
+        pageBreakAfter: "always",
+        display: "grid",
+        gridTemplateRows: "auto 1fr auto",
+        gridGap: "0",
+        fontFamily: "Arial, sans-serif",
+        margin: "0 auto 40px auto",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+        position: "relative",
+      }}
+    >
       {/* Row 1: Fixed Header */}
-      <div style={{ gridRow: "1", padding: "15mm 15mm 8px 15mm", paddingBottom: "8px" }}>
+      <div style={{ gridRow: "1", padding: "12mm 10mm 8px 10mm", paddingBottom: "8px" }}>
         <PageHeader />
       </div>
 
@@ -179,13 +226,13 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
           margin: "0",
         }}
       >
-        <div style={{ padding: "4px 15mm", margin: "0" }}>
+        <div style={{ padding: "8px 10mm", margin: "0" }}>
           {children}
         </div>
       </div>
 
       {/* Row 3: Fixed Footer at bottom */}
-      <div style={{ gridRow: "3", padding: "8px 15mm 15mm 15mm", paddingTop: "8px" }}>
+      <div style={{ gridRow: "3", padding: "8px 10mm 12mm 10mm", paddingTop: "8px" }}>
         <PageFooter pageNumber={pageNumber} totalPages={totalPages} />
       </div>
     </div>
@@ -242,56 +289,8 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
       <style>{`
         @media print {
-          * {
-            -webkit-print-color-adjust: exact !important;
-            color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          
-          body, html {
-            margin: 0 !important;
-            padding: 0 !important;
-            background: white !important;
-            width: 100% !important;
-            height: auto !important;
-          }
-          
-          .fixed,
-          .relative,
-          .w-full,
-          .max-w-5xl,
-          .max-h-screen,
-          .rounded-lg,
-          .shadow-2xl,
-          .overflow-auto,
-          .flex,
-          .flex-col,
-          .items-center,
-          .justify-center,
-          .p-4,
-          .px-6,
-          .py-4,
-          .p-6,
-          .bg-black,
-          .bg-opacity-50,
-          .bg-slate-100,
-          .border-b,
-          .border-slate-200,
-          .bg-slate-50 {
-            position: static !important;
-            display: block !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            height: auto !important;
-            max-height: none !important;
-            background: white !important;
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            border-radius: 0 !important;
-            opacity: 1 !important;
-            visibility: visible !important;
+          .no-print {
+            display: none !important;
           }
         }
         
@@ -362,19 +361,26 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
         }
         
         div[dangerouslySetInnerHTML] h1 {
-          font-size: 14px;
+          font-size: 13px;
+          margin: 15px 0 8px 0;
         }
         
         div[dangerouslySetInnerHTML] h2 {
-          font-size: 13px;
+          font-size: 12px;
+          margin: 12px 0 6px 0;
+          color: #1e293b;
+          text-decoration: underline;
         }
         
         div[dangerouslySetInnerHTML] h3 {
-          font-size: 12px;
+          font-size: 11px;
+          margin: 10px 0 5px 0;
+          color: #1e293b;
         }
         
         div[dangerouslySetInnerHTML] h4 {
-          font-size: 11px;
+          font-size: 10px;
+          margin: 8px 0 4px 0;
         }
       `}</style>
       <div className="relative w-full max-w-5xl max-h-screen bg-white rounded-lg shadow-2xl overflow-auto flex flex-col">
@@ -396,16 +402,9 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
         <div className="border-b border-slate-200 px-6 py-3 bg-slate-50 flex gap-2">
           <button
             onClick={handlePrint}
-            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700"
           >
             Print / Save as PDF
-          </button>
-          <button
-            onClick={handleDownloadPDF}
-            disabled={isDownloading}
-            className="rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {isDownloading ? "Downloading..." : "Download PDF"}
           </button>
           <button
             onClick={onClose}
@@ -428,37 +427,40 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
             }}
           >
             {/* PAGE 1: OFFER LETTER WITH CANDIDATE INFO */}
-            <Section pageNumber={1} totalPages={3}>
-              <div style={{ fontSize: "12px", lineHeight: "1.6", color: "#2d3748", width: "100%" }}>
+            <Section pageNumber={1} totalPages={totalPages}>
+              <div style={{ fontSize: "14px", lineHeight: "1.8", color: "#2d3748", width: "100%" }}>
                 
+
+
                 {/* Candidate Information Section */}
                 {(formatData.candidateName || formatData.candidateAddress || formatData.candidatePhone || formatData.candidateEmail) && (
-                  <div style={{ marginBottom: "18px", pageBreakInside: "avoid" }}>
+                  <div style={{ marginBottom: "25px", pageBreakInside: "avoid" }}>
                     {formatData.candidateName && (
-                      <p style={{ margin: "2px 0", fontSize: "11px" }}><strong>Name:</strong> {formatData.candidateName}</p>
+                      <p style={{ margin: "4px 0", fontSize: "11px" }}><strong>Name:</strong> {formatData.candidateName}</p>
                     )}
                     {formatData.candidateAddress && (
-                      <p style={{ margin: "2px 0", fontSize: "11px" }}><strong>Address:</strong> {formatData.candidateAddress}</p>
+                      <p style={{ margin: "4px 0", fontSize: "11px" }}><strong>Address:</strong> {formatData.candidateAddress}</p>
                     )}
                     {formatData.candidatePhone && (
-                      <p style={{ margin: "2px 0", fontSize: "11px" }}><strong>Phone:</strong> {formatData.candidatePhone}</p>
+                      <p style={{ margin: "4px 0", fontSize: "11px" }}><strong>Phone:</strong> {formatData.candidatePhone}</p>
                     )}
                     {formatData.candidateEmail && (
-                      <p style={{ margin: "2px 0", fontSize: "11px" }}><strong>Email:</strong> {formatData.candidateEmail}</p>
+                      <p style={{ margin: "4px 0", fontSize: "11px" }}><strong>Email:</strong> {formatData.candidateEmail}</p>
                     )}
                   </div>
                 )}
 
                 {/* Offer Letter Title */}
-                <div style={{ textAlign: "center", marginBottom: "15px", pageBreakInside: "avoid" }}>
+                <div style={{ textAlign: "center", margin: "25px 0", pageBreakInside: "avoid" }}>
                   <h2 style={{ 
-                    fontSize: "16px", 
+                    fontSize: "20px", 
                     fontWeight: "bold", 
-                    color: "#1a202c",
+                    color: "#111827",
                     margin: "0",
                     textDecoration: "underline",
                     textDecorationThickness: "2px",
-                    textUnderlineOffset: "4px"
+                    textUnderlineOffset: "6px",
+                    letterSpacing: "2px"
                   }}>
                     OFFER LETTER
                   </h2>
@@ -471,6 +473,17 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
                   </p>
                 )}
 
+                {/* Legal Introduction */}
+                <p style={{ 
+                  marginBottom: "15px", 
+                  textAlign: "justify", 
+                  fontSize: "11px",
+                  lineHeight: "1.7",
+                  pageBreakInside: "avoid"
+                }}>
+                  This Offer Letter is entered into between <strong>{company?.companyName || "the Company"}</strong> and <strong>Mr. {formatData.candidateName || "[Name]"}</strong>, {formatData.fatherName ? `S/o ${formatData.fatherName}, ` : ""}residing at {formatData.candidateAddress || "[Address]"} (hereinafter referred to as the "Employee").
+                </p>
+
                 {/* Introduction */}
                 <p style={{ 
                   marginBottom: "12px", 
@@ -479,7 +492,7 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
                   lineHeight: "1.7",
                   pageBreakInside: "avoid"
                 }}>
-                  We are pleased to offer you the position of <strong>{formatData.jobTitle || "[Position Title]"}</strong> at <strong>Admire Softech Solutions Pvt Ltd</strong>. We believe your skills and experience will be valuable assets to our organization.
+                  We are pleased to offer you the position of <strong>{formatData.jobTitle || "[Position Title]"}</strong> at <strong>{company?.companyName || "the Company"}</strong>. We believe your skills and experience will be valuable assets to our organization.
                 </p>
 
                 {/* Employment Terms as Numbered List */}
@@ -546,11 +559,8 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
                   </div>
                 )}
               </div>
-            </Section>
-
-            {/* PAGE 2: CONTINUED SECTIONS */}
-            <Section pageNumber={2} totalPages={3}>
-              <div style={{ fontSize: "12px", lineHeight: "1.6", color: "#2d3748", width: "100%" }}>
+            {/* Page 2 content starts here without a separate Section */}
+            <div style={{ fontSize: "14px", lineHeight: "1.8", color: "#2d3748", width: "100%" }}>
                 
                 {/* Work Hours */}
                 {formatData.workHours && (
@@ -662,11 +672,8 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
                   </div>
                 )}
               </div>
-            </Section>
-
-            {/* PAGE 3: MORE SECTIONS + SIGNATURE */}
-            <Section pageNumber={3} totalPages={3}>
-              <div style={{ fontSize: "12px", lineHeight: "1.6", color: "#2d3748", width: "100%" }}>
+            {/* Page 3 content starts here without a separate Section */}
+            <div style={{ fontSize: "14px", lineHeight: "1.8", color: "#2d3748", width: "100%" }}>
                 
                 {/* Confidentiality and NDA */}
                 {formatData.confidentialityAndNda && (
@@ -785,24 +792,25 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
                 </p>
                 <div style={{ marginTop: "30px", fontSize: "11px", pageBreakInside: "avoid" }}>
                   <p style={{ marginBottom: "2px" }}>Admin Head</p>
-                  <p style={{ marginBottom: "2px" }}>Admire Softech Solutions Pvt. Ltd.</p>
+                  <p style={{ marginBottom: "2px" }}>{company?.companyName || "Admire Softech Solutions Pvt. Ltd."}</p>
                 </div>
               </div>
             </Section>
 
             {/* PAGE 4: ANNEXURE A */}
             {formatData.annexureA && (
-              <Section pageNumber={4} totalPages={3}>
-                <div style={{ fontSize: "12px", lineHeight: "1.6", color: "#2d3748", width: "100%" }}>
+              <Section pageNumber={2} totalPages={totalPages}>
+                <div style={{ fontSize: "14px", lineHeight: "1.8", color: "#2d3748", width: "100%" }}>
                   <div style={{ textAlign: "center", marginBottom: "15px", pageBreakInside: "avoid" }}>
                     <h2 style={{ 
-                      fontSize: "16px", 
+                      fontSize: "18px", 
                       fontWeight: "bold", 
-                      color: "#1a202c",
+                      color: "#111827",
                       margin: "0",
                       textDecoration: "underline",
                       textDecorationThickness: "2px",
-                      textUnderlineOffset: "4px"
+                      textUnderlineOffset: "6px",
+                      letterSpacing: "1px"
                     }}>
                       ANNEXURE A
                     </h2>
@@ -813,7 +821,7 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
                   <div style={{ marginTop: "20px", pageBreakInside: "avoid", borderTop: "1px solid #ccc", paddingTop: "10px" }}>
                     <p style={{ fontWeight: "bold", fontSize: "11px", marginBottom: "10px" }}>ACKNOWLEDGMENT AND ACCEPTANCE</p>
                     <p style={{ fontSize: "11px", marginBottom: "15px" }}>
-                      I, {formatData.candidateName || "[Candidate Name]"}, hereby accept the employment offer as Web Developer at Admire Softech Solutions Pvt Ltd, under the terms and conditions stated in this letter.
+                      I, {formatData.candidateName || "[Candidate Name]"}, hereby accept the employment offer as {formatData.jobTitle || "[Job Title]"} at {company?.companyName || "the Company"}, under the terms and conditions stated in this letter.
                     </p>
                     <div style={{ marginTop: "20px", fontSize: "11px" }}>
                       <p style={{ marginBottom: "20px" }}>Signature: ___________________________</p>
@@ -826,26 +834,28 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
 
             {/* PAGE 5: NON DISCLOSURE AGREEMENT - TITLE & FIRST SECTIONS */}
             {formatData.nonDisclosureAgreement && (
-              <Section pageNumber={5} totalPages={3}>
-                <div style={{ fontSize: "12px", lineHeight: "1.6", color: "#2d3748", width: "100%" }}>
-                  <div style={{ textAlign: "center", marginBottom: "15px", pageBreakInside: "avoid" }}>
-                    <h2 style={{ 
-                      fontSize: "14px", 
-                      fontWeight: "bold", 
-                      color: "#1a202c",
-                      margin: "0 0 5px 0"
-                    }}>
-                      Non Disclosure Agreement
-                    </h2>
+              <Section pageNumber={3} totalPages={totalPages}>
+                <div style={{ fontSize: "14px", lineHeight: "1.8", color: "#2d3748", width: "100%" }}>
+                  <div style={{ textAlign: "center", marginBottom: "20px", pageBreakInside: "avoid" }}>
+                    <p style={{ fontSize: "11px", fontWeight: "bold", textDecoration: "underline", marginBottom: "4px" }}>Non Disclosure Agreement</p>
                     <h3 style={{ 
-                      fontSize: "13px", 
+                      fontSize: "15px", 
                       fontWeight: "bold", 
-                      color: "#1a202c",
+                      color: "#111827",
                       margin: "0",
-                      textDecoration: "underline"
+                      textDecoration: "underline",
+                      textDecorationThickness: "2px",
+                      textUnderlineOffset: "4px"
                     }}>
                       DATA NON-CLOSURE AGREEMENT (NDA)
                     </h3>
+                  </div>
+                  
+                  <div style={{ fontSize: "11px", lineHeight: "1.7", marginBottom: "15px", textAlign: "justify" }}>
+                    <p>This Agreement is made on <strong>{formatData.offerDate || new Date().toLocaleDateString()}</strong> by and between:</p>
+                    <p style={{ margin: "8px 0" }}><strong>{company?.companyName || "the Company"}</strong>, a company incorporated under the laws of India and having its registered office at {company?.address || "_______________________"} (hereinafter referred to as the "Company").</p>
+                    <p style={{ fontWeight: "bold", margin: "4px 0" }}>AND</p>
+                    <p style={{ margin: "8px 0" }}><strong>Mr. {formatData.candidateName || "[Name]"}</strong>, {formatData.fatherName ? `S/o ${formatData.fatherName}, ` : ""}residing at {formatData.candidateAddress || "[Address]"} (hereinafter referred to as the "Employee").</p>
                   </div>
                   
                   {/* Main NDA Description */}
@@ -879,8 +889,8 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
 
             {/* PAGE 6: NON DISCLOSURE AGREEMENT - MIDDLE SECTIONS */}
             {formatData.nonDisclosureAgreement && (
-              <Section pageNumber={6} totalPages={3}>
-                <div style={{ fontSize: "12px", lineHeight: "1.6", color: "#2d3748", width: "100%" }}>
+              <Section pageNumber={4} totalPages={totalPages}>
+                <div style={{ fontSize: "14px", lineHeight: "1.8", color: "#2d3748", width: "100%" }}>
                   {/* NDA Section 3-5 */}
                   {[
                     { key: "ndaExclusions", label: "3. Exclusions" },
@@ -900,8 +910,8 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
 
             {/* PAGE 7: NON DISCLOSURE AGREEMENT - FINAL SECTIONS */}
             {formatData.nonDisclosureAgreement && (
-              <Section pageNumber={7} totalPages={3}>
-                <div style={{ fontSize: "12px", lineHeight: "1.6", color: "#2d3748", width: "100%" }}>
+              <Section pageNumber={5} totalPages={totalPages}>
+                <div style={{ fontSize: "14px", lineHeight: "1.8", color: "#2d3748", width: "100%" }}>
                   {/* NDA Section 6-8 */}
                   {[
                     { key: "ndaBreachAndRemedies", label: "6. Breach and Remedies" },
@@ -922,12 +932,14 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
                     <p style={{ fontSize: "11px", marginBottom: "15px" }}>
                       I, {formatData.candidateName || "[Candidate Name]"}, hereby accept the terms and conditions of this Non-Disclosure Agreement as of the date mentioned below.
                     </p>
-                    <div style={{ marginTop: "20px", fontSize: "11px" }}>
+                    <div style={{ marginTop: "30px", fontSize: "11px" }}>
+                      <p style={{ fontWeight: "bold", marginBottom: "15px" }}>For {company?.companyName || "Admire Softech Solutions Pvt. Ltd."}</p>
                       <p style={{ marginBottom: "30px" }}>Signature: ___________________________</p>
-                      <p style={{ marginBottom: "5px" }}>Designation: {formatData.jobTitle || "_______________________"}</p>
-                      <p style={{ marginBottom: "5px" }}>Employee Signature: ___________________________</p>
-                      <p style={{ marginBottom: "5px" }}>Name: {formatData.candidateName || "_______________________"}</p>
-                      <p style={{ marginBottom: "5px" }}>Date: ___________________________</p>
+                      <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: "15px", marginTop: "15px" }}>
+                        <p style={{ marginBottom: "10px" }}>Employee Signature: ___________________________</p>
+                        <p style={{ marginBottom: "5px" }}>Name: <strong>Mr. {formatData.candidateName}</strong></p>
+                        <p style={{ marginBottom: "5px" }}>Date: {formatData.offerDate || new Date().toLocaleDateString()}</p>
+                      </div>
                     </div>
                   </div>
                 </div>

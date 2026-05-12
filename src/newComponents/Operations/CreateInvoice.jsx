@@ -91,30 +91,13 @@ const CreateInvoice = () => {
 
   const generateInvoiceNumber = async () => {
     try {
-      const currentYear = new Date().getFullYear()
-      const nextYear = currentYear + 1
-      const yearSuffix = `${String(currentYear).slice(-2)}-${String(nextYear).slice(-2)}`
-
-      // Fetch the last invoice number from the backend
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/invoice/last-number`)
-      let nextNumber = 1
-
-      if (res.ok) {
-        const json = await res.json()
-        if (json.lastNumber) {
-          // Extract the numeric part from the last invoice number
-          const match = json.lastNumber.match(/\/(\d+)$/)
-          if (match) {
-            nextNumber = parseInt(match[1], 10) + 1
-          }
-        }
-      }
-
-      // Format the number with leading zeros (6 digits)
-      const formattedNumber = String(nextNumber).padStart(6, '0')
-      const invoiceNumber = `AD/${yearSuffix}/${formattedNumber}`
+      const now = new Date();
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const year = now.getFullYear();
+      const random = Math.floor(1000 + Math.random() * 9000); // 4 digit random number
+      const invoiceNumber = `AD|${month}-${year}|${random}`;
       
-      return invoiceNumber
+      return invoiceNumber;
     } catch (err) {
       console.error('Error generating invoice number:', err)
       return null

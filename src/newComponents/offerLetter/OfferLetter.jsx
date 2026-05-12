@@ -1,5 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import PreviewOfferLetter from "./PreviewOfferLetter";
+
+const DEFAULT_FORMAT_DATA = {
+  workHours: "<p>Standard working hours are 9:30 AM to 6:30 PM, Monday through Friday. However, you may be required to work additional hours as needed for project deadlines.</p>",
+  confidentiality: "<p>You agree to maintain strict confidentiality regarding all company trade secrets, client data, and internal processes during and after your employment.</p>",
+  atWillEmployment: "<p>Employment with the company is at-will, meaning either you or the company can terminate the relationship at any time with appropriate notice.</p>",
+  noticePeriod: "<p>A notice period of 30 days is required from either party for termination of employment.</p>",
+  relievingAndFinalSettlement: "<p>Final settlement will be processed within 45 days of your last working day, subject to successful handover of all company assets.</p>",
+  confidentialityAndNda: "<p>This offer is subject to the signing of a comprehensive Non-Disclosure Agreement (NDA).</p>",
+  paymentInLieuOfNotice: "<p>The company reserves the right to pay salary in lieu of the notice period at its sole discretion.</p>",
+  exitInterview: "<p>An exit interview is mandatory for all departing employees to provide feedback and ensure a smooth transition.</p>",
+  legalCompliance: "<p>Your employment is subject to all applicable labor laws and company internal policies.</p>",
+  postEmploymentBenefits: "<p>Any post-employment benefits will be governed by the company's prevailing policies at the time of separation.</p>",
+  annexureA: "<p>Details of your compensation structure are provided in this annexure.</p>",
+};
 
 const OfferLetter = () => {
   const navigate = useNavigate();
@@ -10,6 +25,10 @@ const OfferLetter = () => {
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [error, setError] = useState("");
   const [ReactQuill, setReactQuill] = useState(null);
+  const [selectedOffer, setSelectedOffer] = useState(null);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewFormatData, setViewFormatData] = useState(null);
+  const [selectedFormat, setSelectedFormat] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -70,12 +89,20 @@ const OfferLetter = () => {
     "color",
     "background",
   ];
+  const generateRefNumber = () => {
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const year = now.getFullYear();
+    const random = Math.floor(1000 + Math.random() * 9000); // 4 digit random number
+    return `AD|${month}-${year}|${random}`;
+  };
   const [formData, setFormData] = useState({
     // Offer Details
-    refNumber: "",
+    refNumber: generateRefNumber(),
     offerDate: new Date().toISOString().split("T")[0],
     // Candidate Information
     candidateName: "",
+    fatherName: "",
     candidateEmail: "",
     candidatePhone: "",
     candidateAddress: "",
@@ -133,6 +160,17 @@ const OfferLetter = () => {
     const company = companies.find((item) => item._id === activeCompanyId);
     if (company) {
       setSelectedCompany(company);
+      // Fetch format for this company
+      fetch(`${import.meta.env.VITE_API_URL}/offer-letter-format?companyId=${company._id}`)
+        .then(res => res.json())
+        .then(json => {
+          if (json.success && json.data && json.data.length > 0) {
+            setSelectedFormat(json.data[0]);
+          } else {
+            setSelectedFormat(null);
+          }
+        })
+        .catch(err => console.error("Error fetching format:", err));
     }
   }, [activeCompanyId, companies]);
 
@@ -154,6 +192,7 @@ const OfferLetter = () => {
         ...formData,
         companyId: selectedCompany?._id || "",
         companyName: selectedCompany?.companyName || "",
+        formatId: selectedFormat?._id || null,
       };
       const res = await fetch(`${import.meta.env.VITE_API_URL}/offer-letter`, {
         method: "POST",
@@ -164,9 +203,10 @@ const OfferLetter = () => {
       if (!res.ok) throw new Error(data.message || "Failed to create offer letter");
       setOfferLetters((prev) => [data.data, ...prev]);
       setFormData({
-        refNumber: "",
+        refNumber: generateRefNumber(),
         offerDate: new Date().toISOString().split("T")[0],
         candidateName: "",
+        fatherName: "",
         candidateEmail: "",
         candidatePhone: "",
         candidateAddress: "",
@@ -182,6 +222,43 @@ const OfferLetter = () => {
     } catch (err) {
       console.error(err);
       setError(err.message || "Unable to save offer letter");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleView = async (offer) => {
+    try {
+      setLoading(true);
+      setError("");
+      // 1. Find the format for this offer
+      let url = `${import.meta.env.VITE_API_URL}/offer-letter-format`;
+      if (offer.formatId) {
+        url += `/${offer.formatId?._id || offer.formatId}`;
+      } else {
+        url += `?companyId=${offer.companyId}`;
+      }
+      
+      const res = await fetch(url);
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message || "Failed to load format");
+
+      const format = offer.formatId ? json.data : (json.data && json.data.length > 0 ? json.data[0] : DEFAULT_FORMAT_DATA);
+
+      // 2. Merge offer details into format data for preview
+      const mergedData = {
+        ...format,
+        ...offer, // This will override candidateName, jobTitle, salary, etc.
+        offerDate: offer.offerDate ? new Date(offer.offerDate).toLocaleDateString() : "",
+        joiningDate: offer.joiningDate ? new Date(offer.joiningDate).toLocaleDateString() : "",
+      };
+
+      setViewFormatData(mergedData);
+      setSelectedOffer(offer);
+      setShowViewModal(true);
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Unable to load preview");
     } finally {
       setLoading(false);
     }
@@ -283,6 +360,17 @@ const OfferLetter = () => {
                   placeholder="e.g. Neeraj"
                   className="w-full rounded-md border border-gray-300 px-3 py-2"
                   required
+                />
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-semibold">Father's Name</label>
+                <input
+                  type="text"
+                  name="fatherName"
+                  value={formData.fatherName}
+                  onChange={handleChange}
+                  placeholder="e.g. Mukesh Verma"
+                  className="w-full rounded-md border border-gray-300 px-3 py-2"
                 />
               </div>
               <div>
@@ -479,7 +567,14 @@ const OfferLetter = () => {
                 </td>
                 <td className="px-4 py-2 text-slate-600">{offer.joiningDate ? new Date(offer.joiningDate).toLocaleDateString() : "-"}</td>
                 <td className="px-4 py-2 text-slate-600">{offer.salary}</td>
-                <td className="px-4 py-2">
+                 <td className="px-4 py-2 flex gap-2">
+                  <button
+                    onClick={() => handleView(offer)}
+                    className="rounded-lg bg-indigo-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-600"
+                    disabled={loading}
+                  >
+                    View
+                  </button>
                   <button
                     onClick={() => handleDelete(offer._id)}
                     className="rounded-lg bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600"
@@ -492,6 +587,13 @@ const OfferLetter = () => {
             ))}
           </tbody>
         </table>
+        {showViewModal && viewFormatData && (
+        <PreviewOfferLetter
+          formatData={viewFormatData}
+          company={companies.find(c => c._id === (selectedOffer?.companyId?._id || selectedOffer?.companyId)) || selectedOffer?.companyId}
+          onClose={() => setShowViewModal(false)}
+        />
+      )}
       </div>
     </div>
   </div>
