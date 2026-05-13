@@ -740,7 +740,7 @@ const AddCandidate = () => {
                           <td className="px-6 py-5 whitespace-nowrap">
                             {candidate.resume ? (
                               <a
-                                href={candidate.resume.startsWith('http') ? candidate.resume : `${API_BASE_URL}/${candidate.resume}`}
+                                href={candidate.key ? `${API_BASE_URL}/api/media/preview?key=${candidate.key}` : (candidate.resume.startsWith('http') ? candidate.resume : `${API_BASE_URL}/${candidate.resume}`)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 transition-colors"

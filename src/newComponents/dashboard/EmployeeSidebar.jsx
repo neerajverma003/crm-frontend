@@ -50,10 +50,33 @@ function EmployeeSidebar() {
     };
 
     const toggleDropdown = (key) => {
-        setOpenDropdowns((prev) => ({
-            ...prev,
-            [key]: !prev[key],
-        }));
+        setOpenDropdowns((prev) => {
+            const isCurrentlyOpen = prev[key];
+            if (isCurrentlyOpen) {
+                return { ...prev, [key]: false };
+            }
+
+            // Check if it's a top-level role (role-X) or a sub-role (sub-X-Y)
+            if (key.startsWith("role-")) {
+                // If opening a new role, close everything else
+                return { [key]: true };
+            }
+
+            // If it's a sub-role, we want to close other sub-roles in the same parent role?
+            // For now, let's just keep the parent role open.
+            const newState = { ...prev };
+            
+            // Close other sub-roles of the SAME role
+            const rolePrefix = key.split("-").slice(0, 2).join("-"); // e.g. "sub-0"
+            Object.keys(newState).forEach(k => {
+                if (k.startsWith("sub-") && k.includes(rolePrefix) && k !== key) {
+                    newState[k] = false;
+                }
+            });
+            
+            newState[key] = true;
+            return newState;
+        });
     };
 
     const getPointRoute = (pointName) => {

@@ -89,16 +89,21 @@ const OfferLetter = () => {
     "color",
     "background",
   ];
-  const generateRefNumber = () => {
-    const now = new Date();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const year = now.getFullYear();
-    const random = Math.floor(1000 + Math.random() * 9000); // 4 digit random number
-    return `AD|${month}-${year}|${random}`;
+  const fetchNextRefNumber = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/offer-letter/get-next-ref`);
+      const data = await res.json();
+      if (data.success) {
+        setFormData((prev) => ({ ...prev, refNumber: data.refNumber }));
+      }
+    } catch (err) {
+      console.error("Error fetching ref number:", err);
+    }
   };
+
   const [formData, setFormData] = useState({
     // Offer Details
-    refNumber: generateRefNumber(),
+    refNumber: "",
     offerDate: new Date().toISOString().split("T")[0],
     // Candidate Information
     candidateName: "",
@@ -153,6 +158,7 @@ const OfferLetter = () => {
 
     fetchOfferLetters();
     fetchCompanies();
+    fetchNextRefNumber();
   }, []);
 
   useEffect(() => {
@@ -203,7 +209,7 @@ const OfferLetter = () => {
       if (!res.ok) throw new Error(data.message || "Failed to create offer letter");
       setOfferLetters((prev) => [data.data, ...prev]);
       setFormData({
-        refNumber: generateRefNumber(),
+        refNumber: "",
         offerDate: new Date().toISOString().split("T")[0],
         candidateName: "",
         fatherName: "",
@@ -219,6 +225,7 @@ const OfferLetter = () => {
         jobResponsibilities: "",
         status: "Draft",
       });
+      fetchNextRefNumber();
     } catch (err) {
       console.error(err);
       setError(err.message || "Unable to save offer letter");

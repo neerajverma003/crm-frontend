@@ -18,10 +18,14 @@ function CompanySidebar({ roles }) {
     }, [location.pathname]);
 
     const toggleDropdown = (index) => {
-        setOpenDropdowns((prev) => ({
-            ...prev,
-            [index]: !prev[index],
-        }));
+        setOpenDropdowns((prev) => {
+            const isCurrentlyOpen = prev[index];
+            if (isCurrentlyOpen) {
+                return { ...prev, [index]: false };
+            }
+            // For CompanySidebar, all dropdowns are top-level roles
+            return { [index]: true };
+        });
     };
 
     // Map specific subroles to custom routes

@@ -92,363 +92,6 @@
 //         setTouched(allTouched);
 //         return;
 //       }
-
-//       setIsSubmitting(true);
-
-//       try {
-//         // Send JSON instead of FormData
-//         const dataToSend = {
-//           companyName: formData.companyName,
-//           industry: formData.industry,
-//           email: formData.email,
-//           phoneNumber: formData.phone,
-//           website: formData.website,
-//           address: formData.address,
-//           numberOfEmployees: formData.employees,
-//           status: formData.status,
-//         };
-
-//         const response = await fetch(`${import.meta.env.VITE_API_URL}/company`, {
-//           method: "POST",
-//           headers: {
-//             "Content-Type": "application/json",
-//           },
-//           body: JSON.stringify(dataToSend),
-//         });
-
-//         if (!response.ok) {
-//           const errorData = await response.json();
-//           throw new Error(errorData.message || "Failed to add company");
-//         }
-
-//         const data = await response.json();
-//         console.log("Company added:", data);
-//         alert("Company added successfully!");
-
-//         setFormData(initialFormData);
-//         setOpen(false);
-//         setErrors({});
-//         setTouched({});
-//       } catch (err) {
-//         console.error("Error adding company:", err);
-//         alert(err.message || "Failed to add company. Please try again.");
-//       } finally {
-//         setIsSubmitting(false);
-//       }
-//     },
-//     [formData, validateForm]
-//   );
-
-//   const handleOpen = useCallback(() => setOpen(true), []);
-//   const handleClose = useCallback(() => {
-//     setOpen(false);
-//     setFormData(initialFormData);
-//     setErrors({});
-//     setTouched({});
-//   }, []);
-
-//   return (
-//     <div>
-//       {/* Open Modal Button */}
-//       <button
-//         onClick={handleOpen}
-//         aria-haspopup="dialog"
-//         aria-expanded={open}
-//         aria-controls="add-company-modal"
-//         className="bg-black w-fit px-3 py-2 flex gap-2 rounded-md text-white"
-//       >
-//         <svg
-//           xmlns="http://www.w3.org/2000/svg"
-//           width="24"
-//           height="24"
-//           fill="none"
-//           stroke="currentColor"
-//           strokeWidth="2"
-//           strokeLinecap="round"
-//           strokeLinejoin="round"
-//           className="lucide lucide-plus"
-//           aria-hidden="true"
-//         >
-//           <path d="M5 12h14" />
-//           <path d="M12 5v14" />
-//         </svg>
-//         Add Company
-//       </button>
-
-//       {/* Modal */}
-//       <Modal
-//         id="add-company-modal"
-//         isOpen={open}
-//         onClose={handleClose}
-//         aria-label="Add new company form"
-//       >
-//         <div className="p-6">
-//           <h2 className="text-xl font-semibold mb-6" id="add-company-title">
-//             Add New Company
-//           </h2>
-
-//           <form
-//             onSubmit={handleSubmit}
-//             className="grid grid-cols-2 gap-6"
-//             aria-labelledby="add-company-title"
-//           >
-//             {/* Company Name */}
-//             <div>
-//               <label htmlFor="companyName" className="block text-sm mb-1">
-//                 Company Name *
-//               </label>
-//               <input
-//                 id="companyName"
-//                 name="companyName"
-//                 type="text"
-//                 value={formData.companyName}
-//                 onChange={(e) =>
-//                   handleInputChange("companyName", e.target.value)
-//                 }
-//                 onBlur={handleBlur}
-//                 placeholder="Tech Corp Solutions"
-//                 className={`w-full border rounded-md px-3 py-2 ${
-//                   errors.companyName
-//                     ? "border-red-500 bg-red-50"
-//                     : "border-gray-300 bg-white"
-//                 }`}
-//                 disabled={isSubmitting}
-//               />
-//               {errors.companyName && (
-//                 <p className="text-red-500 text-xs mt-1" role="alert">
-//                   {errors.companyName}
-//                 </p>
-//               )}
-//             </div>
-
-//             {/* Industry */}
-//             <div>
-//               <label htmlFor="industry" className="block text-sm mb-1">
-//                 Industry *
-//               </label>
-//               <select
-//                 id="industry"
-//                 name="industry"
-//                 value={formData.industry}
-//                 onChange={(e) => handleInputChange("industry", e.target.value)}
-//                 onBlur={handleBlur}
-//                 className={`w-full border rounded-md px-3 py-2 ${
-//                   errors.industry
-//                     ? "border-red-500 bg-red-50"
-//                     : "border-gray-300 bg-white"
-//                 }`}
-//                 disabled={isSubmitting}
-//               >
-//                 <option value="">Select industry</option>
-//                 {industryOptions.map((ind, idx) => (
-//                   <option key={idx} value={ind}>
-//                     {ind}
-//                   </option>
-//                 ))}
-//               </select>
-//               {errors.industry && (
-//                 <p className="text-red-500 text-xs mt-1" role="alert">
-//                   {errors.industry}
-//                 </p>
-//               )}
-//             </div>
-
-//             {/* Email */}
-//             <div>
-//               <label htmlFor="email" className="block text-sm mb-1">
-//                 Email *
-//               </label>
-//               <input
-//                 id="email"
-//                 name="email"
-//                 type="email"
-//                 value={formData.email}
-//                 onChange={(e) => handleInputChange("email", e.target.value)}
-//                 onBlur={handleBlur}
-//                 placeholder="contact@company.com"
-//                 className={`w-full border rounded-md px-3 py-2 ${
-//                   errors.email
-//                     ? "border-red-500 bg-red-50"
-//                     : "border-gray-300 bg-white"
-//                 }`}
-//                 disabled={isSubmitting}
-//               />
-//               {errors.email && (
-//                 <p className="text-red-500 text-xs mt-1" role="alert">
-//                   {errors.email}
-//                 </p>
-//               )}
-//             </div>
-
-//             {/* Phone */}
-//             <div>
-//               <label htmlFor="phone" className="block text-sm mb-1">
-//                 Phone *
-//               </label>
-//               <input
-//                 id="phone"
-//                 name="phone"
-//                 type="text"
-//                 value={formData.phone}
-//                 onChange={(e) => handleInputChange("phone", e.target.value)}
-//                 onBlur={handleBlur}
-//                 placeholder="+1 (555) 123-4567"
-//                 className={`w-full border rounded-md px-3 py-2 ${
-//                   errors.phone
-//                     ? "border-red-500 bg-red-50"
-//                     : "border-gray-300 bg-white"
-//                 }`}
-//                 disabled={isSubmitting}
-//               />
-//               {errors.phone && (
-//                 <p className="text-red-500 text-xs mt-1" role="alert">
-//                   {errors.phone}
-//                 </p>
-//               )}
-//             </div>
-
-//             {/* Website */}
-//             <div className="col-span-2">
-//               <label htmlFor="website" className="block text-sm mb-1">
-//                 Website *
-//               </label>
-//               <input
-//                 id="website"
-//                 name="website"
-//                 type="text"
-//                 value={formData.website}
-//                 onChange={(e) => handleInputChange("website", e.target.value)}
-//                 onBlur={handleBlur}
-//                 placeholder="www.company.com"
-//                 className={`w-full border rounded-md px-3 py-2 ${
-//                   errors.website
-//                     ? "border-red-500 bg-red-50"
-//                     : "border-gray-300 bg-white"
-//                 }`}
-//                 disabled={isSubmitting}
-//               />
-//               {errors.website && (
-//                 <p className="text-red-500 text-xs mt-1" role="alert">
-//                   {errors.website}
-//                 </p>
-//               )}
-//             </div>
-
-//             {/* Address */}
-//             <div className="col-span-2">
-//               <label htmlFor="address" className="block text-sm mb-1">
-//                 Address *
-//               </label>
-//               <input
-//                 id="address"
-//                 name="address"
-//                 type="text"
-//                 value={formData.address}
-//                 onChange={(e) => handleInputChange("address", e.target.value)}
-//                 onBlur={handleBlur}
-//                 placeholder="123 Business Street, City, State ZIP"
-//                 className={`w-full border rounded-md px-3 py-2 ${
-//                   errors.address
-//                     ? "border-red-500 bg-red-50"
-//                     : "border-gray-300 bg-white"
-//                 }`}
-//                 disabled={isSubmitting}
-//               />
-//               {errors.address && (
-//                 <p className="text-red-500 text-xs mt-1" role="alert">
-//                   {errors.address}
-//                 </p>
-//               )}
-//             </div>
-
-//             {/* Employees */}
-//             <div>
-//               <label htmlFor="employees" className="block text-sm mb-1">
-//                 Number of Employees *
-//               </label>
-//               <input
-//                 id="employees"
-//                 name="employees"
-//                 type="number"
-//                 value={formData.employees}
-//                 onChange={(e) => handleInputChange("employees", e.target.value)}
-//                 onBlur={handleBlur}
-//                 placeholder="100"
-//                 className={`w-full border rounded-md px-3 py-2 ${
-//                   errors.employees
-//                     ? "border-red-500 bg-red-50"
-//                     : "border-gray-300 bg-white"
-//                 }`}
-//                 disabled={isSubmitting}
-//               />
-//               {errors.employees && (
-//                 <p className="text-red-500 text-xs mt-1" role="alert">
-//                   {errors.employees}
-//                 </p>
-//               )}
-//             </div>
-
-//             {/* Status */}
-//             <div>
-//               <label htmlFor="status" className="block text-sm mb-1">
-//                 Status *
-//               </label>
-//               <select
-//                 id="status"
-//                 name="status"
-//                 value={formData.status}
-//                 onChange={(e) => handleInputChange("status", e.target.value)}
-//                 onBlur={handleBlur}
-//                 className={`w-full border rounded-md px-3 py-2 ${
-//                   errors.status
-//                     ? "border-red-500 bg-red-50"
-//                     : "border-gray-300 bg-white"
-//                 }`}
-//                 disabled={isSubmitting}
-//               >
-//                 <option value="">Select status</option>
-//                 {statusOptions.map((s, idx) => (
-//                   <option key={idx} value={s}>
-//                     {s}
-//                   </option>
-//                 ))}
-//               </select>
-//               {errors.status && (
-//                 <p className="text-red-500 text-xs mt-1" role="alert">
-//                   {errors.status}
-//                 </p>
-//               )}
-//             </div>
-
-//             {/* Footer Buttons */}
-//             <div className="flex justify-start gap-2 mt-6 col-span-2">
-//               <button
-//                 type="button"
-//                 onClick={handleClose}
-//                 className="px-4 py-2 border rounded-md"
-//                 disabled={isSubmitting}
-//               >
-//                 Cancel
-//               </button>
-//               <button
-//                 type="submit"
-//                 className="bg-black px-3 py-2 rounded-md text-white flex items-center gap-2"
-//                 disabled={isSubmitting}
-//               >
-//                 {isSubmitting ? "Adding..." : "Add Company"}
-//               </button>
-//             </div>
-//           </form>
-//         </div>
-//       </Modal>
-//     </div>
-//   );
-// };
-
-// export default AddCompany;
-
-
-
 import { useState, useCallback, useEffect } from "react";
 import Modal from "../UserManagement/Modal";
 
@@ -550,12 +193,25 @@ const AddCompany = ({ isOpen: controlledOpen, onClose: controlledOnClose, initia
 
       setIsSubmitting(true);
 
+      const dataToSend = {
+        companyName: formData.companyName,
+        industry: formData.industry,
+        email: formData.email,
+        phoneNumber: formData.phone,
+        website: formData.website,
+        address: formData.address,
+        numberOfEmployees: formData.employees,
+        status: formData.status,
+      };
+
       try {
-        // If a logo file was selected, upload it first and get URL
+        let formDataWithLogoKey = null;
         let logoUrl = initialData && initialData.logo ? initialData.logo : "";
+        let logoKey = initialData && initialData.logoKey ? initialData.logoKey : "";
+
         if (logoFile) {
           const fd = new FormData();
-          fd.append("logo", logoFile);
+          fd.append("file", logoFile); 
           const uploadRes = await fetch(`${import.meta.env.VITE_API_URL}/company/upload-logo`, {
             method: "POST",
             body: fd,
@@ -565,26 +221,21 @@ const AddCompany = ({ isOpen: controlledOpen, onClose: controlledOnClose, initia
             throw new Error(errData.message || "Logo upload failed");
           }
           const uploadData = await uploadRes.json();
-          logoUrl = uploadData.url || (uploadData.result && uploadData.result.secure_url) || "";
+          logoUrl = uploadData.url || (uploadData.result && uploadData.result.url) || "";
+          logoKey = uploadData.key || (uploadData.result && uploadData.result.key) || "";
         }
 
         // Normalize website: backend expects scheme (http:// or https://)
-        let websiteValue = formData.website ? formData.website.toString().trim() : "";
+        let websiteValue = dataToSend.website ? dataToSend.website.toString().trim() : "";
         if (websiteValue && !/^https?:\/\//i.test(websiteValue)) {
           websiteValue = `http://${websiteValue}`;
         }
 
-        // Send JSON instead of FormData
-        const dataToSend = {
-          companyName: formData.companyName,
-          industry: formData.industry,
-          email: formData.email,
-          phoneNumber: formData.phone,
+        const dataToSendFinal = { 
+          ...dataToSend, 
           website: websiteValue,
-          address: formData.address,
-          numberOfEmployees: formData.employees,
-          status: formData.status,
-          logo: logoUrl,
+          logo: logoUrl, 
+          logoKey: logoKey 
         };
 
         let response;
@@ -592,13 +243,13 @@ const AddCompany = ({ isOpen: controlledOpen, onClose: controlledOnClose, initia
           response = await fetch(`${import.meta.env.VITE_API_URL}/company/${initialData._id}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(dataToSend),
+            body: JSON.stringify(dataToSendFinal),
           });
         } else {
           response = await fetch(`${import.meta.env.VITE_API_URL}/company`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(dataToSend),
+            body: JSON.stringify(dataToSendFinal),
           });
         }
 

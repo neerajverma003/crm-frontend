@@ -148,7 +148,10 @@ const CreateHotel = () => {
     setImagesToRemove(prev => prev.includes(imageUrl) ? prev : [...prev, imageUrl]);
     setEditData(prev => ({
       ...prev,
-      hotelImages: prev?.hotelImages?.filter(img => img !== imageUrl) || []
+      hotelImages: prev?.hotelImages?.filter(img => {
+        const url = typeof img === 'string' ? img : img.url;
+        return url !== imageUrl;
+      }) || []
     }));
   };
 
@@ -589,7 +592,7 @@ const CreateHotel = () => {
                     {viewData.hotelImages.map((image, index) => (
                       <div key={index} className="relative group">
                         <img 
-                          src={image} 
+                          src={typeof image === 'string' ? image : image.url} 
                           alt={`Hotel ${index + 1}`}
                           className="w-full h-40 object-cover rounded-lg border-2 border-gray-300 bg-white"
                           onError={() => {
@@ -597,7 +600,8 @@ const CreateHotel = () => {
                             setImageLoadErrors({...imageLoadErrors, [`image-${index}`]: true});
                           }}
                           onLoad={() => {
-                            console.log(`Image ${index} loaded successfully:`, image);
+                            const url = typeof image === 'string' ? image : image.url;
+                            console.log(`Image ${index} loaded successfully:`, url);
                             setImageLoading({...imageLoading, [`image-${index}`]: false});
                           }}
                         />
@@ -874,23 +878,26 @@ const CreateHotel = () => {
                 <div className="mt-4">
                   <p className="text-sm font-medium mb-2">Existing Images ({editData.hotelImages.length}):</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {editData.hotelImages.map((image, index) => (
-                      <div key={`existing-${index}`} className="relative group">
-                        <img
-                          src={image}
-                          alt={`Existing ${index + 1}`}
-                          className="w-full h-24 object-cover rounded border"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveExistingImage(image)}
-                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 z-20 cursor-pointer shadow"
-                          title="Remove image"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
+                    {editData.hotelImages && editData.hotelImages.map((img, idx) => {
+                      const url = typeof img === 'string' ? img : img.url;
+                      return (
+                        <div key={idx} className="relative group">
+                          <img 
+                            src={url} 
+                            alt={`Existing ${idx}`} 
+                            className="w-full h-24 object-cover rounded border"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveExistingImage(url)}
+                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Remove existing image"
+                          >
+                            &times;
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

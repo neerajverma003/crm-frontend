@@ -43,9 +43,15 @@ export default function AllItinerary() {
         }
     };
 
-    const handleDownload = (url, destination, index) => {
+    const handleDownload = (pdfData, destination, index) => {
+        const url = typeof pdfData === 'string' ? pdfData : pdfData.url;
+        const key = typeof pdfData === 'object' ? pdfData.key : null;
+        
+        // Use proxy for safer delivery if key exists
+        const downloadUrl = key ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${key}` : url;
+        
         const link = document.createElement("a");
-        link.href = url;
+        link.href = downloadUrl;
         link.download = `${destination}_Itinerary_${index + 1}.pdf`;
         link.target = "_blank";
         document.body.appendChild(link);
@@ -98,14 +104,14 @@ export default function AllItinerary() {
                 <h1 className="mb-6 text-3xl font-bold text-gray-900">{selectedItinerary.Destination} Itineraries</h1>
 
                 <div className="space-y-4">
-                    {selectedItinerary.Upload.map((pdfUrl, idx) => (
+                    {selectedItinerary.Upload.map((pdfData, idx) => (
                         <div
                             key={idx}
                             className="flex items-center justify-between rounded bg-white p-4 shadow"
                         >
                             <span className="truncate font-semibold">{`Itinerary PDF ${idx + 1}`}</span>
                             <button
-                                onClick={() => handleDownload(pdfUrl, selectedItinerary.Destination, idx)}
+                                onClick={() => handleDownload(pdfData, selectedItinerary.Destination, idx)}
                                 className="flex items-center gap-2 rounded bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"
                             >
                                 <Download className="h-5 w-5" /> Download

@@ -141,7 +141,12 @@ const DailyExpense = () => {
                                         <td className="cursor-pointer p-3 text-sm text-blue-600">
                                             {exp.bill ? (
                                                 <button
-                                                    onClick={() => handleViewBill(exp.bill)} // ✅ Use Cloudinary URL directly
+                                                    onClick={() => {
+                                                        const url = typeof exp.bill === 'string' ? exp.bill : exp.bill.url;
+                                                        const key = typeof exp.bill === 'object' ? exp.bill.key : exp.key;
+                                                        const finalUrl = key ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${key}` : url;
+                                                        handleViewBill(finalUrl);
+                                                    }}
                                                     className="underline"
                                                 >
                                                     View

@@ -249,65 +249,11 @@ const TrainingMaterial = () => {
     setLoadingPreview(false);
   }, [preview]);
 
-  // open preview
-  const openPreview = useCallback(async (tut) => {
-    setLoadingPreview(true);
-    setPreviewError('');
-    setPreviewInfo('');
-
-    const lower = (tut.fileType || '').toLowerCase();
-
-    if (lower === 'pdf' || lower === 'ppt') {
-      const previewUrl = `${API_BASE_URL}/tutorials/preview/${tut._id}`;
-      const originalUrl = tut.cloudinaryUrl || tut.fileUrl;
-
-      try {
-        const res = await fetch(previewUrl);
-
-        if (!res.ok) {
-          let parsed = null;
-          try { const text = await res.text(); parsed = JSON.parse(text); } catch (e) { parsed = null; }
-          const upstreamStatus = (parsed && parsed.status) || res.status;
-          const upstreamMsg = (parsed && parsed.message) || 'Preview not available. Use Download/Open instead.';
-
-          const isDirectViewable = originalUrl && /^https?:\/\//i.test(originalUrl) && (lower === 'pdf' || lower === 'ppt');
-
-          if (isDirectViewable) {
-            const viewer = getViewerUrl(originalUrl, lower);
-            setPreview({ type: tut.fileType, url: viewer, title: tut.title, isBlob: false, originalUrl });
-            setPreviewInfo('Loaded via direct viewer (Google Docs Viewer). If this fails the file may require permission.');
-          } else {
-            if (/auth/i.test(String(upstreamMsg)) || upstreamStatus === 401 || upstreamStatus === 403) {
-              setPreviewError(`File requires permission or upstream authentication. (${upstreamStatus})`);
-            } else {
-              setPreviewError(`${upstreamMsg} (${upstreamStatus})`);
-            }
-            setPreview({ type: tut.fileType, url: originalUrl, title: tut.title, isBlob: false, originalUrl });
-          }
-        } else {
-          const blob = await res.blob();
-          if (!blob || blob.size === 0) {
-            setPreviewError('Preview file is empty or could not be loaded.');
-            setPreview({ type: tut.fileType, url: originalUrl, title: tut.title, isBlob: false, originalUrl });
-          } else {
-            if (preview && preview.isBlob) { try { window.URL.revokeObjectURL(preview.url); } catch (e) {} }
-            const objectUrl = window.URL.createObjectURL(blob);
-            setPreview({ type: tut.fileType, url: objectUrl, title: tut.title, isBlob: true, originalUrl });
-          }
-        }
-      } catch (err) {
-        console.warn('Preview fetch failed, falling back to file URL', err);
-        setPreview({ type: tut.fileType, url: originalUrl, title: tut.title, isBlob: false, originalUrl });
-        setPreviewError('Preview may not be available. Use Download/Open instead.');
-      } finally {
-        setLoadingPreview(false);
-      }
-    } else {
-      const url = tut.cloudinaryUrl || tut.fileUrl;
-      setPreview({ type: tut.fileType, url, title: tut.title, isBlob: false, originalUrl: url });
-      setLoadingPreview(false);
-    }
-  }, [preview]);
+  const openPreview = useCallback((tut) => {
+    const url = `${import.meta.env.VITE_API_URL}/api/media/preview?key=${tut.key}`;
+    setPreview({ type: tut.fileType, url, title: tut.title, isBlob: false, originalUrl: url });
+    setLoadingPreview(false);
+  }, []);
 
   // keyboard close
   useEffect(() => {
@@ -352,14 +298,14 @@ const TrainingMaterial = () => {
   );
 
   const MaterialCard = ({ tut }) => {
-    const url = tut.cloudinaryUrl || tut.fileUrl;
+    const url = tut.fileUrl || tut.cloudinaryUrl;
     return (
       <article className="bg-white border rounded-lg shadow-sm overflow-hidden" role="article" aria-labelledby={`title-${tut._id}`}>
         <div className="relative h-48 bg-gray-100">
           {tut.fileType === 'image' ? (
-            <img src={url} alt={tut.originalName || tut.title} className="w-full h-full object-cover" loading="lazy" />
+            <img src={`${import.meta.env.VITE_API_URL}/api/media/preview?key=${tut.key}`} alt={tut.originalName || tut.title} className="w-full h-full object-cover" loading="lazy" />
           ) : tut.fileType === 'video' ? (
-            <video src={url} muted className="w-full h-full object-cover" />
+            <video src={`${import.meta.env.VITE_API_URL}/api/media/preview?key=${tut.key}`} muted className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-400"><FileText className="w-12 h-12" /></div>
           )}
@@ -388,7 +334,7 @@ const TrainingMaterial = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <a href={(tut.fileType === 'pdf' || tut.fileType === 'ppt') ? `${API_BASE_URL}/tutorials/preview/${tut._id}` : getViewerUrl(url, tut.fileType)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-blue-600"><Download className="w-4 h-4" /> Open</a>
+              <a href={`${import.meta.env.VITE_API_URL}/api/media/preview?key=${tut.key}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-blue-600"><Download className="w-4 h-4" /> Open</a>
             </div>
           </div>
         </div>

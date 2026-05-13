@@ -337,6 +337,7 @@ const B2bCompanyLeads = () => {
   const [viewingPdfUrl, setViewingPdfUrl] = useState(null); // State for PDF viewer modal
   const [detailsForm, setDetailsForm] = useState({
     itinerary: "",
+    itineraryKey: "",
     inclusion: "",
     specialInclusions: "",
     exclusion: "",
@@ -570,12 +571,12 @@ const B2bCompanyLeads = () => {
     }
   };
 
-  const handleOpenPdf = async (url) => {
-    if (!url) {
+  const handleOpenPdf = async (url, key) => {
+    if (!url && !key) {
       alert('PDF URL not available');
       return;
     }
-    setViewingPdfUrl(url);
+    setViewingPdfUrl(key || url);
   };
 
   const handleAddMessage = (lead) => {
@@ -633,6 +634,7 @@ const B2bCompanyLeads = () => {
         setDetailsModal({ isOpen: true, lead: fullLead });
         setDetailsForm({
           itinerary: fullLead.itinerary || "",
+          itineraryKey: fullLead.itineraryKey || "",
           inclusion: fullLead.inclusion || "",
           specialInclusions: fullLead.specialInclusions || "",
           exclusion: fullLead.exclusion || "",
@@ -653,6 +655,7 @@ const B2bCompanyLeads = () => {
       setDetailsModal({ isOpen: true, lead });
       setDetailsForm({
         itinerary: lead.itinerary || "",
+        itineraryKey: lead.itineraryKey || "",
         inclusion: lead.inclusion || "",
         specialInclusions: lead.specialInclusions || "",
         exclusion: lead.exclusion || "",
@@ -1004,7 +1007,7 @@ const B2bCompanyLeads = () => {
                           <label className="block text-xs font-semibold text-gray-600 uppercase mb-2">Itinerary</label>
                           <button
                             type="button"
-                            onClick={() => handleOpenPdf(viewingLead.itinerary)}
+                            onClick={() => handleOpenPdf(viewingLead.itinerary, viewingLead.itineraryKey)}
                             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium"
                           >
                             📄 View Itinerary PDF
@@ -1225,6 +1228,7 @@ const B2bCompanyLeads = () => {
                               setDetailsForm((prev) => ({
                                 ...prev,
                                 itinerary: data.fileUrl,
+                                itineraryKey: data.key,
                               }));
                             } else {
                               alert("Failed to upload PDF: " + (data.message || res.statusText));
@@ -1242,7 +1246,7 @@ const B2bCompanyLeads = () => {
                       <span className="text-sm text-gray-800 font-medium flex-1 truncate">✓ PDF Uploaded</span>
                       <button
                         type="button"
-                        onClick={() => handleOpenPdf(detailsForm.itinerary)}
+                        onClick={() => handleOpenPdf(detailsForm.itinerary, detailsForm.itineraryKey)}
                         className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm font-medium"
                       >
                         View
@@ -1616,7 +1620,13 @@ const B2bCompanyLeads = () => {
 
             <div className="mb-4">
               {(() => {
-                const googleViewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(viewingPdfUrl)}&embedded=true`;
+                // Use proxy URL if it's a key or if we can derive one
+                let finalUrl = viewingPdfUrl;
+                if (viewingPdfUrl && !viewingPdfUrl.startsWith('http')) {
+                   finalUrl = `${import.meta.env.VITE_API_URL}/api/media/preview?key=${viewingPdfUrl}`;
+                }
+
+                const googleViewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(finalUrl)}&embedded=true`;
                 return (
                   <div className="border border-gray-300 rounded p-4">
                     <div className="space-y-4">
@@ -1630,14 +1640,14 @@ const B2bCompanyLeads = () => {
                       />
                       <div className="flex gap-3 justify-center">
                         <a
-                          href={viewingPdfUrl}
+                          href={finalUrl}
                           download
                           className="inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition font-medium"
                         >
                           ⬇️ Download PDF
                         </a>
                         <a
-                          href={viewingPdfUrl}
+                          href={finalUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-block bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition font-medium"

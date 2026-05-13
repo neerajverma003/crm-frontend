@@ -78,9 +78,8 @@ const OfferLetterFormat = () => {
     "background",
   ];
 
-  const [formatData, setFormatData] = useState({
+  const initialFormatData = {
     title: "Offer Letter Format",
-    // Format-specific sections
     workHours: "",
     confidentiality: "",
     atWillEmployment: "",
@@ -102,7 +101,9 @@ const OfferLetterFormat = () => {
     ndaBreachAndRemedies: "",
     ndaGoverningLaw: "",
     ndaAdditionalObligations: "",
-  });
+  };
+
+  const [formatData, setFormatData] = useState(initialFormatData);
 
   const fetchFormats = async (companyId = null) => {
     try {
@@ -123,36 +124,13 @@ const OfferLetterFormat = () => {
         const existing = fetched[0] || null;
         if (existing) {
           setSelectedFormatId(existing._id);
-          setFormatData((prev) => ({
-            ...prev,
+          setFormatData({
+            ...initialFormatData,
             ...existing,
-          }));
+          });
         } else {
           setSelectedFormatId(null);
-          setFormatData((prev) => ({
-            ...prev,
-            workHours: "",
-            confidentiality: "",
-            atWillEmployment: "",
-            noticePeriod: "",
-            relievingAndFinalSettlement: "",
-            confidentialityAndNda: "",
-            paymentInLieuOfNotice: "",
-            exitInterview: "",
-            legalCompliance: "",
-            postEmploymentBenefits: "",
-            annexureA: "",
-            nonDisclosureAgreement: "",
-            ndaWhereas: "",
-            ndaDefinitionOfConfidential: "",
-            ndaObligationOfConfidentiality: "",
-            ndaExclusions: "",
-            ndaTerm: "",
-            ndaReturnOfMaterials: "",
-            ndaBreachAndRemedies: "",
-            ndaGoverningLaw: "",
-            ndaAdditionalObligations: "",
-          }));
+          setFormatData(initialFormatData);
         }
       }
     } catch (err) {

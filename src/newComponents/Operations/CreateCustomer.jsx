@@ -285,10 +285,10 @@ const CreateCustomer = () => {
           url: doc.fileUrl || doc.file_url || null,
           type: doc.fileType || 'application/octet-stream',
           fileType: doc.fileType || 'application/octet-stream',
-          cloudinaryPublicId: doc.cloudinaryPublicId || doc.publicId || null,
+          key: doc.key || doc.cloudinaryPublicId || doc.publicId || null,
           isExisting: true,
         };
-        if (doc.cloudinaryPublicId || doc.publicId) existingIds.push(doc.cloudinaryPublicId || doc.publicId);
+        if (doc.key || doc.cloudinaryPublicId || doc.publicId) existingIds.push(doc.key || doc.cloudinaryPublicId || doc.publicId);
       });
 
       const peopleArray = Object.keys(personsMap).map(id => ({ id, name: personsMap[id] }));
@@ -350,11 +350,11 @@ const CreateCustomer = () => {
 
     if (existing) {
       const docMeta = personDocs[personId][docType];
-      const cloudinaryPublicId = docMeta.cloudinaryPublicId;
+      const key = docMeta.key || docMeta.cloudinaryPublicId;
       const leadId = selectedLead?._id || selectedLead?.id;
 
-      if (!cloudinaryPublicId || !leadId) {
-        console.warn('Missing cloudinaryPublicId or leadId; falling back to local removal');
+      if (!key || !leadId) {
+        console.warn('Missing key or leadId; falling back to local removal');
       } else {
         const confirmDel = window.confirm('This will permanently remove the stored document. Continue?');
         if (!confirmDel) return;
@@ -363,7 +363,7 @@ const CreateCustomer = () => {
           const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/document`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ leadId, cloudinaryPublicId }),
+            body: JSON.stringify({ leadId, key }),
           });
 
           const resJson = await res.json().catch(() => ({}));
@@ -374,7 +374,7 @@ const CreateCustomer = () => {
           console.log('Document deleted on server:', resJson);
 
           // Remove id from keptExistingIds so submit won't re-add it
-          setKeptExistingIds(prev => prev.filter(id => id !== cloudinaryPublicId));
+          setKeptExistingIds(prev => prev.filter(id => id !== key));
         } catch (err) {
           console.error('Error deleting document on server:', err);
           alert(`Failed to delete stored document: ${err.message}`);
@@ -512,7 +512,7 @@ const CreateCustomer = () => {
       // Collect existing cloudinary public ids for this person (if any)
       const existingIds = Object.values(docs).reduce((acc, d) => {
         if (d && d.isExisting) {
-          const idCandidate = d.cloudinaryPublicId || d.publicId || d.public_id || d.cloudinary_public_id || d.id || d._id || null;
+          const idCandidate = d.key || d.cloudinaryPublicId || d.publicId || d.public_id || d.cloudinary_public_id || d.id || d._id || null;
           if (idCandidate) acc.push(String(idCandidate));
         }
         return acc;
@@ -533,7 +533,7 @@ const CreateCustomer = () => {
           fetch(`${import.meta.env.VITE_API_URL}/employeelead/document`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ leadId, cloudinaryPublicId: id }),
+            body: JSON.stringify({ leadId, key: id }),
           })
           .then(async res => {
             const json = await res.json().catch(() => ({}));
@@ -1213,7 +1213,7 @@ const CreateCustomer = () => {
                         <label className="block text-xs font-semibold text-gray-600 uppercase mb-2">Itinerary</label>
                         <button
                           type="button"
-                          onClick={() => handleViewDoc({ name: 'Itinerary', url: selectedLead.itinerary, fileType: 'application/pdf', isExisting: true })}
+                          onClick={() => handleViewDoc({ name: 'Itinerary', url: selectedLead.itinerary, key: selectedLead.itineraryKey, fileType: 'application/pdf', isExisting: true })}
                           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium"
                         >
                           📄 View Itinerary PDF
@@ -2210,7 +2210,22 @@ const CreateCustomer = () => {
                 const isExisting = viewingFile && viewingFile.isExisting;
                 const fileType = viewingFile.type || viewingFile.fileType || '';
                 const isImage = fileType && fileType.startsWith('image/');
-                const src = isExisting ? viewingFile.url : (viewingFile instanceof File ? URL.createObjectURL(viewingFile) : viewingFile.url || null);
+                
+                // Prioritize S3 key for proxy if available
+                let src = null;
+                if (isExisting) {
+                  const key = viewingFile.key;
+                  if (key) {
+                    src = `${import.meta.env.VITE_API_URL}/api/media/preview?key=${key}`;
+                  } else {
+                    src = viewingFile.url;
+                  }
+                } else if (viewingFile instanceof File) {
+                  src = URL.createObjectURL(viewingFile);
+                } else {
+                  src = viewingFile.url || null;
+                }
+
                 const fileName = viewingFile.name || viewingFile.fileName || '';
                 
                 // Better PDF detection - check fileType, filename, and URL

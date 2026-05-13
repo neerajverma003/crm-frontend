@@ -399,6 +399,7 @@ const EmployeeLeads = () => {
   const [pendingStatus, setPendingStatus] = useState(null); // { leadId, newStatus } when message required before saving
   const [detailsForm, setDetailsForm] = useState({
     itinerary: "",
+    itineraryKey: "",
     inclusion: "",
     specialInclusions: "",
     exclusion: "",
@@ -823,6 +824,7 @@ const EmployeeLeads = () => {
       setDetailsModal({ isOpen: true, lead: fullLead });
       setDetailsForm({
         itinerary: fullLead.itinerary || "",
+        itineraryKey: fullLead.itineraryKey || "",
         inclusion: fullLead.inclusion || "",
         specialInclusions: fullLead.specialInclusions || "",
         exclusion: fullLead.exclusion || "",
@@ -840,6 +842,7 @@ const EmployeeLeads = () => {
       setDetailsModal({ isOpen: true, lead });
       setDetailsForm({
         itinerary: lead.itinerary || "",
+        itineraryKey: lead.itineraryKey || "",
         inclusion: lead.inclusion || "",
         specialInclusions: lead.specialInclusions || "",
         exclusion: lead.exclusion || "",
@@ -3209,6 +3212,7 @@ const EmployeeLeads = () => {
                             setDetailsForm((prev) => ({
                               ...prev,
                               itinerary: data.fileUrl,
+                              itineraryKey: data.key,
                             }));
                           } else {
                             alert("Failed to upload PDF: " + (data.message || res.statusText));
@@ -3234,7 +3238,7 @@ const EmployeeLeads = () => {
                     <button
                       type="button"
                       onClick={() => {
-                        setDetailsForm({ ...detailsForm, itinerary: "" });
+                        setDetailsForm({ ...detailsForm, itinerary: "", itineraryKey: "" });
                       }}
                       className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm font-medium"
                     >
@@ -3527,7 +3531,10 @@ const EmployeeLeads = () => {
 
             <div className="mb-4">
               {(() => {
-                const googleViewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(viewingPdfUrl)}&embedded=true`;
+                const proxyUrl = detailsForm.itineraryKey 
+                  ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${detailsForm.itineraryKey}`
+                  : viewingPdfUrl;
+                const googleViewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(proxyUrl)}&embedded=true`;
                 return (
                   <div className="border border-gray-300 rounded p-4">
                     <div className="space-y-4">
@@ -3541,13 +3548,13 @@ const EmployeeLeads = () => {
                       />
                       <div className="flex gap-3 justify-center">
                         <button
-                          onClick={() => handleOpenPdf(viewingPdfUrl)}
+                          onClick={() => handleOpenPdf(proxyUrl)}
                           className="inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition font-medium"
                         >
                           ⬇️ Download PDF
                         </button>
                         <a
-                          href={viewingPdfUrl}
+                          href={proxyUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-block bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition font-medium"

@@ -167,7 +167,7 @@ const EmployeeTrainingMaterial = () => {
 
     if (lower === 'pdf' || lower === 'ppt') {
       const previewUrl = `${API_BASE_URL}/tutorials/preview/${tut._id}`;
-      const originalUrl = tut.cloudinaryUrl || tut.fileUrl;
+      const originalUrl = tut.fileUrl || tut.cloudinaryUrl;
 
       try {
         const res = await fetch(previewUrl);
@@ -211,7 +211,7 @@ const EmployeeTrainingMaterial = () => {
         setLoadingPreview(false);
       }
     } else {
-      const url = tut.cloudinaryUrl || tut.fileUrl;
+      const url = tut.fileUrl || tut.cloudinaryUrl;
       setPreview({ type: tut.fileType, url, title: tut.title, isBlob: false, originalUrl: url });
       setLoadingPreview(false);
     }
@@ -260,7 +260,7 @@ const EmployeeTrainingMaterial = () => {
   );
 
   const MaterialCard = ({ tut }) => {
-    const url = tut.cloudinaryUrl || tut.fileUrl;
+    const url = tut.fileUrl || tut.cloudinaryUrl;
     return (
       <article className="bg-white border rounded-lg shadow-sm overflow-hidden" role="article" aria-labelledby={`title-${tut._id}`}>
         <div className="relative h-48 bg-gray-100">

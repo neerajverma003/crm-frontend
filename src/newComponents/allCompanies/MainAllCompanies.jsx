@@ -248,6 +248,7 @@ const MainAllCompanies = () => {
     deals: company.deals || 0,
     value: company.value || "$0",
     logo: company.logo || "",
+    logoKey: company.logoKey || "",
   });
 
   const activeCount = companies.filter((c) => c.status?.toLowerCase() === "active").length;

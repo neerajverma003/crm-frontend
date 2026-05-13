@@ -1,106 +1,3 @@
-
-// import { Eye, Edit, Trash2 } from "lucide-react";
-// import axios from "axios";
-
-// const BusinessProfileCard = ({
-//   _id,
-//   companyName,
-//   industry,
-//   email,
-//   phoneNumber,
-//   website,
-//   logo,
-//   numberOfEmployees,
-//   deals = 0,
-//   value = "$0",
-//   status,
-//   onDelete, // ✅ callback from parent
-//   onEdit,
-// }) => {
-//   const displayName = companyName || "N/A";
-//   const displayStatus = status?.toLowerCase() === "active" ? "Active" : "Pending";
-
-//   const handleDelete = async () => {
-//     if (!_id) return;
-//     if (!window.confirm(`Are you sure you want to delete ${displayName}?`)) return;
-
-//     try {
-//       const res = await axios.delete(`${import.meta.env.VITE_API_URL}/company/delete/${_id}`);
-//       if (res.status === 200) {
-//         alert("Company deleted successfully ✅");
-//         if (onDelete) onDelete(_id);
-//       }
-//     } catch (error) {
-//       console.error("Error deleting company:", error);
-//       alert("Failed to delete company ❌");
-//     }
-//   };
-
-//   return (
-//     <div className="flex items-center justify-between p-2 border rounded-lg shadow-sm hover:shadow-md transition bg-white">
-//       {/* Left */}
-//       <div className="flex items-center gap-4">
-//         <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center text-lg font-medium text-gray-700 overflow-hidden">
-//           {logo ? (
-//             <img src={logo} alt={`${displayName} logo`} className="w-full h-full object-cover" />
-//           ) : (
-//             displayName[0] || "?"
-//           )}
-//         </div>
-//         <div>
-//           <h2 className="font-semibold text-gray-900">{displayName}</h2>
-//           <p className="text-sm text-gray-500">{industry || "N/A"}</p>
-//           <p className="text-sm text-gray-400">{email || "N/A"}</p>
-//         </div>
-//       </div>
-
-//       {/* Stats */}
-//       <div className="flex items-center gap-3">
-//         <div className="text-right">
-//           <p className="font-semibold">{deals}</p>
-//           <p className="text-xs text-gray-500">Deals</p>
-//         </div>
-//         <div className="text-right">
-//           <p className="font-semibold text-green-600">{value}</p>
-//           <p className="text-xs text-gray-500">Value</p>
-//         </div>
-//         <span
-//           className={`px-2 py-1 text-xs font-medium rounded-full ${
-//             displayStatus === "Active" ? "bg-[#00c951] text-white" : "bg-[#f0b100] text-white"
-//           }`}
-//         >
-//           {displayStatus}
-//         </span>
-//       </div>
-
-//       {/* Actions */}
-//       <div className="flex items-center gap-3 text-gray-500">
-//         <button className="hover:bg-gray-200 p-2 rounded-sm">
-//           <Eye size={15} />
-//         </button>
-//         <button
-//           className="hover:bg-gray-200 p-2 rounded-sm"
-//           onClick={() =>
-//             onEdit &&
-//             onEdit({ _id, companyName, industry, status, email, phoneNumber, website, numberOfEmployees, deals, value })
-//           }
-//         >
-//           <Edit size={15} />
-//         </button>
-//         <button
-//           onClick={handleDelete}
-//           className="text-red-500 hover:bg-gray-200 p-2 rounded-sm"
-//         >
-//           <Trash2 size={15} />
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default BusinessProfileCard;
-
-
 import axios from "axios";
 import { useState } from "react";
 import { MdMail, MdPhone, MdLanguage, MdPeople, MdVisibility, MdEdit, MdDelete } from "react-icons/md";
@@ -114,6 +11,7 @@ const BusinessProfileCard = ({
   phoneNumber,
   website,
   logo,
+  logoKey,
   address,
   numberOfEmployees,
   deals = 0,
@@ -165,8 +63,12 @@ const BusinessProfileCard = ({
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center font-semibold overflow-hidden border border-blue-200">
               {/* Show logo if available, otherwise initial letter */}
-              {logo ? (
-                <img src={logo} alt={`${displayName} logo`} className="w-full h-full object-cover" />
+              {logoKey || logo ? (
+                <img 
+                  src={logoKey ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${logoKey}` : logo} 
+                  alt={`${displayName} logo`} 
+                  className="w-full h-full object-cover" 
+                />
               ) : (
                 <span className="text-xl font-bold text-blue-600">{displayName[0] || "?"}</span>
               )}
@@ -237,7 +139,7 @@ const BusinessProfileCard = ({
           </button>
           <button
             onClick={() => {
-              setEditData({ _id, companyName, industry, status, email, phoneNumber, website, numberOfEmployees, address, deals, value, logo });
+              setEditData({ _id, companyName, industry, status, email, phoneNumber, website, numberOfEmployees, address, deals, value, logo, logoKey });
               setIsEditOpen(true);
             }}
             title="Edit company"
@@ -290,8 +192,12 @@ const BusinessProfileCard = ({
                     {/* Company Header */}
                     <div className="flex items-center gap-4">
                       <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center font-bold text-2xl border border-blue-200 overflow-hidden">
-                        {logo ? (
-                          <img src={logo} alt={`${displayName} logo`} className="w-full h-full object-cover" />
+                        {logoKey || logo ? (
+                          <img 
+                            src={logoKey ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${logoKey}` : logo} 
+                            alt={`${displayName} logo`} 
+                            className="w-full h-full object-cover" 
+                          />
                         ) : (
                           <span className="text-blue-600">{displayName[0] || "?"}</span>
                         )}

@@ -151,7 +151,12 @@ const ViewEmployeeModal = ({ isOpen, onClose, data }) => {
                   {data.documents.panCard && (
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <p className="text-sm font-semibold text-gray-700 uppercase mb-1">PAN Card</p>
-                      <a href={data.documents.panCard.url} target="_blank" rel="noreferrer" className="text-blue-700 font-semibold text-lg break-words">
+                      <a 
+                        href={data.documents.panCard.key ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${data.documents.panCard.key}` : data.documents.panCard.url} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="text-blue-700 font-semibold text-lg break-words"
+                      >
                         {data.documents.panCard.filename || "View PAN"}
                       </a>
                       {data.documents.panCard.uploadedAt && (
@@ -163,7 +168,12 @@ const ViewEmployeeModal = ({ isOpen, onClose, data }) => {
                   {data.documents.aadharCard && (
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <p className="text-sm font-semibold text-gray-700 uppercase mb-1">Aadhar Card</p>
-                      <a href={data.documents.aadharCard.url} target="_blank" rel="noreferrer" className="text-blue-700 font-semibold text-lg break-words">
+                      <a 
+                        href={data.documents.aadharCard.key ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${data.documents.aadharCard.key}` : data.documents.aadharCard.url} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="text-blue-700 font-semibold text-lg break-words"
+                      >
                         {data.documents.aadharCard.filename || "View Aadhar"}
                       </a>
                       {data.documents.aadharCard.uploadedAt && (
@@ -175,7 +185,12 @@ const ViewEmployeeModal = ({ isOpen, onClose, data }) => {
                   {data.documents.accountDetails && (
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <p className="text-sm font-semibold text-gray-700 uppercase mb-1">Account Details</p>
-                      <a href={data.documents.accountDetails.url} target="_blank" rel="noreferrer" className="text-blue-700 font-semibold text-lg break-words">
+                      <a 
+                        href={data.documents.accountDetails.key ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${data.documents.accountDetails.key}` : data.documents.accountDetails.url} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="text-blue-700 font-semibold text-lg break-words"
+                      >
                         {data.documents.accountDetails.filename || "View Account Details"}
                       </a>
                       {data.documents.accountDetails.uploadedAt && (
@@ -187,7 +202,12 @@ const ViewEmployeeModal = ({ isOpen, onClose, data }) => {
                   {data.documents.pcc && (
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <p className="text-sm font-semibold text-gray-700 uppercase mb-1">PCC</p>
-                      <a href={data.documents.pcc.url} target="_blank" rel="noreferrer" className="text-blue-700 font-semibold text-lg break-words">
+                      <a 
+                        href={data.documents.pcc.key ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${data.documents.pcc.key}` : data.documents.pcc.url} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="text-blue-700 font-semibold text-lg break-words"
+                      >
                         {data.documents.pcc.filename || "View PCC"}
                       </a>
                       {data.documents.pcc.uploadedAt && (
@@ -205,7 +225,14 @@ const ViewEmployeeModal = ({ isOpen, onClose, data }) => {
                   <ul className="list-disc pl-5 space-y-2">
                     {data.documents.educationQualifications.map((doc, i) => (
                       <li key={i} className="text-base">
-                        <a href={doc.url} target="_blank" rel="noreferrer" className="text-blue-700 font-semibold break-words">{doc.filename || `Document ${i+1}`}</a>
+                        <a 
+                          href={doc.key ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${doc.key}` : doc.url} 
+                          target="_blank" 
+                          rel="noreferrer" 
+                          className="text-blue-700 font-semibold break-words"
+                        >
+                          {doc.filename || `Document ${i+1}`}
+                        </a>
                         {doc.uploadedAt && <span className="text-sm text-gray-500 ml-2">({new Date(doc.uploadedAt).toLocaleDateString()})</span>}
                       </li>
                     ))}
@@ -219,7 +246,14 @@ const ViewEmployeeModal = ({ isOpen, onClose, data }) => {
                   <ul className="list-disc pl-5 space-y-2">
                     {data.documents.previousCompanyOfferLetters.map((doc, i) => (
                       <li key={i} className="text-base">
-                        <a href={doc.url} target="_blank" rel="noreferrer" className="text-blue-700 font-semibold break-words">{doc.filename || `Offer ${i+1}`}</a>
+                        <a 
+                          href={doc.key ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${doc.key}` : doc.url} 
+                          target="_blank" 
+                          rel="noreferrer" 
+                          className="text-blue-700 font-semibold break-words"
+                        >
+                          {doc.filename || `Offer ${i+1}`}
+                        </a>
                         {doc.uploadedAt && <span className="text-sm text-gray-500 ml-2">({new Date(doc.uploadedAt).toLocaleDateString()})</span>}
                       </li>
                     ))}
@@ -233,7 +267,14 @@ const ViewEmployeeModal = ({ isOpen, onClose, data }) => {
                   <ul className="list-disc pl-5 space-y-2">
                     {data.documents.relievingLetters.map((doc, i) => (
                       <li key={i} className="text-base">
-                        <a href={doc.url} target="_blank" rel="noreferrer" className="text-blue-700 font-semibold break-words">{doc.filename || `Relieving ${i+1}`}</a>
+                        <a 
+                          href={doc.key ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${doc.key}` : doc.url} 
+                          target="_blank" 
+                          rel="noreferrer" 
+                          className="text-blue-700 font-semibold break-words"
+                        >
+                          {doc.filename || `Relieving ${i+1}`}
+                        </a>
                         {doc.uploadedAt && <span className="text-sm text-gray-500 ml-2">({new Date(doc.uploadedAt).toLocaleDateString()})</span>}
                       </li>
                     ))}

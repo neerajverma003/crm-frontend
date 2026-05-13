@@ -6,6 +6,7 @@ const CustomerData = () => {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [viewingFile, setViewingFile] = useState(null);
 
   useEffect(() => {
     fetchCustomers();
@@ -335,7 +336,7 @@ const CustomerData = () => {
                         <label className="block text-xs font-semibold text-gray-600 uppercase mb-2">Itinerary</label>
                         <button
                           type="button"
-                          onClick={() => handleViewDoc({ name: 'Itinerary', url: selectedCustomer.itinerary, fileType: 'application/pdf', isExisting: true })}
+                          onClick={() => handleViewDoc({ name: 'Itinerary', url: selectedCustomer.itinerary, key: selectedCustomer.itineraryKey, fileType: 'application/pdf', isExisting: true })}
                           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium"
                         >
                           📄 View Itinerary PDF
@@ -466,14 +467,12 @@ const CustomerData = () => {
                             {doc.personName} - {doc.documentType}
                           </p>
                         </div>
-                        <a
-                          href={doc.fileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
+                          onClick={() => handleViewDoc({ name: doc.fileName, url: doc.fileUrl, key: doc.key, fileType: doc.documentType, isExisting: true })}
                           className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm flex items-center gap-2"
                         >
                           <FaEye /> View
-                        </a>
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -487,6 +486,75 @@ const CustomerData = () => {
           )}
         </div>
       </div>
+      {/* File Viewer Modal */}
+      {viewingFile && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold">Document Viewer</h3>
+              <button onClick={() => setViewingFile(null)} className="text-gray-500 hover:text-gray-700">
+                <span className="text-2xl">&times;</span>
+              </button>
+            </div>
+
+            <div className="mb-4">
+              <p className="text-sm text-gray-600 mb-2">File: <strong>{viewingFile.name || 'file'}</strong></p>
+
+              {(() => {
+                let src = viewingFile.url;
+                if (viewingFile.isExisting && viewingFile.key) {
+                  src = `${import.meta.env.VITE_API_URL}/api/media/preview?key=${viewingFile.key}`;
+                }
+                
+                const isPdf = (viewingFile.fileType && viewingFile.fileType.includes('pdf')) || (src && src.toLowerCase().includes('.pdf'));
+
+                if (isPdf && src) {
+                  const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(src)}&embedded=true`;
+                  return (
+                    <div className="border border-gray-300 rounded p-4">
+                      <div className="space-y-4">
+                        <iframe
+                          src={viewerUrl}
+                          width="100%"
+                          height="600px"
+                          frameBorder="0"
+                          className="rounded"
+                          title="PDF Document"
+                        />
+                        <div className="flex gap-3 justify-center">
+                          <a
+                            href={src}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition font-medium"
+                          >
+                            ⬇️ Open/Download
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="border border-gray-300 rounded p-4 text-center">
+                    <img src={src} alt="preview" className="max-w-full h-auto max-h-[500px] mx-auto" />
+                  </div>
+                );
+              })()}
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                onClick={() => setViewingFile(null)}
+                className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
