@@ -10,6 +10,111 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 
+const SUBROLE_ROUTES = {
+  // --- User Management points ---
+  "User Creation": "/user-management",
+  "Employee List": "/user-management",
+  "Employee Documents": "/user-management",
+  "Flow Chart": "/user-management",
+  "Upgradation": "/user-management",
+  "User Management": "/user-management",
+  
+  // --- Employee Management points ---
+  "Assign Company": "/assignemployeecompany",
+  "Assign Role": "/assignemployeerole",
+  "Create Destiation": "/createdestinationemployee", // exact DB spelling
+  "Create Destination": "/createdestinationemployee",
+  
+  // --- Leave Management ---
+  "Leave Management": "/leaves",
+  "Leaves": "/leaves",
+  
+  // --- Data Management points ---
+  "Import Data": "/import-data",
+  "Export Data": "/export-data",
+  "Add Profile": "/add-profile",
+  "Add Candidates": "/add-candidate", // exact DB spelling
+  "Add Candidate": "/add-candidate",
+  
+  // --- Pay Roll points ---
+  "Attendance": "/attendance", // under Pay Roll
+  "Salary Management": "/salary-list",
+  "Salary Reports": "/salary-list",
+  "Salary List": "/salary-list",
+  "Generate Payslip": "/generate-payslip",
+  
+  // --- Report points ---
+  "Attendance Report": "/attendance-report",
+  "Employee Report": "/employee-report",
+  "Leave Report": "/leave-report",
+  
+  // --- Compliances points ---
+  "Offer Letter": "/offer-letter",
+  "Termination": "/termination",
+  "Warning": "/warning",
+  "Reliving ": "/relieving", // exact DB spelling with space
+  "Relieving": "/relieving",
+  "Experience Letter": "/experience-letter",
+  "Other": "/other-compliance",
+  "Report List": "/compliance-report-list",
+
+  // --- Lead Dashboard / My Leads ---
+  "My Leads": "/addmylead",
+  "Today's Lead": "/todaysleads",
+  "Follow-Up Leads": "/followupleads",
+  "Lead Reports": "/leadreports",
+  "Assign Destination": "/assigndestination",
+
+  // --- B2B ---
+  "Destination": "/b2b-destination",
+  "Add Company": "/b2b-addcompany",
+  "Company Leads": "/b2b-company-leads",
+
+  // --- Itinerary ---
+  "Add Itinerary": "/add-itinerary",
+  "All Itinerary": "/all-itinerary",
+
+  // --- Operations ---
+  "Create State": "/createstate",
+  "Add State": "/createstate",
+  "Create Hotel": "/createhotel",
+  "Create Transport": "/createtransport",
+  "Create Bank": "/create-bank",
+  "Customer Creation": "/customer-creation",
+  "Customer Data": "/customer-data",
+  "Invoice Creation": "/createinvoice",
+  "Invoice List": "/invoicelist",
+  "Dispute Clients": "/dispute-clients",
+  "dispute clients": "/dispute-clients",
+
+  // --- Accounts ---
+  "Daily Expense": "/dailyexpenses",
+  "Expenses": "/dailyexpenses",
+  "Cheque Entry": "/cheque",
+  "Cheque Expense": "/cheque",
+  "Ledger": "/ledger",
+  "Vendor List": "/vendor-list",
+  "Billing List": "/billing-list",
+  "Classification": "/classification",
+  "GST": "/gst",
+
+  // --- Teams ---
+  "All Team": "/all-team",
+  "Create Team": "/create-team",
+  "Assign Team": "/assign-team",
+
+  // --- Tutorials ---
+  "Training Material": "/training-material",
+  "Upload Material": "/upload-material",
+
+  // --- Admin Management ---
+  "Add Admin": "/add-admin",
+  "Assign management": "/assignrole",
+  "Admin Assign Company": "/assigncompany",
+  "Admin Assign Role": "/assignrole",
+  "Assigned Roles": "/assigned-roles"
+};
+
 // ============================================
 // HELPER COMPONENTS (Defined outside to prevent remounting)
 // ============================================
@@ -42,9 +147,67 @@ const NavMenuItem = ({ item, setIsOpen }) => (
   </li>
 );
 
+const DoubleNestedDropdownItem = ({ item, openDropdowns, toggleDropdown, setIsOpen, navigate, setSelectedSubRole, selectedSubRole, siblings = [] }) => {
+  const isOpen = openDropdowns[item.label];
+  const siblingLabels = siblings.filter(s => s !== item.label);
+
+  return (
+    <li className="group">
+      <button
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          toggleDropdown(item.label, siblingLabels);
+        }}
+        className="w-full flex items-center justify-between px-3 py-1.5 rounded-[5px] text-[11px] text-gray-700 hover:text-blue-700 hover:bg-blue-100/25 transition-all duration-200"
+      >
+        <span className="font-bold truncate text-gray-800">{item.label}</span>
+        <span className={`text-gray-500 hover:text-blue-600 transition-all duration-300 transform ${isOpen ? "rotate-180" : ""}`}>
+          <FiChevronDown size={11} />
+        </span>
+      </button>
+
+      {/* Nested Points */}
+      <div className={`dropdown-wrapper ${isOpen ? "is-open" : ""}`}>
+        <div className="dropdown-content">
+          <ul className="mt-0.5 ml-2 pl-2 border-l border-indigo-300/40 space-y-0.5">
+            {item.children.map((point) => (
+              <li key={point.id}>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const subRoleData = {
+                      subRoleId: point.id,
+                      subRoleName: point.label,
+                      roleName: item.label
+                    };
+                    setSelectedSubRole(subRoleData);
+                    localStorage.setItem("selectedSubRole", JSON.stringify(subRoleData));
+                    
+                    const route = SUBROLE_ROUTES[point.label] || `/${point.label}`;
+                    navigate(route, { state: { subRole: subRoleData } });
+                    setIsOpen(false);
+                  }}
+                  className={`w-full text-left px-3 py-1.5 rounded-md text-[10px] font-semibold nav-link-transition ${
+                    selectedSubRole?.subRoleId === point.id
+                      ? "bg-blue-200/50 text-blue-800 border border-blue-400/50 uppercase shadow-sm font-bold"
+                      : "text-gray-700 hover:text-gray-900 hover:bg-blue-100/20"
+                  }`}
+                >
+                  ◆ {point.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </li>
+  );
+};
+
 const NestedDropdownItem = ({ item, openDropdowns, toggleDropdown, setIsOpen, navigate, setSelectedSubRole, selectedSubRole, siblings = [] }) => {
   const isOpen = openDropdowns[item.label];
-
   const siblingLabels = siblings.filter(s => s !== item.label);
 
   return (
@@ -66,57 +229,53 @@ const NestedDropdownItem = ({ item, openDropdowns, toggleDropdown, setIsOpen, na
       {/* Nested Children */}
       <div className={`dropdown-wrapper ${isOpen ? "is-open" : ""}`}>
         <div className="dropdown-content">
-          <ul className="mt-0.5 ml-3 pl-3 border-l border-blue-300/50 space-y-0">
-            {item.children.map((grandchild) => (
-              <li key={grandchild.id}>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const subRoleData = {
-                      subRoleId: grandchild.id,
-                      subRoleName: grandchild.label,
-                      roleName: item.label
-                    };
-                    setSelectedSubRole(subRoleData);
-                    localStorage.setItem("selectedSubRole", JSON.stringify(subRoleData));
-                    
-                    // Routing Logic
-                    const routes = {
-                      "Expenses": "/dailyexpenses",
-                      "All Itinerary": "/all-itinerary",
-                      "Add Itinerary": "/add-itinerary",
-                      "Cheque Entry": "/cheque",
-                      "Add Company": "/b2b-addcompany",
-                      "Create Destination": "/b2b-destination",
-                      "Attendance": "/attendance",
-                      "User Management": "/user-management",
-                      "Leave Management": "/leaves",
-                      "Customer Creation": "/customer-creation",
-                      "Add Destination": "/createdestination",
-                      "Add Hotel": "/createhotel",
-                      "Invoice Creation": "/createinvoice",
-                      "Add State": "/createstate",
-                      "Add Transport": "/createtransport",
-                      "Customer Data": "/customer-data",
-                      "Invoice List": "/invoicelist",
-                      "dispute clients": "/dispute-clients"
-                    };
+          <ul className="mt-0.5 ml-3 pl-3 border-l border-blue-300/50 space-y-0.5">
+            {item.children.map((grandchild) => {
+              if (grandchild.type === "dropdown") {
+                return (
+                  <DoubleNestedDropdownItem
+                    key={grandchild.id}
+                    item={grandchild}
+                    openDropdowns={openDropdowns}
+                    toggleDropdown={toggleDropdown}
+                    setIsOpen={setIsOpen}
+                    navigate={navigate}
+                    setSelectedSubRole={setSelectedSubRole}
+                    selectedSubRole={selectedSubRole}
+                    siblings={item.children.filter(c => c.type === "dropdown").map(c => c.label)}
+                  />
+                );
+              }
 
-                    const route = routes[subRoleData.subRoleName] || `/${subRoleData.subRoleName}`;
-                    navigate(route, { state: { subRole: subRoleData } });
-                    setIsOpen(false);
-                  }}
-                  className={`w-full text-left px-3 py-1.5 rounded-md text-[10px] font-bold nav-link-transition ${
-                    selectedSubRole?.subRoleId === grandchild.id
-                      ? "bg-blue-200/50 text-blue-800 border border-blue-400/50 uppercase shadow-sm"
-                      : "text-gray-700 hover:text-gray-900 hover:bg-blue-100/25"
-                  }`}
-                >
-                  ◆ {grandchild.label}
-                </button>
-              </li>
-            ))}
+              return (
+                <li key={grandchild.id}>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const subRoleData = {
+                        subRoleId: grandchild.id,
+                        subRoleName: grandchild.label,
+                        roleName: item.label
+                      };
+                      setSelectedSubRole(subRoleData);
+                      localStorage.setItem("selectedSubRole", JSON.stringify(subRoleData));
+                      
+                      const route = SUBROLE_ROUTES[subRoleData.subRoleName] || `/${subRoleData.subRoleName}`;
+                      navigate(route, { state: { subRole: subRoleData } });
+                      setIsOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-1.5 rounded-md text-[10px] font-bold nav-link-transition ${
+                      selectedSubRole?.subRoleId === grandchild.id
+                        ? "bg-blue-200/50 text-blue-800 border border-blue-400/50 uppercase shadow-sm"
+                        : "text-gray-700 hover:text-gray-900 hover:bg-blue-100/25"
+                    }`}
+                  >
+                    ◆ {grandchild.label}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>
@@ -195,7 +354,16 @@ const NavDropdownItem = ({ item, openDropdowns, toggleDropdown, setIsOpen, navig
                   <li>
                     <NavLink
                       to={child.url}
-                      onClick={() => setIsOpen(false)}
+                      onClick={() => {
+                        const subRoleData = {
+                          subRoleId: child.id,
+                          subRoleName: child.label,
+                          roleName: item.label
+                        };
+                        setSelectedSubRole(subRoleData);
+                        localStorage.setItem("selectedSubRole", JSON.stringify(subRoleData));
+                        setIsOpen(false);
+                      }}
                       className={({ isActive }) =>
                         `block px-3.5 py-2 rounded-[7px] text-xs font-semibold nav-link-transition ${
                           isActive
@@ -318,18 +486,44 @@ const AdminSidebar = () => {
             }
 
             if (roleAssignment.subRoles) {
-              roleAssignment.subRoles.forEach((subRoleId) => {
-                let subRoleName = "Unknown SubRole";
-                if (roleAssignment.roleId.subRole) {
-                  const found = roleAssignment.roleId.subRole.find(sr => sr._id === subRoleId || sr._id.toString() === subRoleId.toString());
-                  if (found) subRoleName = found.subRoleName;
+              roleAssignment.subRoles.forEach((subRoleObj) => {
+                // Safe check: Agar populated object hai toh _id nikalenge, warna raw string hi ID hai
+                const actualSubRoleId = subRoleObj?._id?.toString() || subRoleObj?.toString();
+                let subRoleName = subRoleObj?.subRoleName || "Unknown SubRole";
+
+                // Fallback check agar populate na ho
+                if (subRoleName === "Unknown SubRole" && roleAssignment.roleId?.subRole) {
+                  const found = roleAssignment.roleId.subRole.find(sr => {
+                    const srId = sr?._id?.toString() || sr?.toString();
+                    return srId === actualSubRoleId;
+                  });
+                  if (found) subRoleName = found.subRoleName || subRoleName;
                 }
 
-                if (!companyMap[companyId].rolesMap[roleId].subroles.some(sr => sr.id === subRoleId)) {
+                // Check duplicate check safely
+                const isAlreadyAdded = companyMap[companyId].rolesMap[roleId].subroles.some(
+                  sr => (sr.id?._id?.toString() || sr.id?.toString()) === actualSubRoleId
+                );
+
+                if (!isAlreadyAdded) {
+                  // Safe points collection
+                  let subRolePoints = subRoleObj?.points || [];
+                  if ((!subRolePoints || subRolePoints.length === 0) && roleAssignment.roleId?.subRole) {
+                    const found = roleAssignment.roleId.subRole.find(sr => {
+                      const srId = sr?._id?.toString() || sr?.toString();
+                      return srId === actualSubRoleId;
+                    });
+                    if (found) subRolePoints = found.points || [];
+                  }
+
+                  const assignedPointsForThisSubRole = (roleAssignment.points && roleAssignment.points.length > 0)
+                    ? subRolePoints.filter(p => roleAssignment.points.includes(p))
+                    : subRolePoints;
+
                   companyMap[companyId].rolesMap[roleId].subroles.push({
-                    id: subRoleId,
+                    id: actualSubRoleId,
                     label: subRoleName,
-                    points: (roleAssignment.roleId.subRole?.find(sr => sr._id === subRoleId)?.points) || []
+                    points: assignedPointsForThisSubRole
                   });
                 }
               });
@@ -348,11 +542,18 @@ const AdminSidebar = () => {
         id: `role-${role.id}`,
         label: role.label,
         type: role.subroles.length > 0 ? "dropdown" : undefined,
-        children: role.subroles.length > 0 ? role.subroles.map((subrole) => ({
-          ...subrole,
-          type: (subrole.points?.length > 0) ? "dropdown" : undefined,
-          children: (subrole.points?.length > 0) ? subrole.points.map((p, i) => ({ id: `p-${subrole.id}-${i}`, label: p, url: null })) : undefined
-        })) : undefined
+        children: role.subroles.length > 0 ? role.subroles.map((subrole) => {
+          const subRoleUrl = SUBROLE_ROUTES[subrole.label || subrole.subRoleName] || `/${subrole.label || subrole.subRoleName}`;
+          return {
+            ...subrole,
+            url: subRoleUrl,
+            type: (subrole.points?.length > 0) ? "dropdown" : undefined,
+            children: (subrole.points?.length > 0) ? subrole.points.map((p, i) => {
+              const pointUrl = SUBROLE_ROUTES[p] || `/${p}`;
+              return { id: `p-${subrole.id}-${i}`, label: p, url: pointUrl };
+            }) : undefined
+          };
+        }) : undefined
       }))
     }));
   };
