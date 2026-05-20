@@ -353,7 +353,38 @@ const SuperAdminAttendance = () => {
             return formatLocalDateTime(defaultClockOut);
         });
 
-        const [status, setStatus] = useState(dayRecords && dayRecords.length > 0 ? dayRecords[0]?.status : "Present");
+               const [status, setStatus] = useState(dayRecords && dayRecords.length > 0 ? dayRecords[0]?.status : "Present");
+
+        // Add this useEffect here:
+        useEffect(() => {
+            if (!clockIn) return;
+            
+            // Extract HH:MM from format "YYYY-MM-DDTHH:mm" (timezone independent string parsing)
+            const timePart = clockIn.split("T")[1];
+            if (timePart) {
+                const [hours, minutes] = timePart.split(":").map(Number);
+                const totalMinutes = hours * 60 + minutes;
+
+                // Time ranges (IST equivalent minutes)
+                // 9:35 AM (575) to 10:00 AM (600) = Present
+                // 10:01 AM (601) to 10:15 AM (615) = Grace Present
+                // 10:16 AM (616) to 12:00 PM (720) = Late
+                // 12:01 PM (721) to 2:00 PM (840) = Half Day
+
+                let calculatedStatus = "Present";
+                if (totalMinutes >= 575 && totalMinutes <= 600) {
+                    calculatedStatus = "Present";
+                } else if (totalMinutes > 600 && totalMinutes <= 615) {
+                    calculatedStatus = "Grace Present";
+                } else if (totalMinutes > 615 && totalMinutes <= 720) {
+                    calculatedStatus = "Late";
+                } else if (totalMinutes > 720 && totalMinutes <= 840) {
+                    calculatedStatus = "Half Day";
+                }
+                
+                setStatus(calculatedStatus);
+            }
+        }, [clockIn]); // Runs automatically when modal opens AND when clockIn time changes
 
         const handleSubmit = () => {
             const toServerFormat = (localString) => {

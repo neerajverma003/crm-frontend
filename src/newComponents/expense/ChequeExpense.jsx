@@ -1,1050 +1,795 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { X, Edit2, Eye } from "lucide-react";
+import {
+    X, Edit2, Eye, Plus, Search, Filter, Calendar, SlidersHorizontal,
+    CheckCircle2, Clock, XCircle, ArrowLeftRight, Layers, Banknote,
+    ArrowUpRight, TrendingUp, CreditCard, Wallet
+} from "lucide-react";
 
-const ChequeExpense = () => {
+const css = `
+.ce-root * { box-sizing: border-box; margin: 0; padding: 0; }
+
+.ce-stat-card {
+  background: #fff; border: 1px solid #f0f0f0; border-radius: 20px;
+  padding: 24px; position: relative; overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease; cursor: default;
+}
+.ce-stat-card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.07); }
+.ce-stat-card::before {
+  content: ''; position: absolute; width: 140px; height: 140px;
+  border-radius: 50%; top: -40px; right: -40px; opacity: 0.5;
+}
+.ce-stat-card.blue::before { background: radial-gradient(circle, #dbeafe, transparent); }
+.ce-stat-card.emerald::before { background: radial-gradient(circle, #d1fae5, transparent); }
+.ce-stat-card.violet::before { background: radial-gradient(circle, #ede9fe, transparent); }
+.ce-stat-card.amber::before { background: radial-gradient(circle, #fef3c7, transparent); }
+
+.ce-tab {
+  display: flex; flex-direction: column; align-items: flex-start;
+  padding: 10px 16px; border-radius: 12px; border: 1.5px solid #f0f0f0;
+  background: #fff; cursor: pointer; transition: all 0.18s ease;
+  min-width: 100px; gap: 2px;
+}
+.ce-tab:hover { border-color: #d1d5db; background: #fafafa; }
+.ce-tab.active-pending  { background: #fffbeb; border-color: #fcd34d; }
+.ce-tab.active-clear    { background: #f0fdf4; border-color: #6ee7b7; }
+.ce-tab.active-cancelled{ background: #fef2f2; border-color: #fca5a5; }
+.ce-tab.active-shifted  { background: #eff6ff; border-color: #93c5fd; }
+.ce-tab.active-all      { background: #111827; border-color: #111827; }
+
+.ce-input {
+  width: 100%; border: 1.5px solid #e5e7eb; border-radius: 12px;
+  background: #fafafa; padding: 10px 14px; font-size: 14px;
+  color: #111827; outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+.ce-input:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+.ce-input::placeholder { color: #9ca3af; }
+.ce-input:read-only { cursor: not-allowed; background: #f3f4f6; color: #6b7280; }
+
+.ce-btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #111827; color: #fff; border: none; border-radius: 12px;
+  padding: 11px 20px; font-size: 14px; font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease; letter-spacing: 0.01em;
+}
+.ce-btn-primary:hover { background: #1f2937; box-shadow: 0 4px 16px rgba(17,24,39,0.2); transform: translateY(-1px); }
+.ce-btn-primary:active { transform: scale(0.98); }
+.ce-btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.ce-btn-ghost {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: transparent; color: #374151; border: 1.5px solid #e5e7eb;
+  border-radius: 10px; padding: 8px 16px; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s ease;
+}
+.ce-btn-ghost:hover { background: #f9fafb; border-color: #d1d5db; }
+
+.ce-label {
+  display: block; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.07em; color: #6b7280; margin-bottom: 6px;
+}
+
+.ce-modal-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(0,0,0,0.45); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+  animation: ceFadeIn 0.2s ease;
+}
+.ce-modal {
+  background: #fff; border-radius: 24px; width: 100%; max-width: 560px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.18); animation: ceSlideUp 0.25s cubic-bezier(0.16,1,0.3,1);
+  overflow: hidden; max-height: 92vh; overflow-y: auto;
+}
+.ce-modal-sm { max-width: 440px; }
+.ce-modal-header {
+  padding: 28px 28px 20px; border-bottom: 1px solid #f3f4f6;
+  background: linear-gradient(135deg, #f9fafb 0%, #fff 100%);
+  position: sticky; top: 0; z-index: 1;
+}
+.ce-modal-body { padding: 24px 28px 28px; }
+
+.ce-status-badge {
+  display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px;
+  border-radius: 99px; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.04em; text-transform: capitalize;
+}
+.ce-status-badge.pending   { background: #fffbeb; color: #92400e; border: 1px solid #fcd34d; }
+.ce-status-badge.clear     { background: #f0fdf4; color: #14532d; border: 1px solid #86efac; }
+.ce-status-badge.cancelled { background: #fef2f2; color: #7f1d1d; border: 1px solid #fca5a5; }
+.ce-status-badge.shifted   { background: #eff6ff; color: #1e3a8a; border: 1px solid #93c5fd; }
+
+.ce-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 8px; border: none;
+  cursor: pointer; transition: all 0.15s ease;
+}
+.ce-icon-btn.edit  { background: #eff6ff; color: #2563eb; }
+.ce-icon-btn.edit:hover  { background: #dbeafe; }
+.ce-icon-btn.view  { background: #f3f4f6; color: #374151; }
+.ce-icon-btn.view:hover  { background: #e5e7eb; }
+
+.ce-select {
+  border: 1.5px solid #e5e7eb; border-radius: 8px; padding: 5px 10px;
+  font-size: 12px; font-weight: 500;
+  color: #374151; background: #fafafa; outline: none; cursor: pointer;
+  transition: border-color 0.15s;
+}
+.ce-select:focus { border-color: #6366f1; }
+
+.ce-filter-pill {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: #fff; border: 1px solid #f0f0f0; border-radius: 14px;
+  padding: 8px 14px; min-height: 44px;
+}
+
+.ce-date-range-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+@media (max-width: 480px) {
+  .ce-date-range-container {
+    flex-wrap: wrap;
+  }
+  .ce-date-range-container > div {
+    flex: 1 1 100% !important;
+    max-width: 100% !important;
+  }
+  .ce-date-range-container > span {
+    display: none;
+  }
+}
+
+.ce-date-chip {
+  padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s ease; border: none;
+}
+.ce-date-chip.active { background: #111827; color: #fff; }
+.ce-date-chip.inactive { background: #f3f4f6; color: #374151; }
+.ce-date-chip.inactive:hover { background: #e5e7eb; }
+
+.ce-view-field { margin-bottom: 4px; }
+.ce-view-field label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af; display: block; margin-bottom: 3px; }
+.ce-view-field .val { font-size: 14px; color: #111827; font-weight: 400; }
+
+.ce-table tbody tr { transition: background 0.12s ease; }
+.ce-table tbody tr:hover { background: #fafafa; }
+.ce-amount-display { font-weight: 700; }
+
+@keyframes ceFadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes ceSlideUp { from { opacity: 0; transform: translateY(16px) scale(0.98) } to { opacity: 1; transform: translateY(0) scale(1) } }
+@keyframes spin { to { transform: rotate(360deg) } }
+`;
+
+const STATUS_KEYS = ["clear", "shifted", "pending", "cancelled"];
+const FILTER_OPTIONS = ["all", ...STATUS_KEYS];
+
+const statusIcon = { pending: Clock, clear: CheckCircle2, cancelled: XCircle, shifted: ArrowLeftRight };
+const statusColor = { pending: "amber", clear: "emerald", cancelled: "red", shifted: "blue", all: "dark" };
+
+const StatCard = ({ color, icon: Icon, label, value, sub }) => {
+    const colors = {
+        blue: { icon: "#3b82f6", bg: "#eff6ff" },
+        emerald: { icon: "#10b981", bg: "#f0fdf4" },
+        violet: { icon: "#8b5cf6", bg: "#f5f3ff" },
+        amber: { icon: "#f59e0b", bg: "#fffbeb" },
+    };
+    const c = colors[color] || colors.blue;
+    return (
+        <div className={`ce-stat-card ${color}`}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                <span style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", color: "#9ca3af" }}>{label}</span>
+                <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", background: c.bg, color: c.icon }}>
+                    <Icon size={17} />
+                </div>
+            </div>
+            <div className="ce-amount-display" style={{ fontSize: 28, color: "#111827", lineHeight: 1.1 }}>{value}</div>
+            {sub && <div style={{ marginTop: 10, fontSize: 12, color: c.icon, fontWeight: 500, display: "flex", alignItems: "center", gap: 4 }}>
+                <ArrowUpRight size={13} />{sub}
+            </div>}
+        </div>
+    );
+};
+
+const StatusBadge = ({ status }) => {
+    const s = (status || "pending").toLowerCase();
+    return <span className={`ce-status-badge ${s}`}>{s}</span>;
+};
+
+const parseAmount = (amt) => {
+    if (amt == null) return 0;
+    return Number(amt.toString().replace(/,/g, "").replace(/₹/g, "").trim()) || 0;
+};
+
+const formatINR = (val) => `₹${new Intl.NumberFormat("en-IN").format(val)}`;
+
+const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—";
+
+export default function ChequeExpense() {
     const [selectedTab, setSelectedTab] = useState("pending");
     const [searchTerm, setSearchTerm] = useState("");
-    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
-    const [chequePresentFilter, setChequePresentFilter] = useState("all"); // today, tomorrow, 3, 7, 14
+    const [chequePresentFilter, setChequePresentFilter] = useState("all");
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [cheques, setCheques] = useState([]);
-    const [editingChequeId, setEditingChequeId] = useState(null);
+    const [editingId, setEditingId] = useState(null);
     const [viewCheque, setViewCheque] = useState(null);
-    const [statusModal, setStatusModal] = useState({
-        open: false,
-        type: null,
-        chequeId: null,
-        currentStatus: null,
-        reason: "",
-        clearDate: "",
-        shiftRemark: "",
-    });
-
-    const [formData, setFormData] = useState({
-        issuedDate: "",
-        chequePresentDate: new Date().toISOString().split("T")[0],
-        toWhom: "",
-        amount: "",
-        chequeNumber: "",
-        reason: "",
-        entryDate: new Date().toISOString().split("T")[0], // today's date auto-filled
-    });
     const [duplicateError, setDuplicateError] = useState("");
+    const [statusModal, setStatusModal] = useState({ open: false, type: null, chequeId: null, reason: "", clearDate: "", shiftRemark: "" });
+    const [formData, setFormData] = useState({
+        issuedDate: "", chequePresentDate: new Date().toISOString().split("T")[0],
+        toWhom: "", amount: "", chequeNumber: "", reason: "",
+        entryDate: new Date().toISOString().split("T")[0],
+    });
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 40;
 
-    // ✅ Handle input changes and check for duplicate cheque number
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-
-        // Check for duplicate cheque number in real-time
-        if (name === "chequeNumber") {
-            const trimmedValue = value.trim();
-            if (trimmedValue) {
-                const isDuplicate = cheques.some(
-                    (c) =>
-                        c.chequeNumber && c.chequeNumber.toString().trim().toLowerCase() === trimmedValue.toLowerCase() && c._id !== editingChequeId,
-                );
-                setDuplicateError(isDuplicate ? "Duplicate cheque number" : "");
-            } else {
-                setDuplicateError("");
-            }
-        }
-    };
-
-    // ✅ Fetch all cheques from backend
-    const fetchCheques = async () => {
-        try {
-            setLoading(true);
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/cheque/get`);
-            if (!res.ok) throw new Error("Failed to fetch cheques");
-            const data = await res.json();
-            console.log(data);
-            setCheques(data); // Assuming backend sends { cheques: [...] }
-        } catch (error) {
-            console.error("❌ Error fetching cheques:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // ✅ Run once when component loads
     useEffect(() => {
-        fetchCheques();
-    }, []);
+        setCurrentPage(1);
+    }, [selectedTab, searchTerm, startDate, endDate, chequePresentFilter]);
 
-    // ✅ Utilities for totals
-    const parseAmount = (amt) => {
-        if (amt === null || amt === undefined) return 0;
-        try {
-            const s = amt.toString().replace(/,/g, "").replace(/₹/g, "").trim();
-            return Number(s) || 0;
-        } catch (e) {
-            return 0;
-        }
+    const fetchCheques = async () => {
+        try { setLoading(true); const r = await fetch(`${import.meta.env.VITE_API_URL}/cheque/get`); const d = await r.json(); setCheques(d); }
+        catch (e) { console.error(e); } finally { setLoading(false); }
     };
+    useEffect(() => { fetchCheques(); }, []);
+    useEffect(() => { const t = setTimeout(() => setDebouncedSearch(searchTerm.trim().toLowerCase()), 300); return () => clearTimeout(t); }, [searchTerm]);
 
-    const todayString = new Date().toISOString().split("T")[0];
-
-    const todayTotal = useMemo(() => {
-        if (!cheques || cheques.length === 0) return 0;
-        return cheques.reduce((acc, c) => {
-            try {
-                if (c.entryDate === todayString) return acc + parseAmount(c.chequeAmount);
-            } catch (e) {
-                return acc;
-            }
-            return acc;
-        }, 0);
-    }, [cheques, todayString]);
-
-    const todayTotalFiltered = useMemo(() => {
-        if (!cheques || cheques.length === 0) return 0;
-        if (selectedTab === "all") return todayTotal;
-        return cheques.reduce((acc, c) => {
-            try {
-                if ((c.status || "pending").toLowerCase() === selectedTab && c.entryDate === todayString) return acc + parseAmount(c.chequeAmount);
-            } catch (e) {
-                return acc;
-            }
-            return acc;
-        }, 0);
-    }, [cheques, todayString, selectedTab]);
-
-    const monthlyTotal = useMemo(() => {
-        if (!cheques || cheques.length === 0) return 0;
-        const now = new Date();
-        const curMonth = now.getMonth();
-        const curYear = now.getFullYear();
-        return cheques.reduce((acc, c) => {
-            try {
-                const dateObj = new Date(c.entryDate);
-                if (dateObj.getMonth() === curMonth && dateObj.getFullYear() === curYear) {
-                    return acc + parseAmount(c.chequeAmount);
-                }
-            } catch (e) {
-                return acc;
-            }
-            return acc;
-        }, 0);
-    }, [cheques]);
-
-    const monthlyTotalFiltered = useMemo(() => {
-        if (!cheques || cheques.length === 0) return 0;
-        if (selectedTab === "all") return monthlyTotal;
-        const now = new Date();
-        const curMonth = now.getMonth();
-        const curYear = now.getFullYear();
-        return cheques.reduce((acc, c) => {
-            try {
-                const dateObj = new Date(c.entryDate);
-                if ((c.status || "pending").toLowerCase() === selectedTab && dateObj.getMonth() === curMonth && dateObj.getFullYear() === curYear) {
-                    return acc + parseAmount(c.chequeAmount);
-                }
-            } catch (e) {
-                return acc;
-            }
-            return acc;
-        }, 0);
-    }, [cheques, selectedTab]);
-
-    const formatINR = (value) => {
-        try {
-            return new Intl.NumberFormat("en-IN").format(value);
-        } catch (e) {
-            return value;
-        }
-    };
-
-    const STATUSES = ["all", "clear", "shifted", "pending", "cancelled"];
-    const FILTER_OPTIONS = STATUSES;
-    const STATUS_KEYS = ["clear", "shifted", "pending", "cancelled"];
-    const statusBadgeStyles = {
-        pending: "bg-yellow-200 text-yellow-900",
-        clear: "bg-green-200 text-green-800",
-        cancelled: "bg-red-200 text-red-800",
-        shifted: "bg-blue-200 text-blue-800",
-    };
+    const todayStr = new Date().toISOString().split("T")[0];
 
     const totalsByStatus = useMemo(() => {
-        const map = {};
-        STATUS_KEYS.forEach((s) => {
-            map[s] = { count: 0, total: 0 };
-        });
-        cheques.forEach((c) => {
-            const st = (c.status || "pending").toLowerCase();
-            const amt = parseAmount(c.chequeAmount);
-            if (!map[st]) map[st] = { count: 0, total: 0 };
-            map[st].count += 1;
-            map[st].total += amt;
-        });
+        const map = {}; STATUS_KEYS.forEach(s => { map[s] = { count: 0, total: 0 }; });
+        cheques.forEach(c => { const s = (c.status || "pending").toLowerCase(); if (!map[s]) map[s] = { count: 0, total: 0 }; map[s].count++; map[s].total += parseAmount(c.chequeAmount); });
         return map;
     }, [cheques]);
 
-    const filteredCheques = useMemo(() => {
-        if (!cheques) return [];
-        if (selectedTab === "all") return cheques;
-        return cheques.filter((c) => (c.status || "pending").toLowerCase() === selectedTab);
-    }, [cheques, selectedTab]);
+    const allTotal = useMemo(() => cheques.reduce((a, c) => a + parseAmount(c.chequeAmount), 0), [cheques]);
 
-    // Helper to apply cheque present date quick filters (today, tomorrow, 3, 7, 14 days)
-    const applyChequePresentQuickFilter = (items) => {
-        if (!chequePresentFilter || chequePresentFilter === "all") return items;
-        const base = new Date();
-        base.setHours(0, 0, 0, 0);
+    const todayTotal = useMemo(() => cheques.reduce((a, c) => c.entryDate === todayStr ? a + parseAmount(c.chequeAmount) : a, 0), [cheques]);
 
-        let start = new Date(base);
-        let end = new Date(base);
+    const monthlyTotal = useMemo(() => {
+        const now = new Date(); const m = now.getMonth(), y = now.getFullYear();
+        return cheques.reduce((a, c) => { const d = new Date(c.entryDate); return d.getMonth() === m && d.getFullYear() === y ? a + parseAmount(c.chequeAmount) : a; }, 0);
+    }, [cheques]);
 
-        if (chequePresentFilter === "today") {
-            // already set as today
-        } else if (chequePresentFilter === "tomorrow") {
-            start.setDate(start.getDate() + 1);
-            end.setDate(end.getDate() + 1);
+    const filtered = useMemo(() => {
+        let r = selectedTab === "all" ? cheques : cheques.filter(c => (c.status || "pending").toLowerCase() === selectedTab);
+        if (debouncedSearch) r = r.filter(c => (c.receiverName || "").toLowerCase().includes(debouncedSearch) || (c.chequeNumber || "").toLowerCase().includes(debouncedSearch));
+        if (startDate || endDate) r = r.filter(c => { try { const d = new Date(c.entryDate); if (startDate && d < new Date(startDate)) return false; if (endDate) { const e = new Date(endDate); e.setHours(23, 59, 59); if (d > e) return false; } return true; } catch { return false; } });
+        if (chequePresentFilter && chequePresentFilter !== "all") {
+            const base = new Date(); base.setHours(0, 0, 0, 0);
+            let start = new Date(base), end = new Date(base);
+            if (chequePresentFilter === "tomorrow") { start.setDate(start.getDate() + 1); end.setDate(end.getDate() + 1); }
+            else { const days = Number(chequePresentFilter); if (!isNaN(days)) end.setDate(end.getDate() + days - 1); }
+            r = r.filter(c => { if (!c.chequePresentDate) return false; try { const d = new Date(c.chequePresentDate); d.setHours(0, 0, 0, 0); return d >= start && d <= end; } catch { return false; } });
+        }
+        return r;
+    }, [cheques, selectedTab, debouncedSearch, startDate, endDate, chequePresentFilter]);
+
+    const filteredTotal = useMemo(() => filtered.reduce((a, c) => a + parseAmount(c.chequeAmount), 0), [filtered]);
+
+    const totalPages = Math.ceil(filtered.length / itemsPerPage);
+    const paginatedCheques = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    const renderPageNumbers = () => {
+        const pages = [];
+        const maxVisible = 5;
+        if (totalPages <= maxVisible) {
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
         } else {
-            const days = Number(chequePresentFilter);
-            if (!Number.isNaN(days) && days > 0) {
-                end.setDate(end.getDate() + (days - 1));
+            pages.push(1);
+            let start = Math.max(2, currentPage - 1);
+            let end = Math.min(totalPages - 1, currentPage + 1);
+            if (currentPage <= 2) {
+                end = 4;
             }
+            if (currentPage >= totalPages - 1) {
+                start = totalPages - 3;
+            }
+            if (start > 2) {
+                pages.push("...");
+            }
+            for (let i = start; i <= end; i++) {
+                pages.push(i);
+            }
+            if (end < totalPages - 1) {
+                pages.push("...");
+            }
+            pages.push(totalPages);
         }
-
-        return items.filter((c) => {
-            if (!c.chequePresentDate) return false;
-            try {
-                const d = new Date(c.chequePresentDate);
-                d.setHours(0, 0, 0, 0);
-                return d >= start && d <= end;
-            } catch {
-                return false;
-            }
-        });
+        return pages;
     };
 
-    // Debounce the search term for performance, so the UI won't filter on every keystroke
-    useEffect(() => {
-        const handler = setTimeout(() => setDebouncedSearchTerm(searchTerm.trim().toLowerCase()), 300);
-        return () => clearTimeout(handler);
-    }, [searchTerm]);
-
-    // Apply search filter over already filteredCheques
-    const finalFilteredCheques = useMemo(() => {
-        let result = filteredCheques;
-        // apply search term
-        if (debouncedSearchTerm) {
-            const term = debouncedSearchTerm;
-            result = result.filter((c) => {
-                const name = (c.receiverName || "").toString().toLowerCase();
-                const num = (c.chequeNumber || "").toString().toLowerCase();
-                return name.includes(term) || num.includes(term);
-            });
-        }
-        // apply date range (on entryDate)
-        if (startDate || endDate) {
-            const start = startDate ? new Date(startDate) : null;
-            const end = endDate ? new Date(endDate) : null;
-            result = result.filter((c) => {
-                try {
-                    const d = new Date(c.entryDate);
-                    if (start && d < start) return false;
-                    if (end) {
-                        // compare end day inclusive: set time of end to 23:59:59
-                        const endWithTime = new Date(end);
-                        endWithTime.setHours(23, 59, 59, 999);
-                        if (d > endWithTime) return false;
-                    }
-                    return true;
-                } catch (e) {
-                    return false;
-                }
-            });
-        }
-        // apply cheque present date quick filter
-        result = applyChequePresentQuickFilter(result);
-        return result;
-    }, [filteredCheques, debouncedSearchTerm, startDate, endDate, chequePresentFilter]);
-
-    const finalFilteredTotal = useMemo(() => {
-        if (!finalFilteredCheques || finalFilteredCheques.length === 0) return 0;
-        return finalFilteredCheques.reduce((acc, c) => acc + parseAmount(c.chequeAmount), 0);
-    }, [finalFilteredCheques]);
-
-    const updateStatus = async (id, payload = {}) => {
-        try {
-            // Call API to update status and any additional data supplied
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/cheque/${id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            });
-            if (!res.ok) throw new Error("Failed to update status");
-            // refresh list to ensure server-side updates are reflected
-            await fetchCheques();
-            alert("Status updated successfully");
-        } catch (error) {
-            console.error("Error updating status:", error);
-            alert("Unable to update status, try again.");
-            // refresh list to show current state
-            fetchCheques();
-        }
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(p => ({ ...p, [name]: value }));
+        if (name === "chequeNumber" && value.trim()) {
+            const dup = cheques.some(c => c.chequeNumber?.toString().trim().toLowerCase() === value.trim().toLowerCase() && c._id !== editingId);
+            setDuplicateError(dup ? "Duplicate cheque number" : "");
+        } else if (name === "chequeNumber") setDuplicateError("");
     };
 
-    // Wrapper to handle special statuses that require additional input
-    const handleStatusSelection = (cheque, newStatus) => {
-        const currentStatus = (cheque.status || "pending").toLowerCase();
-        if (currentStatus === newStatus) return;
-
-        if (newStatus === "cancelled") {
-            setStatusModal({ open: true, type: "cancelled", chequeId: cheque._id, currentStatus, reason: "", clearDate: "" });
-        } else if (newStatus === "clear" || newStatus === "cleared") {
-            // accept 'clear' or 'cleared' keys
-            setStatusModal({
-                open: true,
-                type: "clear",
-                chequeId: cheque._id,
-                currentStatus,
-                reason: "",
-                clearDate: new Date().toISOString().split("T")[0],
-            });
-        } else if (newStatus === "shifted") {
-            setStatusModal({ open: true, type: "shifted", chequeId: cheque._id, currentStatus, reason: "", clearDate: "", shiftRemark: "" });
-        } else {
-            updateStatus(cheque._id, { status: newStatus });
-        }
-    };
-
-    const handleCloseStatusModal = async () => {
-        setStatusModal({ open: false, type: null, chequeId: null, currentStatus: null, reason: "", clearDate: "" });
-        // Refresh cheques to reset select element to server state (in case user cancelled)
-        await fetchCheques();
-    };
-
-    const confirmStatusChange = async () => {
-        const { chequeId, type, reason, clearDate } = statusModal;
-        const { shiftRemark } = statusModal;
-        if (!chequeId) return;
-
-        if (type === "cancelled") {
-            if (!reason || !reason.trim()) {
-                return alert("Please provide a reason for cancellation.");
-            }
-            await updateStatus(chequeId, { status: "cancelled", cancelReason: reason.trim() });
-            handleCloseStatusModal();
-            return;
-        }
-
-        if (type === "clear") {
-            if (!clearDate) {
-                return alert("Please select the cleared date.");
-            }
-            await updateStatus(chequeId, { status: "clear", clearedDate: clearDate });
-            handleCloseStatusModal();
-            return;
-        }
-        if (type === "shifted") {
-            if (!shiftRemark || !shiftRemark.trim()) {
-                return alert("Please provide a reason for shifting the cheque.");
-            }
-            await updateStatus(chequeId, { status: "shifted", shiftRemark: shiftRemark?.trim() || undefined });
-            handleCloseStatusModal();
-            return;
-        }
-    };
-
-    // ✅ Handle form submission (POST)
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const expenseEntry = {
-            chequeIssuedDate: formData.issuedDate,
-            chequePresentDate: formData.chequePresentDate || new Date().toISOString().split("T")[0],
-            receiverName: formData.toWhom,
-            chequeNumber: formData.chequeNumber,
-            chequeAmount: formData.amount,
-            reasonToIssue: formData.reason,
-        };
-        if (!editingChequeId) {
-            expenseEntry.entryDate = new Date().toISOString().split("T")[0];
-        }
-
+        const body = { chequeIssuedDate: formData.issuedDate, chequePresentDate: formData.chequePresentDate, receiverName: formData.toWhom, chequeNumber: formData.chequeNumber, chequeAmount: formData.amount, reasonToIssue: formData.reason };
+        if (!editingId) body.entryDate = todayStr;
         try {
-            const url = editingChequeId ? `${import.meta.env.VITE_API_URL}/cheque/${editingChequeId}` : `${import.meta.env.VITE_API_URL}/cheque`;
-            const method = editingChequeId ? "PUT" : "POST";
-
-            const res = await fetch(url, {
-                method,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(expenseEntry),
-            });
-
+            const url = editingId ? `${import.meta.env.VITE_API_URL}/cheque/${editingId}` : `${import.meta.env.VITE_API_URL}/cheque`;
+            const res = await fetch(url, { method: editingId ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
             const data = await res.json().catch(() => null);
-            // Surface duplicate error message from server to user
-            if (!res.ok) {
-                if (data && data.message && data.message.toLowerCase().includes("duplicate")) {
-                    return alert(data.message);
-                }
-                throw new Error(data?.message || "Failed to save cheque expense");
-            }
-
-            console.log(" Cheque Expense Saved:", data);
-
-            alert(editingChequeId ? "Cheque expense updated successfully!" : "Cheque expense added successfully!");
-            setShowModal(false);
-            setEditingChequeId(null);
-            setDuplicateError("");
-            fetchCheques(); // ✅ Refresh list after adding/ editing cheque
-
-            // Reset form
-            setFormData({
-                issuedDate: "",
-                chequePresentDate: new Date().toISOString().split("T")[0],
-                toWhom: "",
-                amount: "",
-                chequeNumber: "",
-                reason: "",
-                entryDate: new Date().toISOString().split("T")[0],
-            });
-        } catch (error) {
-            console.error(" Error saving cheque expense:", error);
-            alert("Error saving cheque expense. Please try again.");
-        }
+            if (!res.ok) { if (data?.message?.toLowerCase().includes("duplicate")) return alert(data.message); throw new Error(data?.message); }
+            setShowModal(false); setEditingId(null); setDuplicateError("");
+            setFormData({ issuedDate: "", chequePresentDate: todayStr, toWhom: "", amount: "", chequeNumber: "", reason: "", entryDate: todayStr });
+            fetchCheques();
+        } catch (e) { alert("Error saving cheque. Please try again."); }
     };
-    // Open modal with cheque data for editing
-    const openEditModal = (cheque) => {
-        setEditingChequeId(cheque._id);
-        setFormData({
-            issuedDate: new Date(cheque.chequeIssuedDate).toISOString().split("T")[0],
-            chequePresentDate: cheque.chequePresentDate ? new Date(cheque.chequePresentDate).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
-            toWhom: cheque.receiverName || "",
-            amount: cheque.chequeAmount || "",
-            chequeNumber: cheque.chequeNumber || "",
-            reason: cheque.reasonToIssue || "",
-            entryDate: cheque.entryDate || new Date().toISOString().split("T")[0],
-        });
+
+    const openEditModal = (c) => {
+        setEditingId(c._id);
+        setFormData({ issuedDate: new Date(c.chequeIssuedDate).toISOString().split("T")[0], chequePresentDate: c.chequePresentDate ? new Date(c.chequePresentDate).toISOString().split("T")[0] : todayStr, toWhom: c.receiverName || "", amount: c.chequeAmount || "", chequeNumber: c.chequeNumber || "", reason: c.reasonToIssue || "", entryDate: c.entryDate || todayStr });
         setShowModal(true);
     };
+
+    const updateStatus = async (id, payload) => {
+        try { const res = await fetch(`${import.meta.env.VITE_API_URL}/cheque/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }); if (!res.ok) throw new Error(); await fetchCheques(); }
+        catch { alert("Unable to update status."); fetchCheques(); }
+    };
+
+    const handleStatusSelection = (cheque, newStatus) => {
+        const curr = (cheque.status || "pending").toLowerCase();
+        if (curr === newStatus) return;
+        if (newStatus === "cancelled") setStatusModal({ open: true, type: "cancelled", chequeId: cheque._id, reason: "", clearDate: "", shiftRemark: "" });
+        else if (newStatus === "clear") setStatusModal({ open: true, type: "clear", chequeId: cheque._id, reason: "", clearDate: todayStr, shiftRemark: "" });
+        else if (newStatus === "shifted") setStatusModal({ open: true, type: "shifted", chequeId: cheque._id, reason: "", clearDate: "", shiftRemark: "" });
+        else updateStatus(cheque._id, { status: newStatus });
+    };
+
+    const closeStatusModal = async () => { setStatusModal({ open: false, type: null, chequeId: null, reason: "", clearDate: "", shiftRemark: "" }); await fetchCheques(); };
+
+    const confirmStatus = async () => {
+        const { chequeId, type, reason, clearDate, shiftRemark } = statusModal;
+        if (type === "cancelled") { if (!reason.trim()) return alert("Please provide a cancellation reason."); await updateStatus(chequeId, { status: "cancelled", cancelReason: reason.trim() }); }
+        else if (type === "clear") { if (!clearDate) return alert("Please select the cleared date."); await updateStatus(chequeId, { status: "clear", clearedDate: clearDate }); }
+        else if (type === "shifted") { if (!shiftRemark?.trim()) return alert("Please provide a shift reason."); await updateStatus(chequeId, { status: "shifted", shiftRemark: shiftRemark.trim() }); }
+        closeStatusModal();
+    };
+
+    const statusModalDisabled = (statusModal.type === "cancelled" && !statusModal.reason.trim()) || (statusModal.type === "clear" && !statusModal.clearDate) || (statusModal.type === "shifted" && !statusModal.shiftRemark?.trim());
+
+    const quickFilters = [{ key: "all", label: "All" }, { key: "today", label: "Today" }, { key: "tomorrow", label: "Tomorrow" }, { key: "3", label: "3 days" }, { key: "7", label: "7 days" }, { key: "14", label: "14 days" }];
+
+    const tabLabelColor = { all: "#fff", pending: "#92400e", clear: "#14532d", cancelled: "#7f1d1d", shifted: "#1e3a8a" };
+    const tabSubColor = { all: "rgba(255,255,255,0.7)", pending: "#b45309", clear: "#166534", cancelled: "#991b1b", shifted: "#1d4ed8" };
+
     return (
-            <div className="bg-[#f8fafc] min-h-dvh py-4 sm:px-6 lg:px-8">
-                <div className="flex w-full flex-col gap-6">
-                    {/* Header */}
+        <div className="ce-root" style={{ minHeight: "100vh", background: "#f8f9fb", padding: "32px 24px" }}>
+            <style>{css}</style>
+
+            <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+                {/* Header */}
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginBottom: 36 }}>
                     <div>
-                        <h1 className="mb-2 text-2xl font-bold text-gray-900">Cheque Expenses</h1>
-                        <p className="text-gray-600">Track, manage and monitor all cheque based expenses</p>
-                    </div>
-
-                    {/* Status buttons - show at very top for quick access before summary cards */}
-                    <div className="mb-2 flex flex-wrap items-center gap-2">
-                    {FILTER_OPTIONS.map((s) => (
-                        <button
-                            key={`top-${s}`}
-                            onClick={() => setSelectedTab(s)}
-                            className={`rounded-md border px-3 py-1 text-left transition ${
-                                selectedTab === s ? statusBadgeStyles[s] || "bg-black text-white" : "bg-white text-gray-700 hover:bg-gray-100"
-                            }`}
-                            aria-pressed={selectedTab === s}
-                        >
-                            <div className="text-sm font-medium capitalize">{s}</div>
-                            <div className="text-xs">
-                                {s === "all" ? cheques.length : totalsByStatus[s]?.count || 0} • ₹
-                                {s === "all"
-                                    ? formatINR(cheques.reduce((acc, c) => acc + parseAmount(c.chequeAmount), 0))
-                                    : formatINR(totalsByStatus[s]?.total || 0)}
-                            </div>
-                        </button>
-                    ))}
-                    </div>
-
-                    {/*  Summary Cards */}
-                    <div className="mb-2 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                        <div className="mb-1 text-lg font-semibold text-gray-800">Today Cheque Expense</div>
-                        <div className="text-2xl font-bold text-black">₹{formatINR(todayTotal)}</div>
-                        <div className="mt-1 text-sm text-gray-500">
-                            Showing <span className="capitalize">{selectedTab}</span>: ₹{formatINR(todayTotalFiltered)}
+                        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                            <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#6366f1" }} />
+                            <span style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.1em", color: "#6b7280" }}>Finance</span>
                         </div>
+                        <h1 style={{ fontSize: 30, fontWeight: 800, color: "#111827", letterSpacing: "-0.02em", lineHeight: 1.15 }}>Cheque Tracker</h1>
+                        <p style={{ fontSize: 14, color: "#9ca3af", marginTop: 6, fontWeight: 300 }}>Track, manage and monitor all cheque-based expenditures</p>
                     </div>
-                    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                        <div className="mb-1 text-lg font-semibold text-gray-800">Monthly Cheque Expense</div>
-                        <div className="text-2xl font-bold text-black">₹{formatINR(monthlyTotal)}</div>
-                        <div className="mt-1 text-sm text-gray-500">
-                            Showing <span className="capitalize">{selectedTab}</span>: ₹{formatINR(monthlyTotalFiltered)}
-                        </div>
-                    </div>
-                    </div>
-
-                    {/*  Filters + Add Button */}
-                    <div className="mb-2 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-                    <div className="flex flex-wrap items-center gap-3">
-                        <div className="flex items-center gap-2 rounded-full bg-white px-3 py-1 shadow-sm">
-                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">Entry Date</span>
-                            <label className="text-sm text-gray-600">From</label>
-                            <input
-                                type="date"
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
-                                className="w-44 rounded-lg border px-3 py-1.5"
-                            />
-                            <label className="text-sm text-gray-600">To</label>
-                            <input
-                                type="date"
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                                className="w-44 rounded-lg border px-3 py-1.5"
-                            />
-                        </div>
-
-                        {/* Cheque Present Date quick filters */}
-                        <div className="flex flex-wrap items-center gap-2 rounded-full bg-white px-3 py-1 shadow-sm">
-                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">Present Date</span>
-                            {[
-                                { key: "all", label: "All" },
-                                { key: "today", label: "Today" },
-                                { key: "tomorrow", label: "Tomorrow" },
-                                { key: "3", label: "Next 3 days" },
-                                { key: "7", label: "Next 7 days" },
-                                { key: "14", label: "Next 14 days" },
-                            ].map((opt) => (
-                                <button
-                                    key={opt.key}
-                                    type="button"
-                                    onClick={() => setChequePresentFilter(opt.key)}
-                                    className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                                        chequePresentFilter === opt.key ? "bg-gray-900 text-white shadow-sm" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                    }`}
-                                >
-                                    {opt.label}
-                                </button>
-                            ))}
-                        </div>
-
-                        <div className="relative">
-                            <input
-                                type="search"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                placeholder="Search name or cheque number"
-                                className="w-64 rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            />
-                            {searchTerm && (
-                                <button
-                                    onClick={() => setSearchTerm("")}
-                                    className="absolute right-1 top-1.5 text-gray-500 hover:text-gray-800"
-                                >
-                                    ×
-                                </button>
-                            )}
-                        </div>
-                        {/* <div className="ml-4 text-right">
-            <div className="text-sm text-gray-600">Filtered Records: <span className="font-medium">{finalFilteredCheques.length}</span></div>
-            <div className="text-sm text-gray-600">Filtered Total: <span className="font-medium">₹{formatINR(finalFilteredTotal)}</span></div>
-          </div> */}
-                    </div>
-                    <button
-                        onClick={() => {
-                            setEditingChequeId(null);
-                            setShowModal(true);
-                        }}
-                        className="flex items-center gap-2 text-nowrap rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800"
-                    >
-                        + Add Cheque
+                    <button className="ce-btn-primary" onClick={() => { setEditingId(null); setShowModal(true); }}>
+                        <Plus size={16} strokeWidth={2.5} />
+                        Add Cheque
                     </button>
+                </div>
+
+                {/* Stats */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 28 }}>
+                    <StatCard color="blue" icon={TrendingUp} label="Today" value={formatINR(todayTotal)} sub="Today's entries" />
+                    <StatCard color="emerald" icon={Calendar} label="This Month" value={formatINR(monthlyTotal)} sub="Monthly total" />
+                    <StatCard color="violet" icon={Wallet} label="All Time" value={formatINR(allTotal)} sub="Lifetime tracked" />
+                    <StatCard color="amber" icon={CreditCard} label="Records" value={cheques.length.toLocaleString()} sub="Total cheques" />
+                </div>
+
+                {/* Status Tabs */}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 24 }}>
+                    {FILTER_OPTIONS.map(s => {
+                        const isActive = selectedTab === s;
+                        const count = s === "all" ? cheques.length : (totalsByStatus[s]?.count || 0);
+                        const total = s === "all" ? allTotal : (totalsByStatus[s]?.total || 0);
+                        const Icon = statusIcon[s] || Layers;
+                        return (
+                            <button key={s} className={`ce-tab ${isActive ? `active-${s}` : ""}`} onClick={() => setSelectedTab(s)}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                    <Icon size={13} color={isActive ? (s === "all" ? "#fff" : tabLabelColor[s]) : "#9ca3af"} />
+                                    <span style={{ fontSize: 12, fontWeight: 600, textTransform: "capitalize", color: isActive ? (s === "all" ? "#fff" : tabLabelColor[s]) : "#374151" }}>{s}</span>
+                                </div>
+                                <span style={{ fontSize: 12, color: isActive ? (s === "all" ? "rgba(255,255,255,0.75)" : tabSubColor[s]) : "#9ca3af", fontWeight: 700 }}>
+                                    {count} · {formatINR(total)}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* Filters */}
+                <div style={{ background: "#fff", border: "1px solid #f0f0f0", borderRadius: 18, padding: 20, marginBottom: 24 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                        <SlidersHorizontal size={15} color="#6b7280" />
+                        <span style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", color: "#9ca3af" }}>Filters</span>
                     </div>
-
-                    {/* Tabs for statuses */}
-                {/* <div className="flex gap-2 items-center mb-4">
-        {FILTER_OPTIONS.map((s) => (
-          <button
-            key={`bottom-${s}`}
-            onClick={() => setSelectedTab(s)}
-            className={`px-3 py-1 rounded-md border ${selectedTab === s ? 'bg-black text-white' : 'bg-white text-black'}`}
-            aria-pressed={selectedTab === s}
-          >
-            <div className="text-sm font-medium capitalize">{s}</div>
-            <div className="text-xs">{s === 'all' ? cheques.length : (totalsByStatus[s]?.count || 0)} • ₹{s === 'all' ? formatINR(cheques.reduce((acc, c) => acc + parseAmount(c.chequeAmount), 0)) : formatINR(totalsByStatus[s]?.total || 0)}</div>
-          </button>
-        ))}
-      </div> */}
-
-                    {/* ✅ Cheque Table */}
-                    <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
-                    {loading ? (
-                        <p className="p-4 text-center text-gray-600">Loading cheques...</p>
-                    ) : cheques.length === 0 ? (
-                        <p className="p-4 text-center text-gray-600">No cheque records found.</p>
-                    ) : finalFilteredCheques.length === 0 ? (
-                        <p className="p-4 text-center text-gray-600">
-                            {debouncedSearchTerm
-                                ? `No results for "${debouncedSearchTerm}" in ${selectedTab} status`
-                                : `No records for ${selectedTab} status`}
-                            {(startDate || endDate) && <span>{` between ${startDate || "..."} and ${endDate || "..."}`}</span>}.
-                        </p>
-                    ) : (
-                        <table className="min-w-full border-collapse text-sm">
-                            <thead className="border-b bg-gray-50">
-                                <tr>
-                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Entry Date</th>
-                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Cheque Number</th>
-                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">To Whom</th>
-                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Amount</th>
-                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Issued Date</th>
-                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Present Date</th>
-                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Reason</th>
-                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Shifted Reason</th>
-                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Status</th>
-                                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {finalFilteredCheques.map((cheque) => (
-                                    <tr
-                                        key={cheque._id}
-                                        className="border-b hover:bg-gray-50"
-                                    >
-                                        <td className="p-3 whitespace-nowrap text-sm text-gray-800">{cheque.entryDate}</td>
-                                        <td className="p-3 whitespace-nowrap text-sm text-gray-800">{cheque.chequeNumber}</td>
-                                        <td className="p-3 whitespace-nowrap text-sm text-gray-800">{cheque.receiverName}</td>
-                                        <td className="p-3 whitespace-nowrap text-sm text-gray-800">₹{cheque.chequeAmount}</td>
-                                        <td className="p-3 whitespace-nowrap text-sm font-semibold text-gray-800">
-                                            {new Date(cheque.chequeIssuedDate).toLocaleDateString()}
-                                        </td>
-                                        <td className="p-3 whitespace-nowrap text-sm text-gray-800">
-                                            {cheque.chequePresentDate
-                                                ? new Date(cheque.chequePresentDate).toLocaleDateString()
-                                                : "-"}
-                                        </td>
-                                        <td className="p-3 text-sm text-gray-800">{cheque.reasonToIssue}</td>
-                                        <td className="p-3 whitespace-nowrap text-sm text-gray-800">{cheque.shiftRemark || "-"}</td>
-                                        <td className="p-3 whitespace-nowrap text-sm">
-                                            <span
-                                                className={`rounded-full px-2 py-1 text-xs font-medium capitalize ${statusBadgeStyles[(cheque.status || "pending").toLowerCase()] || "bg-gray-100 text-gray-700"}`}
-                                            >
-                                                {cheque.status || "pending"}
-                                            </span>
-                                        </td>
-                                        <td className="p-3 whitespace-nowrap text-sm text-gray-800">
-                                            <div className="flex items-center gap-2 whitespace-nowrap">
-                                                <button
-                                                    onClick={() => openEditModal(cheque)}
-                                                    className="rounded-md border border-blue-600 bg-blue-600 p-1.5 text-white hover:bg-blue-700"
-                                                    title="Edit cheque"
-                                                >
-                                                    <Edit2 size={16} />
-                                                </button>
-                                                <button
-                                                    onClick={() => setViewCheque(cheque)}
-                                                    className="rounded-md border border-gray-700 bg-gray-700 p-1.5 text-white hover:bg-gray-900"
-                                                    title="View cheque details"
-                                                >
-                                                    <Eye size={16} />
-                                                </button>
-                                                <select
-                                                    value={cheque.status || "pending"}
-                                                    onChange={(e) => handleStatusSelection(cheque, e.target.value)}
-                                                    className="rounded-md border px-2 py-1"
-                                                >
-                                                    {STATUSES.filter((st) => st.toLowerCase() !== "all").map((st) => (
-                                                        <option
-                                                            value={st}
-                                                            key={st}
-                                                        >
-                                                            {st}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                        </td>
-                                    </tr>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "stretch" }}>
+                        {/* Search */}
+                        <div style={{ position: "relative", flex: "1 1 240px" }}>
+                            <Search size={15} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#9ca3af", pointerEvents: "none" }} />
+                            <input type="text" placeholder="Search name or cheque number…" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="ce-input" style={{ paddingLeft: 36, height: "44px" }} />
+                            {searchTerm && <button onClick={() => setSearchTerm("")} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#9ca3af", cursor: "pointer", display: "flex" }}><X size={14} /></button>}
+                        </div>
+                        {/* Date range */}
+                        <div className="ce-filter-pill" style={{ flex: "1 1 340px", minWidth: "320px" }}>
+                            <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", color: "#9ca3af", whiteSpace: "nowrap" }}>Entry Date</span>
+                            <div className="ce-date-range-container">
+                                <div style={{ position: "relative", flex: "1 1 110px", minWidth: "100px", maxWidth: "140px" }}>
+                                    <Calendar size={13} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#9ca3af", pointerEvents: "none" }} />
+                                    <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="ce-input" style={{ paddingLeft: 30, fontSize: 13, height: "30px", paddingTop: 0, paddingBottom: 0 }} />
+                                </div>
+                                <span style={{ fontSize: 12, color: "#9ca3af" }}>–</span>
+                                <div style={{ position: "relative", flex: "1 1 110px", minWidth: "100px", maxWidth: "140px" }}>
+                                    <Calendar size={13} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#9ca3af", pointerEvents: "none" }} />
+                                    <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="ce-input" style={{ paddingLeft: 30, fontSize: 13, height: "30px", paddingTop: 0, paddingBottom: 0 }} />
+                                </div>
+                            </div>
+                        </div>
+                        {/* Quick present date */}
+                        <div className="ce-filter-pill" style={{ flex: "1 1 360px", minWidth: "320px" }}>
+                            <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", color: "#9ca3af", whiteSpace: "nowrap" }}>Present Date</span>
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, flex: 1 }}>
+                                {quickFilters.map(opt => (
+                                    <button key={opt.key} className={`ce-date-chip ${chequePresentFilter === opt.key ? "active" : "inactive"}`} onClick={() => setChequePresentFilter(opt.key)}>{opt.label}</button>
                                 ))}
-                            </tbody>
-                        </table>
+                            </div>
+                        </div>
+                        {(searchTerm || startDate || endDate || chequePresentFilter !== "all") && (
+                            <button
+                                onClick={() => {
+                                    setSearchTerm("");
+                                    setStartDate("");
+                                    setEndDate("");
+                                    setChequePresentFilter("all");
+                                }}
+                                className="ce-btn-ghost"
+                                style={{
+                                    height: "44px",
+                                    padding: "0 16px",
+                                    color: "#ef4444",
+                                    borderColor: "#fca5a5",
+                                    background: "#fef2f2",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 6
+                                }}
+                            >
+                                <X size={14} /> Clear Filters
+                            </button>
+                        )}
+                    </div>
+                    {filtered.length > 0 && (
+                        <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid #f3f4f6", display: "flex", gap: 16, fontSize: 13, color: "#6b7280" }}>
+                            <span><b style={{ color: "#111827" }}>{filtered.length}</b> records</span>
+                            <span><b style={{ color: "#111827" }}>{formatINR(filteredTotal)}</b> total</span>
+                        </div>
                     )}
                 </div>
 
-                </div>
+                {/* Table */}
+                <div style={{ background: "#fff", borderRadius: 20, border: "1px solid #f0f0f0", overflow: "hidden" }}>
+                    <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid #f3f4f6", display: "flex", alignItems: "center", gap: 10 }}>
+                        <span style={{ fontWeight: 700, fontSize: 16, color: "#111827" }}>Cheques</span>
+                        {filtered.length > 0 && <span style={{ fontSize: 12, background: "#f3f4f6", color: "#6b7280", padding: "2px 8px", borderRadius: 99, fontWeight: 500 }}>{filtered.length}</span>}
+                    </div>
+                    <div style={{ overflowX: "auto" }}>
+                        {loading ? (
+                            <div style={{ padding: "60px 24px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+                                <div style={{ width: 32, height: 32, border: "2.5px solid #e5e7eb", borderTopColor: "#6366f1", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
+                                <span style={{ fontSize: 13, color: "#9ca3af" }}>Loading cheques…</span>
+                            </div>
+                        ) : filtered.length === 0 ? (
+                            <div style={{ padding: "64px 24px", textAlign: "center" }}>
+                                <div style={{ width: 52, height: 52, borderRadius: 16, background: "#f3f4f6", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                                    <CreditCard size={24} color="#d1d5db" />
+                                </div>
+                                <p style={{ fontSize: 16, fontWeight: 700, color: "#374151", marginBottom: 6 }}>No cheques found</p>
+                                <p style={{ fontSize: 13, color: "#9ca3af" }}>Try adjusting your filters or add a new cheque.</p>
+                            </div>
+                        ) : (
+                            <table className="ce-table" style={{ width: "100%", borderCollapse: "collapse" }}>
+                                <thead>
+                                    <tr style={{ borderBottom: "1px solid #f3f4f6" }}>
+                                        {["Entry Date", "Cheque No.", "Receiver", "Amount", "Issued", "Present", "Reason", "Shift Note", "Status", "Actions"].map((h, i) => (
+                                            <th key={h} style={{ padding: "12px 16px", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", color: "#9ca3af", textAlign: "left", background: "#fafafa", whiteSpace: "nowrap" }}>{h}</th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {paginatedCheques.map((c, idx) => (
+                                        <tr key={c._id} style={{ borderBottom: idx < paginatedCheques.length - 1 ? "1px solid #f9fafb" : "none" }}>
+                                            {/* Entry Date – indigo */}
+                                            <td style={{ padding: "14px 16px", fontSize: 13, color: "#6366f1", whiteSpace: "nowrap", fontWeight: 500 }}>
+                                                <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                                                    <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#c7d2fe", flexShrink: 0 }} />
+                                                    {c.entryDate || "—"}
+                                                </div>
+                                            </td>
+                                            {/* Cheque No – dark bold */}
+                                            <td style={{ padding: "14px 16px", whiteSpace: "nowrap" }}>
+                                                <span style={{ fontWeight: 700, fontSize: 13, color: "#111827", letterSpacing: "0.03em", background: "#f3f4f6", padding: "3px 8px", borderRadius: 6 }}>{c.chequeNumber || "—"}</span>
+                                            </td>
+                                            {/* Receiver – deep navy */}
+                                            <td style={{ padding: "14px 16px", fontSize: 14, color: "#1e3a8a", fontWeight: 600, whiteSpace: "nowrap", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis" }}>{c.receiverName || "—"}</td>
+                                            {/* Amount – emerald */}
+                                            <td style={{ padding: "14px 16px", whiteSpace: "nowrap" }}>
+                                                <span className="ce-amount-display" style={{ fontSize: 14, color: "#059669", fontWeight: 700 }}>{formatINR(parseAmount(c.chequeAmount))}</span>
+                                            </td>
+                                            {/* Issued Date – slate blue */}
+                                            <td style={{ padding: "14px 16px", fontSize: 13, color: "#0369a1", fontWeight: 500, whiteSpace: "nowrap" }}>{fmtDate(c.chequeIssuedDate)}</td>
+                                            {/* Present Date – violet */}
+                                            <td style={{ padding: "14px 16px", fontSize: 13, color: "#7c3aed", fontWeight: 500, whiteSpace: "nowrap" }}>{fmtDate(c.chequePresentDate)}</td>
+                                            {/* Reason – amber */}
+                                            <td style={{ padding: "14px 16px", fontSize: 13, color: "#b45309", maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.reasonToIssue || "—"}</td>
+                                            {/* Shift Note – blue-gray */}
+                                            <td style={{ padding: "14px 16px", fontSize: 13, color: "#1d4ed8", fontStyle: c.shiftRemark ? "normal" : "italic", whiteSpace: "nowrap" }}>{c.shiftRemark || <span style={{ color: "#d1d5db" }}>—</span>}</td>
+                                            <td style={{ padding: "14px 16px" }}><StatusBadge status={c.status} /></td>
+                                            <td style={{ padding: "14px 16px" }}>
+                                                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                                    <button className="ce-icon-btn edit" onClick={() => openEditModal(c)} title="Edit"><Edit2 size={14} /></button>
+                                                    <button className="ce-icon-btn view" onClick={() => setViewCheque(c)} title="View"><Eye size={14} /></button>
+                                                    <select value={c.status || "pending"} onChange={e => handleStatusSelection(c, e.target.value)} className="ce-select">
+                                                        {STATUS_KEYS.map(s => <option key={s} value={s}>{s}</option>)}
+                                                    </select>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
 
-                {/* ✅ Add Cheque Modal */}
-                {showModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                        <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-xl">
-                            <div className="mb-4 flex items-center justify-between">
-                                <h2 className="text-xl font-semibold">{editingChequeId ? "Edit Cheque Expense" : "Add Cheque Expense"}</h2>
-                                <button
-                                    onClick={() => {
-                                        setShowModal(false);
-                                        setEditingChequeId(null);
-                                    }}
-                                    className="text-gray-500 hover:text-gray-700"
+                    {/* Pagination Controls */}
+                    {filtered.length > 0 && totalPages > 1 && (
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", borderTop: "1px solid #f3f4f6", background: "#fafafa", flexWrap: "wrap", gap: 12 }}>
+                            <span style={{ fontSize: 13, color: "#6b7280" }}>
+                                Showing <span style={{ fontWeight: 600 }}>{((currentPage - 1) * itemsPerPage) + 1}</span> to <span style={{ fontWeight: 600 }}>{Math.min(currentPage * itemsPerPage, filtered.length)}</span> of <span style={{ fontWeight: 600 }}>{filtered.length}</span> cheques
+                            </span>
+                            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                                <button 
+                                    type="button"
+                                    className="ce-btn-ghost" 
+                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+                                    disabled={currentPage === 1}
+                                    style={{ padding: "6px 12px", fontSize: 12 }}
                                 >
-                                    <X size={20} />
+                                    Previous
+                                </button>
+                                {renderPageNumbers().map((page, index) => {
+                                    if (page === "...") {
+                                        return <span key={`dots-${index}`} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, fontSize: 12, color: "#9ca3af" }}>...</span>;
+                                    }
+                                    return (
+                                        <button
+                                            key={page}
+                                            type="button"
+                                            onClick={() => setCurrentPage(page)}
+                                            className={currentPage === page ? "ce-btn-primary" : "ce-btn-ghost"}
+                                            style={{ 
+                                                width: 32, 
+                                                height: 32, 
+                                                padding: 0, 
+                                                justifyContent: "center", 
+                                                fontSize: 12,
+                                                background: currentPage === page ? "#111827" : "transparent",
+                                                color: currentPage === page ? "#fff" : "#374151",
+                                                border: currentPage === page ? "1px solid #111827" : "1px solid #e5e7eb"
+                                            }}
+                                        >
+                                            {page}
+                                        </button>
+                                    );
+                                })}
+                                <button 
+                                    type="button"
+                                    className="ce-btn-ghost" 
+                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+                                    disabled={currentPage === totalPages}
+                                    style={{ padding: "6px 12px", fontSize: 12 }}
+                                >
+                                    Next
                                 </button>
                             </div>
+                        </div>
+                    )}
+                </div>
+            </div>
 
-                            <form
-                                onSubmit={handleSubmit}
-                                className="space-y-4"
-                            >
-                            <div className="grid grid-cols-2 gap-4">
-                                    {/* Entry Date */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Entry Date</label>
-                                        <input
-                                            type="date"
-                                            name="entryDate"
-                                            value={formData.entryDate}
-                                            readOnly
-                                            className="mt-1 w-full cursor-not-allowed rounded-lg border bg-gray-100 p-2 text-gray-600"
-                                        />
+            {/* Add/Edit Modal */}
+            {showModal && (
+                <div className="ce-modal-overlay" onClick={() => { setShowModal(false); setEditingId(null); }}>
+                    <div className="ce-modal" onClick={e => e.stopPropagation()}>
+                        <div className="ce-modal-header">
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                    <div style={{ width: 32, height: 32, borderRadius: 10, background: "#111827", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                        <Banknote size={16} color="#fff" />
                                     </div>
-
-                                    {/* Issued Date */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700">Cheque Issued Date</label>
-                                        <input
-                                            type="date"
-                                            name="issuedDate"
-                                            value={formData.issuedDate}
-                                            onChange={handleChange}
-                                            required
-                                            className="mt-1 w-full rounded-lg border p-2 focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    </div>
-
-                                    {/* Cheque Present Date */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Cheque Present Date</label>
-                                        <input
-                                            type="date"
-                                            name="chequePresentDate"
-                                            value={formData.chequePresentDate}
-                                            onChange={handleChange}
-                                            className="mt-1 w-full rounded-lg border p-2 focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    </div>
-
-                                    {/* To Whom */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">To Whom Issued</label>
-                                        <input
-                                            type="text"
-                                            name="toWhom"
-                                            value={formData.toWhom}
-                                            onChange={handleChange}
-                                            placeholder="Enter receiver name"
-                                            required
-                                            className="mt-1 w-full rounded-lg border p-2 focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    </div>
-
-                                    {/* Validity removed: field omitted by design */}
-
-                                    {/* Cheque Number */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Cheque Number</label>
-                                        <input
-                                            type="text"
-                                            name="chequeNumber"
-                                            value={formData.chequeNumber}
-                                            onChange={handleChange}
-                                            placeholder="Enter cheque number"
-                                            required
-                                            className={`mt-1 w-full rounded-lg border p-2 focus:ring-2 focus:ring-blue-500 ${
-                                                duplicateError ? "border-red-500" : "border-gray-300"
-                                            }`}
-                                        />
-                                        {duplicateError && <p className="mt-1 text-sm text-red-500">{duplicateError}</p>}
-                                    </div>
-
-                                    {/* Amount */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Cheque Amount</label>
-                                        <input
-                                            type="number"
-                                            name="amount"
-                                            value={formData.amount}
-                                            onChange={handleChange}
-                                            placeholder="Enter amount"
-                                            required
-                                            className="mt-1 w-full rounded-lg border p-2 focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    </div>
-
-                                    {/* Reason */}
-                                    <div className="col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700">Reason to Issue</label>
-                                        <textarea
-                                            name="reason"
-                                            value={formData.reason}
-                                            onChange={handleChange}
-                                            placeholder="Enter reason for issuing cheque"
-                                            required
-                                            rows="2"
-                                            className="mt-1 w-full resize-none rounded-lg border p-2 focus:ring-2 focus:ring-blue-500"
-                                        />
+                                        <h2 style={{ fontSize: 17, fontWeight: 800, color: "#111827" }}>{editingId ? "Edit Cheque" : "Record Cheque"}</h2>
+                                        <p style={{ fontSize: 12, color: "#9ca3af", marginTop: 1 }}>{editingId ? "Update cheque details" : "Add a new cheque entry"}</p>
                                     </div>
                                 </div>
-
-                                {/* Footer */}
-                                <div className="mt-6 flex justify-end gap-3">
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setShowModal(false);
-                                            setEditingChequeId(null);
-                                            setDuplicateError("");
-                                        }}
-                                        className="rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        disabled={!!duplicateError}
-                                        className={`rounded-lg px-4 py-2 text-white ${
-                                            duplicateError ? "cursor-not-allowed bg-gray-400" : "bg-black hover:bg-gray-800"
-                                        }`}
-                                    >
-                                        {editingChequeId ? "Update Cheque Expense" : "Add Cheque Expense"}
+                                <button onClick={() => { setShowModal(false); setEditingId(null); }} style={{ background: "transparent", border: "none", cursor: "pointer", padding: 6, borderRadius: 8, color: "#9ca3af" }}><X size={18} /></button>
+                            </div>
+                        </div>
+                        <div className="ce-modal-body">
+                            <form onSubmit={handleSubmit}>
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                                    <div>
+                                        <label className="ce-label">Entry Date</label>
+                                        <input type="date" name="entryDate" value={formData.entryDate} readOnly className="ce-input" />
+                                    </div>
+                                    <div>
+                                        <label className="ce-label">Issued Date</label>
+                                        <input type="date" name="issuedDate" value={formData.issuedDate} onChange={handleChange} required className="ce-input" />
+                                    </div>
+                                    <div>
+                                        <label className="ce-label">Present Date</label>
+                                        <input type="date" name="chequePresentDate" value={formData.chequePresentDate} onChange={handleChange} className="ce-input" />
+                                    </div>
+                                    <div>
+                                        <label className="ce-label">To Whom Issued</label>
+                                        <input type="text" name="toWhom" value={formData.toWhom} onChange={handleChange} placeholder="Receiver name" required className="ce-input" />
+                                    </div>
+                                    <div>
+                                        <label className="ce-label">Cheque Number</label>
+                                        <input type="text" name="chequeNumber" value={formData.chequeNumber} onChange={handleChange} placeholder="Enter cheque number" required className="ce-input" style={duplicateError ? { borderColor: "#ef4444" } : {}} />
+                                        {duplicateError && <p style={{ fontSize: 11, color: "#ef4444", marginTop: 4 }}>{duplicateError}</p>}
+                                    </div>
+                                    <div>
+                                        <label className="ce-label">Amount (₹)</label>
+                                        <input type="number" name="amount" value={formData.amount} onChange={handleChange} placeholder="0" required className="ce-input" />
+                                    </div>
+                                    <div style={{ gridColumn: "1 / -1" }}>
+                                        <label className="ce-label">Reason to Issue</label>
+                                        <textarea name="reason" value={formData.reason} onChange={handleChange} placeholder="Why is this cheque being issued?" required rows={3} className="ce-input" style={{ resize: "none", lineHeight: 1.6 }} />
+                                    </div>
+                                </div>
+                                <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 24, paddingTop: 20, borderTop: "1px solid #f3f4f6" }}>
+                                    <button type="button" className="ce-btn-ghost" onClick={() => { setShowModal(false); setEditingId(null); setDuplicateError(""); }}>Cancel</button>
+                                    <button type="submit" className="ce-btn-primary" disabled={!!duplicateError} style={{ minWidth: 140, justifyContent: "center" }}>
+                                        {editingId ? "Update Cheque" : "Add Cheque"}
                                     </button>
                                 </div>
                             </form>
                         </div>
                     </div>
-                )}
-                {statusModal.open && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                        <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-                            <div className="mb-4 flex items-center justify-between">
-                                <h2 className="text-xl font-semibold">{statusModal.type === "cancelled" ? "Cancel Cheque" : "Clear Cheque"}</h2>
-                                <button
-                                    onClick={() => handleCloseStatusModal()}
-                                    className="text-gray-500 hover:text-gray-700"
-                                >
-                                    <X size={20} />
-                                </button>
-                            </div>
+                </div>
+            )}
 
-                            {statusModal.type === "cancelled" ? (
-                                <div className="mb-4">
-                                    <label className="mb-1 block text-sm font-medium text-gray-700">Reason for Cancellation</label>
-                                    <textarea
-                                        rows={4}
-                                        value={statusModal.reason}
-                                        onChange={(e) => setStatusModal((s) => ({ ...s, reason: e.target.value }))}
-                                        className="mt-1 w-full rounded-lg border p-2 focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Please describe why this cheque is cancelled"
-                                    />
+            {/* Status Modal */}
+            {statusModal.open && (
+                <div className="ce-modal-overlay" onClick={closeStatusModal}>
+                    <div className="ce-modal ce-modal-sm" onClick={e => e.stopPropagation()}>
+                        <div className="ce-modal-header">
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                    <div style={{ width: 32, height: 32, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", background: statusModal.type === "cancelled" ? "#fef2f2" : statusModal.type === "clear" ? "#f0fdf4" : "#eff6ff" }}>
+                                        {statusModal.type === "cancelled" ? <XCircle size={16} color="#ef4444" /> : statusModal.type === "clear" ? <CheckCircle2 size={16} color="#10b981" /> : <ArrowLeftRight size={16} color="#3b82f6" />}
+                                    </div>
+                                    <div>
+                                        <h2 style={{ fontSize: 17, fontWeight: 800, color: "#111827" }}>
+                                            {statusModal.type === "cancelled" ? "Cancel Cheque" : statusModal.type === "clear" ? "Clear Cheque" : "Shift Cheque"}
+                                        </h2>
+                                        <p style={{ fontSize: 12, color: "#9ca3af", marginTop: 1 }}>Provide required details to proceed</p>
+                                    </div>
                                 </div>
-                            ) : statusModal.type === "shifted" ? (
-                                <div className="mb-4">
-                                    <label className="mb-1 block text-sm font-medium text-gray-700">Shifted Reason</label>
-                                    <textarea
-                                        rows={3}
-                                        value={statusModal.shiftRemark}
-                                        onChange={(e) => setStatusModal((s) => ({ ...s, shiftRemark: e.target.value }))}
-                                        className="mt-1 w-full rounded-lg border p-2 focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Please describe why this cheque is shifted"
-                                    />
-                                </div>
-                            ) : (
-                                <div className="mb-4">
-                                    <label className="mb-1 block text-sm font-medium text-gray-700">Cheque Cleared Date</label>
-                                    <input
-                                        type="date"
-                                        value={statusModal.clearDate}
-                                        onChange={(e) => setStatusModal((s) => ({ ...s, clearDate: e.target.value }))}
-                                        className="mt-1 w-full rounded-lg border p-2 focus:ring-2 focus:ring-blue-500"
-                                    />
+                                <button onClick={closeStatusModal} style={{ background: "transparent", border: "none", cursor: "pointer", padding: 6, borderRadius: 8, color: "#9ca3af" }}><X size={18} /></button>
+                            </div>
+                        </div>
+                        <div className="ce-modal-body">
+                            {statusModal.type === "cancelled" && (
+                                <div>
+                                    <label className="ce-label">Cancellation Reason</label>
+                                    <textarea rows={4} value={statusModal.reason} onChange={e => setStatusModal(s => ({ ...s, reason: e.target.value }))} className="ce-input" style={{ resize: "none", lineHeight: 1.6 }} placeholder="Why is this cheque being cancelled?" />
                                 </div>
                             )}
-
-                            <div className="mt-6 flex justify-end gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => handleCloseStatusModal()}
-                                    className="rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => confirmStatusChange()}
-                                    disabled={
-                                        (statusModal.type === "cancelled" && !statusModal.reason.trim()) ||
-                                        (statusModal.type === "clear" && !statusModal.clearDate) ||
-                                        (statusModal.type === "shifted" && (!statusModal.shiftRemark || !statusModal.shiftRemark.trim()))
-                                    }
-                                    className={`rounded-lg bg-black px-4 py-2 text-white hover:bg-gray-800 ${(statusModal.type === "cancelled" && !statusModal.reason.trim()) || (statusModal.type === "clear" && !statusModal.clearDate) || (statusModal.type === "shifted" && !statusModal.shiftRemark.trim()) ? "cursor-not-allowed opacity-40" : ""}`}
-                                >
-                                    Confirm
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-                {viewCheque && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                        <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-xl">
-                            <div className="mb-4 flex items-center justify-between">
-                                <h2 className="text-xl font-semibold">Cheque Details</h2>
-                                <button
-                                    onClick={() => setViewCheque(null)}
-                                    className="text-gray-500 hover:text-gray-700"
-                                >
-                                    <X size={20} />
-                                </button>
-                            </div>
-
-                            <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    {/* Entry Date */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Entry Date</label>
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={viewCheque.entryDate || "-"}
-                                            className="mt-1 w-full rounded-lg border bg-gray-50 p-2 text-gray-700"
-                                        />
-                                    </div>
-
-                                    {/* Cheque Issued Date */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Cheque Issued Date</label>
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={viewCheque.chequeIssuedDate ? new Date(viewCheque.chequeIssuedDate).toLocaleDateString() : "-"}
-                                            className="mt-1 w-full rounded-lg border bg-gray-50 p-2 text-gray-700"
-                                        />
-                                    </div>
-
-                                    {/* Cheque Present Date */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Cheque Present Date</label>
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={
-                                                viewCheque.chequePresentDate
-                                                    ? new Date(viewCheque.chequePresentDate).toLocaleDateString()
-                                                    : "-"
-                                            }
-                                            className="mt-1 w-full rounded-lg border bg-gray-50 p-2 text-gray-700"
-                                        />
-                                    </div>
-
-                                    {/* To Whom */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">To Whom Issued</label>
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={viewCheque.receiverName || "-"}
-                                            className="mt-1 w-full rounded-lg border bg-gray-50 p-2 text-gray-700"
-                                        />
-                                    </div>
-
-                                    {/* Cheque Number */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Cheque Number</label>
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={viewCheque.chequeNumber || "-"}
-                                            className="mt-1 w-full rounded-lg border bg-gray-50 p-2 text-gray-700"
-                                        />
-                                    </div>
-
-                                    {/* Amount */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Cheque Amount</label>
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={viewCheque.chequeAmount ? `₹${viewCheque.chequeAmount}` : "-"}
-                                            className="mt-1 w-full rounded-lg border bg-gray-50 p-2 text-gray-700"
-                                        />
-                                    </div>
-
-                                    {/* Status */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Status</label>
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={(viewCheque.status || "pending").toString()}
-                                            className="mt-1 w-full rounded-lg border bg-gray-50 p-2 capitalize text-gray-700"
-                                        />
-                                    </div>
-
-                                    {/* Cleared Date (if any) */}
-                                    {viewCheque.clearedDate && (
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Cleared Date</label>
-                                            <input
-                                                type="text"
-                                                readOnly
-                                                value={new Date(viewCheque.clearedDate).toLocaleDateString()}
-                                                className="mt-1 w-full rounded-lg border bg-gray-50 p-2 text-gray-700"
-                                            />
-                                        </div>
-                                    )}
-
-                                    {/* Shifted Reason (if any) */}
-                                    {viewCheque.shiftRemark && (
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Shifted Reason</label>
-                                            <input
-                                                type="text"
-                                                readOnly
-                                                value={viewCheque.shiftRemark}
-                                                className="mt-1 w-full rounded-lg border bg-gray-50 p-2 text-gray-700"
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Reason to Issue */}
+                            {statusModal.type === "clear" && (
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Reason to Issue</label>
-                                    <textarea
-                                        readOnly
-                                        rows={3}
-                                        value={viewCheque.reasonToIssue || "-"}
-                                        className="mt-1 w-full resize-none rounded-lg border bg-gray-50 p-2 text-gray-700"
-                                    />
+                                    <label className="ce-label">Cleared Date</label>
+                                    <input type="date" value={statusModal.clearDate} onChange={e => setStatusModal(s => ({ ...s, clearDate: e.target.value }))} className="ce-input" />
                                 </div>
-
-                                {/* Cancel Reason (if any) */}
-                                {viewCheque.cancelReason && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Cancel Reason</label>
-                                        <textarea
-                                            readOnly
-                                            rows={3}
-                                            value={viewCheque.cancelReason}
-                                            className="mt-1 w-full resize-none rounded-lg border bg-gray-50 p-2 text-gray-700"
-                                        />
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="mt-6 flex justify-end">
-                                <button
-                                    onClick={() => setViewCheque(null)}
-                                    className="rounded-lg bg-black px-4 py-2 text-white hover:bg-gray-800"
-                                >
-                                    Close
-                                </button>
+                            )}
+                            {statusModal.type === "shifted" && (
+                                <div>
+                                    <label className="ce-label">Shift Reason</label>
+                                    <textarea rows={3} value={statusModal.shiftRemark} onChange={e => setStatusModal(s => ({ ...s, shiftRemark: e.target.value }))} className="ce-input" style={{ resize: "none", lineHeight: 1.6 }} placeholder="Why is this cheque being shifted?" />
+                                </div>
+                            )}
+                            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 20, paddingTop: 16, borderTop: "1px solid #f3f4f6" }}>
+                                <button type="button" className="ce-btn-ghost" onClick={closeStatusModal}>Cancel</button>
+                                <button type="button" className="ce-btn-primary" disabled={statusModalDisabled} onClick={confirmStatus} style={{ minWidth: 100, justifyContent: "center" }}>Confirm</button>
                             </div>
                         </div>
                     </div>
-                )}
-            </div>
-        );
-};
+                </div>
+            )}
 
-export default ChequeExpense;
+            {/* View Modal */}
+            {viewCheque && (
+                <div className="ce-modal-overlay" onClick={() => setViewCheque(null)}>
+                    <div className="ce-modal" onClick={e => e.stopPropagation()}>
+                        <div className="ce-modal-header">
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                    <div style={{ width: 32, height: 32, borderRadius: 10, background: "#f3f4f6", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                        <Eye size={16} color="#374151" />
+                                    </div>
+                                    <div>
+                                        <h2 style={{ fontSize: 17, fontWeight: 800, color: "#111827" }}>Cheque Details</h2>
+                                        <p style={{ fontSize: 12, color: "#9ca3af", marginTop: 1 }}>Cheque #{viewCheque.chequeNumber || "—"}</p>
+                                    </div>
+                                </div>
+                                <button onClick={() => setViewCheque(null)} style={{ background: "transparent", border: "none", cursor: "pointer", padding: 6, borderRadius: 8, color: "#9ca3af" }}><X size={18} /></button>
+                            </div>
+                        </div>
+                        <div className="ce-modal-body">
+                            {/* Amount hero */}
+                            <div style={{ background: "#f9fafb", borderRadius: 14, padding: "20px 20px", marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                <div>
+                                    <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", color: "#9ca3af", marginBottom: 4 }}>Amount</div>
+                                    <div className="ce-amount-display" style={{ fontSize: 28, color: "#111827" }}>{formatINR(parseAmount(viewCheque.chequeAmount))}</div>
+                                </div>
+                                <StatusBadge status={viewCheque.status} />
+                            </div>
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px 20px" }}>
+                                {[
+                                    { label: "Entry Date", val: viewCheque.entryDate || "—" },
+                                    { label: "Issued Date", val: fmtDate(viewCheque.chequeIssuedDate) },
+                                    { label: "Present Date", val: fmtDate(viewCheque.chequePresentDate) },
+                                    { label: "Receiver", val: viewCheque.receiverName || "—" },
+                                    { label: "Cheque Number", val: viewCheque.chequeNumber || "—" },
+                                    ...(viewCheque.clearedDate ? [{ label: "Cleared Date", val: fmtDate(viewCheque.clearedDate) }] : []),
+                                ].map(({ label, val }) => (
+                                    <div key={label} className="ce-view-field">
+                                        <label>{label}</label>
+                                        <div className="val">{val}</div>
+                                    </div>
+                                ))}
+                            </div>
+                            {viewCheque.reasonToIssue && (
+                                <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid #f3f4f6" }}>
+                                    <div className="ce-view-field"><label>Reason to Issue</label><div className="val" style={{ lineHeight: 1.6 }}>{viewCheque.reasonToIssue}</div></div>
+                                </div>
+                            )}
+                            {(viewCheque.shiftRemark || viewCheque.cancelReason) && (
+                                <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid #f3f4f6", display: "flex", flexDirection: "column", gap: 12 }}>
+                                    {viewCheque.shiftRemark && <div className="ce-view-field"><label>Shift Note</label><div className="val">{viewCheque.shiftRemark}</div></div>}
+                                    {viewCheque.cancelReason && <div className="ce-view-field"><label>Cancellation Reason</label><div className="val" style={{ color: "#b91c1c" }}>{viewCheque.cancelReason}</div></div>}
+                                </div>
+                            )}
+                            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 24, paddingTop: 16, borderTop: "1px solid #f3f4f6" }}>
+                                <button className="ce-btn-ghost" onClick={() => { setViewCheque(null); openEditModal(viewCheque); }}><Edit2 size={13} /> Edit</button>
+                                <button className="ce-btn-primary" onClick={() => setViewCheque(null)}>Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
