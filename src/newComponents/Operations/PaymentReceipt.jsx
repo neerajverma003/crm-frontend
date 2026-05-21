@@ -221,7 +221,7 @@ const PaymentReceipt = ({ customer, invoiceNo, date, endDate, amount, advancePay
             <div><strong>Mob :</strong> {customer?.phone || 'N/A'}</div>
             <div><strong>Service Type :</strong> {customer?.tripType || 'Tour'}</div>
             <div><strong>Start Date :</strong> {formatDate(customer?.expectedTravelDate)}</div>
-            <div><strong>End Date :</strong> {endDate ? formatDate(endDate) : (customer?.noOfDays ? `${customer.noOfDays} days` : 'N/A')}</div>
+            <div><strong>Trip Ended :</strong> {endDate ? formatDate(endDate) : (customer?.noOfDays ? `${customer.noOfDays} days` : 'N/A')}</div>
           </div>
 
           <div className="right-info">

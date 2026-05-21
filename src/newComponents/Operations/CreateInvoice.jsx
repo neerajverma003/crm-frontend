@@ -89,13 +89,22 @@ const CreateInvoice = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const generateInvoiceNumber = async () => {
+  const generateInvoiceNumber = async (selectedDateStr) => {
     try {
-      const now = new Date();
-      const month = String(now.getMonth() + 1).padStart(2, "0");
+      let now = selectedDateStr ? new Date(selectedDateStr) : new Date();
+      if (isNaN(now.getTime())) {
+        now = new Date();
+      }
+      
+      const month = now.getMonth() + 1;
       const year = now.getFullYear();
+      
+      // Calculate financial year (April 1 to March 31)
+      const startYear = month >= 4 ? year : year - 1;
+      const endYear = startYear + 1;
+      
       const random = Math.floor(1000 + Math.random() * 9000); // 4 digit random number
-      const invoiceNumber = `AD|${month}-${year}|${random}`;
+      const invoiceNumber = `AD|${startYear}-${endYear}|${random}`;
       
       return invoiceNumber;
     } catch (err) {
@@ -147,7 +156,7 @@ const CreateInvoice = () => {
 
       // Auto-generate invoice number when customer is selected
       if (value) {
-        generateInvoiceNumber().then((invoiceNo) => {
+        generateInvoiceNumber(updatedForm.date).then((invoiceNo) => {
           if (invoiceNo) {
             setForm((prevForm) => ({ ...prevForm, invoiceNo }))
           }
@@ -186,6 +195,15 @@ const CreateInvoice = () => {
     if ((name === 'amount' || name === 'gstPercentage') && updatedForm.gstPercentage && updatedForm.amount) {
       const gstAmount = (parseFloat(updatedForm.amount) * parseFloat(updatedForm.gstPercentage)) / 100
       updatedForm.gstAmount = gstAmount.toFixed(2)
+    }
+
+    // Update invoice number if date changes
+    if (name === 'date' && updatedForm.customerId) {
+      generateInvoiceNumber(value).then((invoiceNo) => {
+        if (invoiceNo) {
+          setForm((prevForm) => ({ ...prevForm, invoiceNo }))
+        }
+      })
     }
 
     setForm(updatedForm)
@@ -525,7 +543,7 @@ const CreateInvoice = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-2">Date</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">Invoice Date</label>
                   <input
                     type="date"
                     name="date"
@@ -536,7 +554,7 @@ const CreateInvoice = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-2">End Date</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">Trip Ended</label>
                   <input
                     type="date"
                     name="endDate"
