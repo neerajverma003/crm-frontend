@@ -50,7 +50,7 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
         if (activeEmployees.length > 0) {
           // setSelectedEmployee(activeEmployees[0]);
           // fetchEmployeeLeads(activeEmployees[0]._id);
-          if (typeof onEmployeeSelect === "function") onEmployeeSelect();
+          // if (typeof onEmployeeSelect === "function") onEmployeeSelect(); // Removed to prevent setting undefined
         } else {
           setError("No active employees found");
         }
@@ -141,7 +141,7 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
     }
 
     // Sort by latest first (createdAt descending)
-    filtered = filtered.sort((a, b) => {
+    filtered = [...filtered].sort((a, b) => {
       const dateA = new Date(a.createdAt || 0);
       const dateB = new Date(b.createdAt || 0);
       return dateB - dateA;
@@ -476,7 +476,7 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredLeads.map((lead) => (
+                    {visibleLeads.map((lead) => (
                       <tr key={lead._id} className="hover:bg-blue-50 transition-colors group">
                         <td className="px-6 py-3 border-b border-gray-100 text-gray-700">
                           <div className="flex flex-col gap-0.5">

@@ -279,7 +279,7 @@ const router = createBrowserRouter([
       {
         path: "/sim-management",
         element: (
-          <ProtectedRoute allowedRoles={roles.adminOnly}>
+          <ProtectedRoute allowedRoles={roles.all}>
             <SimManagement />
           </ProtectedRoute>
         ),
@@ -287,7 +287,7 @@ const router = createBrowserRouter([
       {
         path: "/email-management",
         element: (
-          <ProtectedRoute allowedRoles={roles.adminOnly}>
+          <ProtectedRoute allowedRoles={roles.all}>
             <EmailManagement />
           </ProtectedRoute>
         ),
@@ -345,7 +345,7 @@ const router = createBrowserRouter([
       {
         path: "/company-overview",
         element: (
-          <ProtectedRoute allowedRoles={roles.superAdminOnly}>
+          <ProtectedRoute allowedRoles={roles.adminOnly}>
             <CompanyOverview />
           </ProtectedRoute>
         ),
@@ -417,7 +417,7 @@ const router = createBrowserRouter([
       {
         path: "/addrole",
         element: (
-          <ProtectedRoute allowedRoles={roles.superAdminOnly}>
+          <ProtectedRoute allowedRoles={roles.adminOnly}>
             <AddRole />
           </ProtectedRoute>
         ),
@@ -522,7 +522,7 @@ const router = createBrowserRouter([
       {
         path: "/offer-letter",
         element: (
-          <ProtectedRoute allowedRoles={roles.superAdminOnly}>
+          <ProtectedRoute allowedRoles={roles.adminOnly}>
             <OfferLetter />
           </ProtectedRoute>
         ),
@@ -530,7 +530,7 @@ const router = createBrowserRouter([
       {
         path: "/offer-letter-format",
         element: (
-          <ProtectedRoute allowedRoles={roles.superAdminOnly}>
+          <ProtectedRoute allowedRoles={roles.adminOnly}>
             <OfferLetterFormat />
           </ProtectedRoute>
         ),
@@ -549,7 +549,7 @@ const router = createBrowserRouter([
       {
         path: "/department",
         element: (
-          <ProtectedRoute allowedRoles={roles.superAdminOnly}>
+          <ProtectedRoute allowedRoles={roles.adminOnly}>
             <Department />
           </ProtectedRoute>
         ),
@@ -557,7 +557,7 @@ const router = createBrowserRouter([
       {
         path: "/designation",
         element: (
-          <ProtectedRoute allowedRoles={roles.superAdminOnly}>
+          <ProtectedRoute allowedRoles={roles.adminOnly}>
             <Designation />s
           </ProtectedRoute>
         ),
@@ -709,7 +709,7 @@ const router = createBrowserRouter([
       {
         path: "/task-assign",
         element: (
-          <ProtectedRoute allowedRoles={roles.superAdminOnly}>
+          <ProtectedRoute allowedRoles={roles.adminOnly}>
             <TaskAssign />
           </ProtectedRoute>
         ),
@@ -717,7 +717,7 @@ const router = createBrowserRouter([
       {
         path: "/task-report",
         element: (
-          <ProtectedRoute allowedRoles={roles.superAdminOnly}>
+          <ProtectedRoute allowedRoles={roles.adminOnly}>
             <TaskReport />
           </ProtectedRoute>
         ),

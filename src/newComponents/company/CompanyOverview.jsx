@@ -15,10 +15,10 @@ const CompanyOverview = () => {
       try {
         setLoading(true);
         setError('');
-        
+
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/company/all`);
         const allCompanies = res?.data?.companies || [];
-        
+
         setCompanies(allCompanies);
       } catch (err) {
         console.error('❌ Error fetching companies:', err);
@@ -32,7 +32,7 @@ const CompanyOverview = () => {
     fetchCompanies();
   }, []);
   console.log(companies);
-  
+
   // ✅ Handle card click to navigate
   const handleCardClick = (company) => {
     navigate('/companies', { state: { selectedCompany: company } });
@@ -96,7 +96,7 @@ const CompanyOverview = () => {
               Managing <span className="font-semibold text-blue-600">{companies.length}</span> companies
             </p>
           </div>
-          
+
           {/* Stats Card */}
           <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg w-full md:w-fit">
             <div className="flex items-center gap-4">
@@ -117,8 +117,8 @@ const CompanyOverview = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {companies.map((company) => {
             const status = company.status?.toLowerCase() === 'active' ? 'Active' : 'Pending';
-            const statusColor = status === 'Active' 
-              ? 'bg-green-100 text-green-800 border-green-300' 
+            const statusColor = status === 'Active'
+              ? 'bg-green-100 text-green-800 border-green-300'
               : 'bg-yellow-100 text-yellow-800 border-yellow-300';
 
             return (
@@ -131,10 +131,29 @@ const CompanyOverview = () => {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3 flex-1">
                     {/* Avatar */}
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                      {(company.companyName || 'C')[0].toUpperCase()}
+                    {/* Avatar with Logo */}
+                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-white font-bold text-lg shadow-md overflow-hidden shrink-0 border border-gray-200">
+                      {company.logo ? (
+                        <img
+                          src={company.logo}
+                          alt={company.companyName}
+                          className="w-full h-full object-contain p-1"
+                          onError={(e) => {
+                            // Agar image link tuta hua ho, toh text fallback show kare
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <span
+                        className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-blue-600 text-white"
+                        style={{ display: company.logo ? 'none' : 'flex' }}
+                      >
+                        {(company.companyName || 'C')[0].toUpperCase()}
+                      </span>
                     </div>
-                    
+
+
                     {/* Company Name & Industry */}
                     <div className="flex-1 min-w-0">
                       <h3 className="font-bold text-gray-900 text-lg truncate group-hover:text-blue-600 transition-colors">

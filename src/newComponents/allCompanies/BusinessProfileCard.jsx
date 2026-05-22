@@ -67,7 +67,7 @@ const BusinessProfileCard = ({
                 <img 
                   src={logoKey ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${logoKey}` : logo} 
                   alt={`${displayName} logo`} 
-                  className="w-full h-full object-cover" 
+                  className="w-full h-full object-contain p-1" 
                 />
               ) : (
                 <span className="text-xl font-bold text-blue-600">{displayName[0] || "?"}</span>
@@ -196,7 +196,7 @@ const BusinessProfileCard = ({
                           <img 
                             src={logoKey ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${logoKey}` : logo} 
                             alt={`${displayName} logo`} 
-                            className="w-full h-full object-cover" 
+                            className="w-full h-full object-contain p-1" 
                           />
                         ) : (
                           <span className="text-blue-600">{displayName[0] || "?"}</span>
@@ -459,7 +459,7 @@ const BusinessProfileCard = ({
                       />
                       {(editData.logoPreview || editData.logo) && (
                         <div className="mt-2">
-                          <img src={editData.logoPreview || editData.logo} alt="logo preview" className="h-20 w-20 object-cover rounded-md" />
+                          <img src={editData.logoPreview || editData.logo} alt="logo preview" className="h-20 w-20 object-contain rounded-md" />
                         </div>
                       )}
                     </div>

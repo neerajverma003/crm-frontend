@@ -3194,7 +3194,9 @@ const EmployeeLeads = () => {
                         try {
                           const formData = new FormData();
                           formData.append("file", file);
-                          formData.append("leadName", detailsModal.lead.name);
+                          formData.append("leadName", detailsModal.lead.name || detailsModal.lead.leadName || "Unknown");
+                          formData.append("module", "mylead");
+                          formData.append("employeeName", localStorage.getItem("userName") || "UnknownEmployee");
                           console.log(file);
                           console.log(formData);
                           for (let [key, value] of formData.entries()) {

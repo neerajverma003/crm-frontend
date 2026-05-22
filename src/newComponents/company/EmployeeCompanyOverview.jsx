@@ -116,7 +116,7 @@ const EmployeeCompanyOverview = () => {
                             </div> */}
                             {/* <div>
                                 <p className="text-white/80 text-sm">Total Companies</p>
-                                <p className="text-3xl font-bold">{companies.length}</p>
+                                <p className="w-full h-full object-contain p-1">{companies.length}</p>
                             </div> */}
                         {/* </div> */}
                     {/* </div> */}

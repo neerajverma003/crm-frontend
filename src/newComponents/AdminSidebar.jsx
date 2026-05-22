@@ -112,7 +112,18 @@ const SUBROLE_ROUTES = {
   "Assign management": "/assignrole",
   "Admin Assign Company": "/assigncompany",
   "Admin Assign Role": "/assignrole",
-  "Assigned Roles": "/assigned-roles"
+  "Assigned Roles": "/assigned-roles",
+
+  // --- Inventory ---
+  "SIM management": "/sim-management",
+  "Email management": "/email-management"
+};
+
+const generateUrl = (label) => {
+  if (!label) return "#";
+  if (SUBROLE_ROUTES[label]) return SUBROLE_ROUTES[label];
+  // Convert "My New Feature" -> "/my-new-feature"
+  return "/" + label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 };
 
 // ============================================
@@ -185,7 +196,7 @@ const DoubleNestedDropdownItem = ({ item, openDropdowns, toggleDropdown, setIsOp
                     setSelectedSubRole(subRoleData);
                     localStorage.setItem("selectedSubRole", JSON.stringify(subRoleData));
                     
-                    const route = SUBROLE_ROUTES[point.label] || `/${point.label}`;
+                    const route = generateUrl(point.label);
                     navigate(route, { state: { subRole: subRoleData } });
                     setIsOpen(false);
                   }}
@@ -261,7 +272,7 @@ const NestedDropdownItem = ({ item, openDropdowns, toggleDropdown, setIsOpen, na
                       setSelectedSubRole(subRoleData);
                       localStorage.setItem("selectedSubRole", JSON.stringify(subRoleData));
                       
-                      const route = SUBROLE_ROUTES[subRoleData.subRoleName] || `/${subRoleData.subRoleName}`;
+                      const route = generateUrl(subRoleData.subRoleName);
                       navigate(route, { state: { subRole: subRoleData } });
                       setIsOpen(false);
                     }}
@@ -521,7 +532,7 @@ const AdminSidebar = () => {
                     : subRolePoints;
 
                   companyMap[companyId].rolesMap[roleId].subroles.push({
-                    id: actualSubRoleId,
+                    id:`${companyId}-${actualSubRoleId}`,
                     label: subRoleName,
                     points: assignedPointsForThisSubRole
                   });
@@ -543,13 +554,13 @@ const AdminSidebar = () => {
         label: role.label,
         type: role.subroles.length > 0 ? "dropdown" : undefined,
         children: role.subroles.length > 0 ? role.subroles.map((subrole) => {
-          const subRoleUrl = SUBROLE_ROUTES[subrole.label || subrole.subRoleName] || `/${subrole.label || subrole.subRoleName}`;
+          const subRoleUrl = generateUrl(subrole.label || subrole.subRoleName);
           return {
             ...subrole,
             url: subRoleUrl,
             type: (subrole.points?.length > 0) ? "dropdown" : undefined,
             children: (subrole.points?.length > 0) ? subrole.points.map((p, i) => {
-              const pointUrl = SUBROLE_ROUTES[p] || `/${p}`;
+              const pointUrl = generateUrl(p);
               return { id: `p-${subrole.id}-${i}`, label: p, url: pointUrl };
             }) : undefined
           };
