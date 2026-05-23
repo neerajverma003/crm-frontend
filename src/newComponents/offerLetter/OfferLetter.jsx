@@ -29,6 +29,7 @@ const OfferLetter = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewFormatData, setViewFormatData] = useState(null);
   const [selectedFormat, setSelectedFormat] = useState(null);
+  const [editingOfferId, setEditingOfferId] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -111,6 +112,7 @@ const OfferLetter = () => {
     candidateEmail: "",
     candidatePhone: "",
     candidateAddress: "",
+    candidateGender: "Male",
     // Employment Terms
     jobTitle: "",
     joiningDate: new Date().toISOString().split("T")[0],
@@ -200,14 +202,30 @@ const OfferLetter = () => {
         companyName: selectedCompany?.companyName || "",
         formatId: selectedFormat?._id || null,
       };
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/offer-letter`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to create offer letter");
-      setOfferLetters((prev) => [data.data, ...prev]);
+
+      let res, data;
+
+      if (editingOfferId) {
+        res = await fetch(`${import.meta.env.VITE_API_URL}/offer-letter/${editingOfferId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed to update offer letter");
+        setOfferLetters((prev) => prev.map((item) => (item._id === editingOfferId ? data.data : item)));
+        setEditingOfferId(null);
+      } else {
+        res = await fetch(`${import.meta.env.VITE_API_URL}/offer-letter`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed to create offer letter");
+        setOfferLetters((prev) => [data.data, ...prev]);
+      }
+
       setFormData({
         refNumber: "",
         offerDate: new Date().toISOString().split("T")[0],
@@ -216,6 +234,7 @@ const OfferLetter = () => {
         candidateEmail: "",
         candidatePhone: "",
         candidateAddress: "",
+        candidateGender: "Male",
         jobTitle: "",
         joiningDate: new Date().toISOString().split("T")[0],
         employmentType: "",
@@ -232,6 +251,29 @@ const OfferLetter = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEdit = (offer) => {
+    setEditingOfferId(offer._id);
+    setFormData({
+      refNumber: offer.refNumber || "",
+      offerDate: offer.offerDate ? new Date(offer.offerDate).toISOString().split("T")[0] : "",
+      candidateName: offer.candidateName || "",
+      fatherName: offer.fatherName || "",
+      candidateEmail: offer.candidateEmail || "",
+      candidatePhone: offer.candidatePhone || "",
+      candidateAddress: offer.candidateAddress || "",
+      candidateGender: offer.candidateGender || "Male",
+      jobTitle: offer.jobTitle || "",
+      joiningDate: offer.joiningDate ? new Date(offer.joiningDate).toISOString().split("T")[0] : "",
+      employmentType: offer.employmentType || "",
+      reportingTo: offer.reportingTo || "",
+      salary: offer.salary || "",
+      benefits: offer.benefits || "",
+      jobResponsibilities: offer.jobResponsibilities || "",
+      status: offer.status || "Draft",
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleView = async (offer) => {
@@ -379,6 +421,19 @@ const OfferLetter = () => {
                   placeholder="e.g. Mukesh Verma"
                   className="w-full rounded-md border border-gray-300 px-3 py-2"
                 />
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-semibold">Gender</label>
+                <select
+                  name="candidateGender"
+                  value={formData.candidateGender || "Male"}
+                  onChange={handleChange}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2"
+                >
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
               <div>
                 <label className="mb-2 block text-sm font-semibold">Email</label>
@@ -537,13 +592,45 @@ const OfferLetter = () => {
             </select>
           </div>
 
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-blue-600 px-4 py-3 text-white hover:bg-blue-700 disabled:opacity-60"
-            disabled={loading}
-          >
-            {loading ? "Saving..." : "Create Offer Letter"}
-          </button>
+          <div className="flex gap-4 pt-4">
+            <button
+              type="submit"
+              className="w-full rounded-lg bg-blue-600 px-4 py-3 text-white hover:bg-blue-700 disabled:opacity-60"
+              disabled={loading}
+            >
+              {loading ? "Saving..." : editingOfferId ? "Update Offer Letter" : "Create Offer Letter"}
+            </button>
+            {editingOfferId && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingOfferId(null);
+                  setFormData({
+                    refNumber: "",
+                    offerDate: new Date().toISOString().split("T")[0],
+                    candidateName: "",
+                    fatherName: "",
+                    candidateEmail: "",
+                    candidatePhone: "",
+                    candidateAddress: "",
+                    candidateGender: "Male",
+                    jobTitle: "",
+                    joiningDate: new Date().toISOString().split("T")[0],
+                    employmentType: "",
+                    reportingTo: "",
+                    salary: "",
+                    benefits: "",
+                    jobResponsibilities: "",
+                    status: "Draft",
+                  });
+                  fetchNextRefNumber();
+                }}
+                className="w-full rounded-lg bg-slate-500 px-4 py-3 text-white hover:bg-slate-600"
+              >
+                Cancel Edit
+              </button>
+            )}
+          </div>
         </form>
 
       {error && <p className="mb-4 text-red-600">{error}</p>}
@@ -581,6 +668,13 @@ const OfferLetter = () => {
                     disabled={loading}
                   >
                     View
+                  </button>
+                  <button
+                    onClick={() => handleEdit(offer)}
+                    className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600"
+                    disabled={loading}
+                  >
+                    Edit
                   </button>
                   <button
                     onClick={() => handleDelete(offer._id)}
