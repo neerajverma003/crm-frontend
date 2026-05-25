@@ -258,12 +258,14 @@ const MainAllCompanies = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 p-8 overflow-y-auto">
       {/* Page Header */}
       <div className="mb-8">
-        <div className="flex justify-between items-start">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">All Companies</h1>
-            <p className="text-gray-600">Manage and organize all your business partners</p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">All Companies</h1>
+            <p className="text-sm sm:text-base text-gray-600">Manage and organize all your business partners</p>
           </div>
-          <AddCompany />
+          <div className="w-full sm:w-auto self-start">
+            <AddCompany />
+          </div>
         </div>
       </div>
 

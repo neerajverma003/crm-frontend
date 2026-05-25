@@ -95,10 +95,11 @@ const CompanyCard = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Top Row with Status Badge */}
-      <div className="p-6 pb-4">
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center font-semibold overflow-hidden border border-blue-200">
+      {/* Top Row with Status Badge */}
+      <div className="p-4 sm:p-6 pb-4">
+        <div className="flex justify-between items-start mb-4 gap-2">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 rounded-lg bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center font-semibold overflow-hidden border border-blue-200">
               {/* Show logo if available, otherwise initial letter */}
               {logoKey || logo ? (
                 <img 
@@ -107,16 +108,16 @@ const CompanyCard = ({
                   className="w-full h-full object-contain p-1" 
                 />
               ) : (
-                <span className="text-xl font-bold text-blue-600">{displayName[0] || "?"}</span>
+                <span className="text-lg sm:text-xl font-bold text-blue-600">{displayName[0] || "?"}</span>
               )}
             </div>
-            <div className="flex-1">
-              <h2 className="font-bold text-gray-900 truncate text-sm">{displayName}</h2>
-              <p className="text-xs text-gray-500 mt-1">{industry || "Not specified"}</p>
+            <div className="min-w-0 flex-1">
+              <h2 className="font-bold text-gray-900 truncate text-sm sm:text-base">{displayName}</h2>
+              <p className="text-xs text-gray-500 mt-1 truncate">{industry || "Not specified"}</p>
             </div>
           </div>
           <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ml-2 ${
+            className={`flex-shrink-0 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold whitespace-nowrap ${
               displayStatus === "Active"
                 ? "bg-green-100 text-green-700"
                 : "bg-amber-100 text-amber-700"
@@ -127,22 +128,22 @@ const CompanyCard = ({
         </div>
 
         {/* Contact Info */}
-        <div className="space-y-2 mb-4">
-          <div className="flex items-center gap-2 text-xs text-gray-600 hover:text-gray-900 transition-colors group/link">
-            <MdMail size={14} className="text-gray-400 group-hover/link:text-blue-600" />
+        <div className="space-y-2.5 mb-2">
+          <div className="flex items-center gap-2.5 text-xs text-gray-600 hover:text-gray-900 transition-colors group/link min-w-0">
+            <MdMail size={14} className="text-gray-400 group-hover/link:text-blue-600 flex-shrink-0" />
             <span className="truncate">{email || "No email"}</span>
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-600 hover:text-gray-900 transition-colors group/link">
-            <MdPhone size={14} className="text-gray-400 group-hover/link:text-blue-600" />
+          <div className="flex items-center gap-2.5 text-xs text-gray-600 hover:text-gray-900 transition-colors group/link min-w-0">
+            <MdPhone size={14} className="text-gray-400 group-hover/link:text-blue-600 flex-shrink-0" />
             <span className="truncate">{phoneNumber || "No phone"}</span>
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-600 hover:text-gray-900 transition-colors group/link">
-            <MdLanguage size={14} className="text-gray-400 group-hover/link:text-blue-600" />
+          <div className="flex items-center gap-2.5 text-xs text-gray-600 hover:text-gray-900 transition-colors group/link min-w-0">
+            <MdLanguage size={14} className="text-gray-400 group-hover/link:text-blue-600 flex-shrink-0" />
             <span className="truncate">{website ? website.replace(/^https?:\/\//, "") : "No website"}</span>
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-600">
-            <MdPeople size={14} className="text-gray-400" />
-            <span>{numberOfEmployees || 0} {numberOfEmployees === 1 ? "employee" : "employees"}</span>
+          <div className="flex items-center gap-2.5 text-xs text-gray-600 min-w-0">
+            <MdPeople size={14} className="text-gray-400 flex-shrink-0" />
+            <span className="truncate">{numberOfEmployees || 0} {numberOfEmployees === 1 ? "employee" : "employees"}</span>
           </div>
         </div>
       </div>

@@ -80,14 +80,14 @@ const UserCard = () => {
                 {cards.map((card, index) => (
                     <div
                         key={index}
-                        className={`group relative flex w-full h-[240px] flex-col overflow-hidden rounded-[2.5rem] p-7 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(0,0,0,0.1)] ${card.wrapperClass} shadow-xl`}
+                        className={`group relative flex w-full h-[220px] sm:h-[240px] flex-col overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-7 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(0,0,0,0.1)] ${card.wrapperClass} shadow-xl`}
                     >
                         {/* Card Header */}
-                        <div className="flex items-center justify-between mb-8">
-                            <div className={`flex h-14 w-14 items-center justify-center rounded-2xl shadow-inner transition-transform duration-500 group-hover:scale-110 ${card.iconBg}`}>
-                                {React.cloneElement(card.icon, { size: 24 })}
+                        <div className="flex items-center justify-between mb-4 sm:mb-8 gap-2">
+                            <div className={`flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl shadow-inner transition-transform duration-500 group-hover:scale-110 ${card.iconBg}`}>
+                                {React.cloneElement(card.icon, { size: 20, className: `${card.icon.props.className} sm:w-6 sm:h-6` })}
                             </div>
-                            <div className={`rounded-full px-4 py-1.5 text-[10px] font-black tracking-widest uppercase backdrop-blur-md ${
+                            <div className={`rounded-full px-3 sm:px-4 py-1.5 text-[9px] sm:text-[10px] font-black tracking-widest uppercase backdrop-blur-md shrink-0 ${
                                 card.theme === "blue" ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500 border border-gray-100"
                             }`}>
                                 {card.totalLabel}: {card.totalValue}
@@ -97,15 +97,15 @@ const UserCard = () => {
                         {/* Split Stats Area */}
                         <div className="flex items-center mt-auto">
                             {/* Active Side */}
-                            <div className="flex-1">
-                                <p className={`text-[11px] font-black tracking-widest uppercase mb-1.5 ${
+                            <div className="flex-1 min-w-0">
+                                <p className={`text-[10px] sm:text-[11px] font-black tracking-widest uppercase mb-1.5 ${
                                     card.theme === "blue" ? "text-blue-100/80" : "text-gray-400"
                                 }`}>
                                     Active
                                 </p>
-                                <div className="flex items-baseline gap-2">
-                                    <h4 className="text-4xl font-black tracking-tighter sm:text-5xl">{card.active}</h4>
-                                    <span className={`flex items-center text-[10px] font-black px-1.5 py-0.5 rounded-md ${
+                                <div className="flex items-baseline gap-1 sm:gap-2">
+                                    <h4 className="text-3xl sm:text-5xl font-black tracking-tighter truncate">{card.active}</h4>
+                                    <span className={`shrink-0 flex items-center text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded-md ${
                                         card.theme === "blue" ? "bg-white/20 text-emerald-300" : "bg-emerald-50 text-emerald-600"
                                     }`}>
                                         ↑ {Math.round((card.active / (card.totalValue || 1)) * 100)}%
@@ -114,20 +114,20 @@ const UserCard = () => {
                             </div>
 
                             {/* Vertical Divider */}
-                            <div className={`h-14 w-[1.5px] mx-5 rounded-full transition-all duration-500 group-hover:h-16 ${
+                            <div className={`h-12 sm:h-14 w-[1.5px] mx-3 sm:mx-5 shrink-0 rounded-full transition-all duration-500 group-hover:h-16 ${
                                 card.theme === "blue" ? "bg-white/30" : "bg-gray-200"
                             }`} />
 
                             {/* Inactive Side */}
-                            <div className="flex-1">
-                                <p className={`text-[11px] font-black tracking-widest uppercase mb-1.5 ${
+                            <div className="flex-1 min-w-0">
+                                <p className={`text-[10px] sm:text-[11px] font-black tracking-widest uppercase mb-1.5 ${
                                     card.theme === "blue" ? "text-blue-100/80" : "text-gray-400"
                                 }`}>
                                     Inactive
                                 </p>
-                                <div className="flex items-baseline gap-2">
-                                    <h4 className="text-4xl font-black tracking-tighter opacity-90 sm:text-5xl">{card.inactive}</h4>
-                                    <span className={`flex items-center text-[10px] font-black px-1.5 py-0.5 rounded-md ${
+                                <div className="flex items-baseline gap-1 sm:gap-2">
+                                    <h4 className="text-3xl sm:text-5xl font-black tracking-tighter opacity-90 truncate">{card.inactive}</h4>
+                                    <span className={`shrink-0 flex items-center text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded-md ${
                                         card.theme === "blue" ? "bg-white/20 text-rose-300" : "bg-rose-50 text-rose-500"
                                     }`}>
                                         ↓ {Math.round((card.inactive / (card.totalValue || 1)) * 100)}%

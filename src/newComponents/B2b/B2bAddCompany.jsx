@@ -322,145 +322,150 @@ const B2bAddCompany = () => {
   console.log(company);
 
   return (
-    <div className="max-w-6xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-md">
-      <div className="flex items-center justify-between mb-6">
+    <div className="min-h-screen bg-gradient-to-br from-[#f6f8fa] to-[#e9ecef] p-4 sm:p-8">
+      <div className="w-full max-w-7xl mx-auto space-y-6">
+        {/* Header & Tabs */}
+        <div className="flex flex-col space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-3xl font-black text-slate-900 tracking-tight leading-tight drop-shadow-sm">B2B Add Company</h2>
+              <p className="mt-1 text-sm font-medium text-slate-600">Register and manage B2B partner companies.</p>
+            </div>
+          </div>
 
-        <div className="flex items-center gap-3">
-          {role !== "employee" && (
-            <button
-              onClick={() => {
-                setActiveTab("All")
-                setFormData({
-                  ...formData,
-                  company: null, // Clear company selection when "All" is selected
-                });
-              }}
-              className={`px-4 py-2 rounded-full font-semibold shadow-sm transition ${activeTab === "All" ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white' : 'bg-white text-gray-700 border border-gray-200'}`}
-            >
-              All
-            </button>
-          )
-          }
-          {company.length > 0 && company.map((comp) => (
-            <button
-              onClick={() => {
-                setActiveTab(comp.companyName)
-                setFormData({
-                  ...formData,
-                  company: comp.companyName, // Set company ID in form data when a company tab is selected
-                });
-              }}
-              key={comp._id}
-              className={`px-4 py-2 rounded-full font-semibold shadow-sm transition ${activeTab === comp.companyName ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white' : 'bg-white text-gray-700 border border-gray-200'}`}
-            >
-              {comp.companyName}
-            </button>
-          ))}
+          <div className="flex items-center gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
+            {role !== "employee" && (
+              <button
+                onClick={() => {
+                  setActiveTab("All")
+                  setFormData({ ...formData, company: null });
+                }}
+                className={`flex-none px-5 py-2.5 rounded-full font-semibold shadow-sm transition-all duration-300 ${activeTab === "All" ? 'bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}
+              >
+                All
+              </button>
+            )}
+            {company.length > 0 && company.map((comp) => (
+              <button
+                key={comp._id}
+                onClick={() => {
+                  setActiveTab(comp.companyName)
+                  setFormData({ ...formData, company: comp.companyName });
+                }}
+                className={`flex-none px-5 py-2.5 rounded-full font-semibold shadow-sm transition-all duration-300 ${activeTab === comp.companyName ? 'bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}
+              >
+                {comp.companyName}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
-      <h2 className="text-2xl font-semibold mb-6 text-center">B2B Add Company</h2>
 
-      {/* ADD FORM */}
-      {!editData && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-5xl mx-auto mb-10">
-          <div>
-            <label className="block text-sm font-medium mb-1">Country</label>
-            <input
-              type="text"
-              name="country"
-              value={formData.country}
-              readOnly
-              className="w-full border p-2 bg-gray-100 rounded"
-            />
+        {/* ADD FORM */}
+        {!editData && (
+        <div className="bg-white/90 p-6 sm:p-8 rounded-2xl shadow-xl border border-slate-100 transition-all">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Country</label>
+              <input
+                type="text"
+                name="country"
+                value={formData.country}
+                readOnly
+                className="w-full border border-slate-200 bg-slate-100 rounded-xl px-4 py-2.5 text-sm text-slate-500 cursor-not-allowed outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">State</label>
+              <select
+                name="state"
+                value={formData.state}
+                onChange={handleChange}
+                className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+              >
+                <option value="">Select State</option>
+                {states.map((s) => (
+                  <option key={s._id} value={s._id}>{s.state}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Company Name</label>
+              <input
+                type="text"
+                name="companyName"
+                value={formData.companyName}
+                onChange={handleChange}
+                placeholder="Enter company name"
+                className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Contact Person Name</label>
+              <input
+                type="text"
+                name="contactPersonName"
+                value={formData.contactPersonName}
+                onChange={handleChange}
+                placeholder="Enter contact person"
+                className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Phone</label>
+              <input
+                type="number"
+                name="contactPersonNumber"
+                value={formData.contactPersonNumber}
+                onChange={handleChange}
+                placeholder="Phone number"
+                className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Email address"
+                className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">WhatsApp</label>
+              <input
+                type="number"
+                name="whatsapp"
+                value={formData.whatsapp}
+                onChange={handleChange}
+                placeholder="WhatsApp number"
+                className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Address</label>
+              <textarea
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="Enter full address"
+                className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none resize-y min-h-[100px]"
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">State</label>
-            <select
-              name="state"
-              value={formData.state}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-            >
-              <option value="">Select State</option>
-              {states.map((s) => (
-                <option key={s._id} value={s._id}>
-                  {s.state}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium mb-1">Company Name</label>
-            <input
-              type="text"
-              name="companyName"
-              value={formData.companyName}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Contact Person Name</label>
-            <input
-              type="text"
-              name="contactPersonName"
-              value={formData.contactPersonName}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Phone</label>
-            <input
-              type="number"
-              name="contactPersonNumber"
-              value={formData.contactPersonNumber}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">WhatsApp</label>
-            <input
-              type="number"
-              name="whatsapp"
-              value={formData.whatsapp}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium mb-1">Address</label>
-            <textarea
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-              rows="3"
-            />
-          </div>
-
-          <div className="md:col-span-2">
+          <div className="mt-6 flex justify-end">
             <button
               onClick={handleSubmit}
-              className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800"
+              className="w-full sm:w-auto px-6 py-2.5 rounded-xl font-semibold bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 hover:shadow-md hover:-translate-y-0.5 transition-all"
             >
               Add Company
             </button>
@@ -469,56 +474,65 @@ const B2bAddCompany = () => {
       )}
 
       {/* TABLE LISTING COMPANIES */}
-      <div className="max-w-5xl mx-auto overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300 text-left">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-300 p-2">Company Name</th>
-              <th className="border border-gray-300 p-2">WhatsApp Number</th>
-              <th className="border border-gray-300 p-2">Phone</th>
-              <th className="border border-gray-300 p-2">Email</th>
-              <th className="border border-gray-300 p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {companies.length === 0 ? (
+      <div className="bg-white/90 rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-slate-100">
+            <thead className="bg-slate-50/80">
               <tr>
-                <td colSpan="5" className="text-center p-4">
-                  No companies added yet.
-                </td>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Company Name</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">WhatsApp</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Phone</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Email</th>
+                <th className="px-6 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider w-32">Actions</th>
               </tr>
-            ) : (
-              companies.map((company, index) => (
-                <tr key={company._id || index} className="hover:bg-gray-50">
-                  <td className="border border-gray-300 p-2">{company.companyName}</td>
-                  <td className="border border-gray-300 p-2">{company.whatsapp}</td>
-                  <td className="border border-gray-300 p-2">{company.contactPersonNumber}</td>
-                  <td className="border border-gray-300 p-2">{company.email}</td>
-                  <td className="border border-gray-300 p-2 flex space-x-2">
-                    <button
-                      onClick={() => setViewData(company)}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      <FaEye size={18} />
-                    </button>
-                    <button
-                      onClick={() => handleEdit(company, index)}
-                      className="text-green-600 hover:text-green-800"
-                    >
-                      <FaEdit size={18} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(index, company._id)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <FaTrash size={18} />
-                    </button>
+            </thead>
+            <tbody className="bg-white divide-y divide-slate-50">
+              {companies.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="px-6 py-12 text-center text-sm text-slate-500 font-medium bg-slate-50/30">
+                    No companies added yet.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                companies.map((company, index) => (
+                  <tr key={company._id || index} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="font-semibold text-slate-800">{company.companyName}</span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{company.whatsapp}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{company.contactPersonNumber}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{company.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center justify-center space-x-2">
+                        <button
+                          onClick={() => setViewData(company)}
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-100 hover:text-blue-700 transition-colors"
+                          title="View Details"
+                        >
+                          <FaEye className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleEdit(company, index)}
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50 text-emerald-500 hover:bg-emerald-100 hover:text-emerald-700 transition-colors"
+                          title="Edit Company"
+                        >
+                          <FaEdit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(index, company._id)}
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 transition-colors"
+                          title="Delete Company"
+                        >
+                          <FaTrash className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* EDIT MODAL */}
@@ -643,6 +657,7 @@ const B2bAddCompany = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

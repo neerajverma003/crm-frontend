@@ -724,58 +724,61 @@ const SuperAdminDashboard = () => {
                           </button>
                       </div>
 
-                      <div className="max-h-[320px] space-y-4 overflow-y-auto p-6">
+                      <div className="max-h-[320px] overflow-y-auto p-0">
                           {loadingLeads ? (
-                              <p className="text-center text-sm text-gray-500">Loading leads...</p>
+                              <p className="text-center text-sm text-gray-500 py-6">Loading leads...</p>
                           ) : lead.length === 0 ? (
-                              <p className="text-center text-sm text-gray-500">No leads found</p>
+                              <p className="text-center text-sm text-gray-500 py-6">No leads found</p>
                           ) : (
-                              lead.map((item) => (
+                              lead.map((item) => {
+                                const leadName = item.name || item.fullName || item.clientName || "Unknown Lead";
+                                return (
                                   <div
                                       key={item._id}
-                                      className="flex items-center justify-between"
+                                      className="flex items-center justify-between p-4 border-b border-gray-100 last:border-0 hover:bg-slate-50 transition-colors"
                                   >
                                       <div className="flex items-center gap-4">
-                                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500 font-semibold text-white">
-                                              {item.name?.[0]?.toUpperCase()}
+                                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-50 font-bold text-indigo-600 ring-1 ring-indigo-100">
+                                              {leadName.charAt(0).toUpperCase()}
                                           </div>
                                           <div>
-                                              <p className="text-sm font-semibold text-gray-900">{item.name}</p>
+                                              <p className="text-sm font-semibold text-gray-900">{leadName}</p>
                                               <p className="text-xs text-gray-500">{item.leadType || "Lead"}</p>
                                           </div>
                                       </div>
 
-                                      <div className="flex items-center gap-4">
-                                          <p className="text-sm font-semibold text-gray-900">₹ {item.value || "0"}</p>
+                                      <div className="flex items-center gap-3">
+                                          <p className="text-sm font-semibold text-gray-900 whitespace-nowrap">₹ {item.value || "0"}</p>
                                           <span
-                                              className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                                              className={`rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap ${
                                                   item.leadStatus === "Hot"
-                                                      ? "bg-red-100 text-red-600"
+                                                      ? "bg-red-100 text-red-700"
                                                       : item.leadStatus === "Warm"
-                                                        ? "bg-yellow-100 text-yellow-600"
-                                                        : "bg-gray-100 text-gray-600"
+                                                        ? "bg-orange-100 text-orange-700"
+                                                        : "bg-gray-100 text-gray-700"
                                               }`}
                                           >
-                                              {item.leadStatus}
+                                              {item.leadStatus || "New"}
                                           </span>
                                       </div>
                                   </div>
-                              ))
+                                );
+                              })
                           )}
                       </div>
                   </div>
 
                   {/* Attendance */}
                   <div className="rounded-2xl border border-gray-200 bg-white shadow-xl transition hover:-translate-y-0.5 hover:shadow-2xl">
-                    <div className="flex flex-col gap-3 border-b px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
+                    <div className="flex flex-wrap items-start justify-between gap-4 border-b px-6 py-4">
+                      <div className="min-w-0">
                         <h3 className="flex items-center gap-2 text-xl font-bold text-gray-900">
-                          <UserCheck className="h-6 w-6 text-green-600" />
-                          Attendance
+                          <UserCheck className="h-6 w-6 text-green-600 shrink-0" />
+                          <span className="truncate">Attendance</span>
                         </h3>
-                        <p className="text-sm font-medium text-gray-600">Record for {selectedDate}</p>
+                        <p className="mt-1 text-sm font-medium text-gray-600 whitespace-nowrap">Record for {selectedDate}</p>
                       </div>
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="shrink-0">
                         <input
                           type="date"
                           value={selectedDate}
@@ -795,14 +798,14 @@ const SuperAdminDashboard = () => {
                       ) : activeAdminAttendance.length === 0 ? (
                         <div className="text-center text-sm text-gray-500">No active attendance records found for {selectedDate}.</div>
                       ) : (
-                        <div className="max-h-72 overflow-y-auto overflow-x-hidden rounded-lg border border-gray-100 ring-1 ring-gray-50">
-                          <table className="w-full table-fixed divide-y divide-gray-200 text-sm">
-                            <thead className="bg-gray-50">
+                        <div className="max-h-72 overflow-y-auto overflow-x-auto rounded-lg border border-gray-100 ring-1 ring-gray-50">
+                          <table className="w-full min-w-[450px] divide-y divide-gray-200 text-sm">
+                            <thead className="bg-gray-50 sticky top-0 z-10">
                               <tr>
-                                <th className="w-3/10 px-4 py-3 text-left text-sm font-semibold uppercase tracking-wider text-gray-600">Name</th>
-                                <th className="w-1/5 px-4 py-3 text-left text-sm font-semibold uppercase tracking-wider text-gray-600">Status</th>
-                                <th className="w-1/5 px-4 py-3 text-left text-sm font-semibold uppercase tracking-wider text-gray-600">Check-in</th>
-                                <th className="w-1/5 px-4 py-3 text-left text-sm font-semibold uppercase tracking-wider text-gray-600">Check-out</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Name</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Status</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Check-in</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Check-out</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100 bg-white">
@@ -821,15 +824,17 @@ const SuperAdminDashboard = () => {
                                           : "bg-gray-100 text-gray-700";
 
                                 return (
-                                  <tr key={item._id} className="hover:bg-blue-50">
-                                    <td className="px-4 py-3 text-sm font-semibold text-gray-700 text-ellipsis overflow-hidden whitespace-nowrap">{name}</td>
-                                    <td className="px-4 py-3 text-sm">
-                                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${statusColor}`}>
+                                  <tr key={item._id} className="hover:bg-blue-50 transition-colors">
+                                    <td className="px-4 py-3 text-sm font-semibold text-gray-700 whitespace-nowrap">
+                                      <div className="truncate max-w-[120px] sm:max-w-[150px]" title={name}>{name}</div>
+                                    </td>
+                                    <td className="px-4 py-3 text-sm whitespace-nowrap">
+                                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap ${statusColor}`}>
                                         {item.status || "—"}
                                       </span>
                                     </td>
-                                    <td className="px-4 py-3 text-sm font-medium text-gray-700">{formatTime(item.clockIn)}</td>
-                                    <td className="px-4 py-3 text-sm font-medium text-gray-700">{formatTime(item.clockOut)}</td>
+                                    <td className="px-4 py-3 text-sm font-medium text-gray-700 whitespace-nowrap">{formatTime(item.clockIn)}</td>
+                                    <td className="px-4 py-3 text-sm font-medium text-gray-700 whitespace-nowrap">{formatTime(item.clockOut)}</td>
                                   </tr>
                                 );
                               })}

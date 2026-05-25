@@ -123,112 +123,137 @@ const Department = () => {
   const uniqueDepartments = [...new Set(entries.map(e => e.dep))];
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <h2 className="text-2xl font-semibold mb-6">Department Form</h2>
-
-      {/* Add Department Form */}
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <div className="grid grid-cols-2 gap-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#f6f8fa] to-[#e9ecef] p-4 sm:p-8">
+      <div className="w-full max-w-7xl mx-auto space-y-6">
+        
+        {/* Header section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Company Name</label>
-            <select
-              name="companyId"
-              value={formData.companyId}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-2 mt-1 focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select a company</option>
-              {companies.map(company => (
-                <option key={company._id} value={company._id}>
-                  {company.companyName}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Department</label>
-            <input
-              type="text"
-              name="dep"
-              value={formData.dep}
-              onChange={handleChange}
-              placeholder="Enter department"
-              className="w-full border rounded-lg p-2 mt-1 focus:ring-2 focus:ring-blue-500"
-            />
+            <h2 className="text-3xl font-black text-slate-900 tracking-tight leading-tight drop-shadow-sm">Department Form</h2>
+            <p className="mt-1 text-sm font-medium text-slate-600">Create and manage departments for all companies.</p>
           </div>
         </div>
 
-        <div className="mt-6">
-          <button type="submit" className="px-4 py-2 rounded-lg bg-black text-white hover:bg-gray-800">
-            Add Department
-          </button>
-        </div>
-      </form>
+        {/* Add Department Form */}
+        <form onSubmit={handleSubmit} className="bg-white/90 p-6 sm:p-8 rounded-2xl shadow-xl border border-slate-100 transition-all">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Company Name</label>
+              <select
+                name="companyId"
+                value={formData.companyId}
+                onChange={handleChange}
+                className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+              >
+                <option value="">Select a company</option>
+                {companies.map(company => (
+                  <option key={company._id} value={company._id}>
+                    {company.companyName}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-      {/* Dropdown Filters */}
-      <div className="bg-white p-4 rounded-lg shadow-md mb-4 flex gap-4">
-        <select
-          name="companyId"
-          value={filter.companyId}
-          onChange={handleFilterChange}
-          className="border rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="">All Companies</option>
-          {companies.map(company => (
-            <option key={company._id} value={company._id}>
-              {company.companyName}
-            </option>
-          ))}
-        </select>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Department Name</label>
+              <input
+                type="text"
+                name="dep"
+                value={formData.dep}
+                onChange={handleChange}
+                placeholder="e.g. Sales, Marketing"
+                className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none placeholder-slate-400"
+              />
+            </div>
+          </div>
 
-        <select
-          name="dep"
-          value={filter.dep}
-          onChange={handleFilterChange}
-          className="border rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="">All Departments</option>
-          {uniqueDepartments.map(dep => (
-            <option key={dep} value={dep}>{dep}</option>
-          ))}
-        </select>
-      </div>
+          <div className="mt-6 flex justify-end">
+            <button type="submit" className="w-full sm:w-auto px-6 py-2.5 rounded-xl font-semibold bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 hover:shadow-md hover:-translate-y-0.5 transition-all">
+              Add Department
+            </button>
+          </div>
+        </form>
 
-      {/* Department Table */}
-      <div className="overflow-x-auto bg-white rounded-lg shadow-md border">
-        <table className="min-w-full border-collapse">
-          <thead className="bg-gray-100 border-b">
-            <tr>
-              <th className="p-3 text-left text-sm font-semibold text-gray-600">Department</th>
-              <th className="p-3 text-left text-sm font-semibold text-gray-600">Company Name</th>
-              <th className="p-3 text-center text-sm font-semibold text-gray-600">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredEntries.length === 0 ? (
-              <tr>
-                <td colSpan="3" className="p-3 text-center text-gray-500">No entries found</td>
-              </tr>
-            ) : (
-              filteredEntries.map((entry, idx) => (
-                <tr key={idx} className="border-b hover:bg-gray-50">
-                  <td className="p-3 text-sm text-gray-800">{entry.dep}</td>
-                  <td className="p-3 text-sm text-gray-800">{entry.companyName}</td>
-                  <td className="p-3 text-center">
-                    <button
-                      onClick={() => handleDelete(entry._id)}
-                      className="px-2 py-2 rounded-full bg-red-200 hover:bg-red-300"
-                      title="Delete"
-                    >
-                      <MdDelete className='text-red-500 text-md' />
-                    </button>
-                  </td>
+        {/* Filters and Table Section */}
+        <div className="bg-white/90 rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+          
+          {/* Filters */}
+          <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row gap-4">
+            <div className="flex-1 min-w-[200px]">
+              <select
+                name="companyId"
+                value={filter.companyId}
+                onChange={handleFilterChange}
+                className="w-full border border-slate-200 bg-white rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+              >
+                <option value="">All Companies</option>
+                {companies.map(company => (
+                  <option key={company._id} value={company._id}>
+                    {company.companyName}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex-1 min-w-[200px]">
+              <select
+                name="dep"
+                value={filter.dep}
+                onChange={handleFilterChange}
+                className="w-full border border-slate-200 bg-white rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+              >
+                <option value="">All Departments</option>
+                {uniqueDepartments.map(dep => (
+                  <option key={dep} value={dep}>{dep}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Table */}
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-100">
+              <thead className="bg-slate-50/80">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Department</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Company Name</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider w-24">Actions</th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-slate-50">
+                {filteredEntries.length === 0 ? (
+                  <tr>
+                    <td colSpan="3" className="px-6 py-12 text-center text-sm text-slate-500 font-medium bg-slate-50/30">
+                      No departments found
+                    </td>
+                  </tr>
+                ) : (
+                  filteredEntries.map((entry, idx) => (
+                    <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-indigo-50 text-indigo-700 ring-1 ring-indigo-500/10">
+                          {entry.dep}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-700">
+                        {entry.companyName}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <button
+                          onClick={() => handleDelete(entry._id)}
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 transition-colors"
+                          title="Delete Department"
+                        >
+                          <MdDelete className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );

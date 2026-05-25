@@ -72,6 +72,29 @@ const SelectField = ({ name, options, required, value, error, onChange }) => (
   </div>
 );
 
+// 🧩 Action Dropdown Component
+const ActionDropdown = ({ isOpen, onToggle, options }) => {
+  return (
+    <div className="relative">
+      <button onClick={onToggle} className="px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-all text-xs font-semibold flex items-center gap-1 border border-indigo-100">
+        Actions <svg className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" /></svg>
+      </button>
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-[40]" onClick={onToggle}></div>
+          <div className="absolute right-0 sm:right-auto sm:left-0 top-full mt-1 w-36 bg-white rounded-xl shadow-lg border border-gray-100 z-[50] py-1 flex flex-col gap-0.5">
+            {options.map((opt, i) => opt.show !== false && (
+              <button key={i} onClick={() => { opt.onClick(); onToggle(); }} className={`flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 transition-colors w-full text-left ${opt.className || "text-gray-700"}`}>
+                {opt.icon} {opt.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 // 🧩 Modal Component
 const Modal = ({ isOpen, onClose, size = "large", children }) => {
   if (!isOpen) return null;
@@ -283,7 +306,7 @@ const LeadForm = ({ initialData, onSubmit, onClose, isEditing = false }) => {
         )}
 
         {/* Multi-place input */}
-        <div className="col-span-2">
+        <div className="col-span-1 sm:col-span-2">
           <label className="block text-xs font-medium text-gray-700 mb-0.5">Places to Cover</label>
           <div className="flex flex-wrap gap-1 mb-1">
             {(formData.placesToCoverArray || []).map((place, idx) => (
@@ -311,7 +334,7 @@ const LeadForm = ({ initialData, onSubmit, onClose, isEditing = false }) => {
         <InputField name="groupNumber" type="text" value={formData.groupNumber} onChange={handleChange} />
 
         {/* Child Ages */}
-        <div className="col-span-2">
+        <div className="col-span-1 sm:col-span-2">
           <label className="block text-xs font-medium text-gray-700 mb-0.5">Child Ages</label>
           {formData.childAges.map((age, idx) => (
             <div key={idx} className="flex gap-2 mb-1">
@@ -412,6 +435,7 @@ const EmployeeLeads = () => {
   const [viewingPdfUrl, setViewingPdfUrl] = useState(null); // State for PDF viewer modal
   const [assignEmployeeModal, setAssignEmployeeModal] = useState({ isOpen: false, lead: null }); // 🆕 Modal for assigning to employee
   const [selectedEmployeeForAssign, setSelectedEmployeeForAssign] = useState(""); // 🆕
+  const [openDropdownId, setOpenDropdownId] = useState(null); // Dropdown menu state
 
   // Messages UI state for viewing message history
   const [messages, setMessages] = useState([]);
@@ -1592,104 +1616,71 @@ const EmployeeLeads = () => {
         <div className="hidden sm:block text-sm text-gray-400">&nbsp;</div>
       </nav> */}
 
-      <nav className="mb-8">
-        <div className="flex items-center justify-between">
-
-          {/* SCROLL WRAPPER FOR MOBILE */}
-          <div className="w-full overflow-x-auto sm:overflow-visible scrollbar-hide">
-            <div
-              className="
-          flex flex-col sm:flex-row gap-3
-          bg-white/80 backdrop-blur-lg
-          sm:rounded-full
-          px-2 sm:px-3 py-2
-          shadow-lg border border-gray-200
-          min-w-max
-        "
-            >
-              {/* ROW 1 */}
-              <div className="flex gap-2 sm:gap-3 flex-nowrap">
-                <button
-                  onClick={() => setActiveTab('my-leads')}
-                  className={`relative flex-shrink-0 px-4 sm:px-6 py-2 rounded-full text-sm sm:text-base font-semibold transition-all duration-200 shadow-sm focus:ring-2 focus:ring-blue-400
-              ${activeTab === 'my-leads'
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white scale-105'
-                      : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'}
-            `}
-                >
-                  MY LEADS
-                  {activeTab === 'my-leads' && (
-                    <span className="absolute -bottom-2 left-6 right-6 h-1 bg-blue-500 rounded-full hidden sm:block" />
-                  )}
-                </button>
-
-                {(userRole &&
-                  (userRole.toLowerCase() === 'superadmin' ||
-                    userRole.toLowerCase() !== 'superadmin')) && (
-                    <button
-                      onClick={() => setActiveTab('special-lead')}
-                      className={`relative flex-shrink-0 px-4 sm:px-6 py-2 rounded-full text-sm sm:text-base font-semibold transition-all duration-200 shadow-sm focus:ring-2 focus:ring-blue-400
-                ${activeTab === 'special-lead'
-                          ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white scale-105'
-                          : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'}
+      <nav className="mb-3 w-full">
+        <div className="flex w-full">
+          <div 
+            className="flex flex-row overflow-x-auto whitespace-nowrap gap-2 w-full bg-white/60 p-1.5 rounded-2xl border border-gray-100 shadow-sm backdrop-blur-md [&::-webkit-scrollbar]:hidden"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <button
+              onClick={() => setActiveTab('my-leads')}
+              className={`flex-none px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
+                ${activeTab === 'my-leads'
+                  ? 'bg-white text-indigo-600 shadow-sm ring-1 ring-indigo-100'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-500'}
               `}
-                    >
-                      SPECIAL LEAD
-                      {activeTab === 'special-lead' && (
-                        <span className="absolute -bottom-2 left-6 right-6 h-1 bg-blue-500 rounded-full hidden sm:block" />
-                      )}
-                    </button>
-                  )}
+            >
+              MY LEADS
+            </button>
 
+            {(userRole &&
+              (userRole.toLowerCase() === 'superadmin' ||
+                userRole.toLowerCase() !== 'superadmin')) && (
                 <button
-                  onClick={() => setActiveTab('assigned')}
-                  className={`relative flex-shrink-0 px-4 sm:px-6 py-2 rounded-full text-sm sm:text-base font-semibold transition-all duration-200 shadow-sm focus:ring-2 focus:ring-blue-400
-              ${activeTab === 'assigned'
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white scale-105'
-                      : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'}
-            `}
+                  onClick={() => setActiveTab('special-lead')}
+                  className={`flex-none px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
+                    ${activeTab === 'special-lead'
+                      ? 'bg-white text-indigo-600 shadow-sm ring-1 ring-indigo-100'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-500'}
+                  `}
                 >
-                  MY ASSIGNED LEAD
-                  {activeTab === 'assigned' && (
-                    <span className="absolute -bottom-2 left-6 right-6 h-1 bg-blue-500 rounded-full hidden sm:block" />
-                  )}
+                  SPECIAL LEAD
                 </button>
-              </div>
+              )}
 
-              {/* ROW 2 */}
-              <div className="flex gap-2 sm:gap-3 flex-nowrap">
-                <button
-                  onClick={() => setActiveTab('destination-assigned')}
-                  className={`relative flex-shrink-0 px-4 sm:px-6 py-2 rounded-full text-sm sm:text-base font-semibold transition-all duration-200 shadow-sm focus:ring-2 focus:ring-blue-400
-              ${activeTab === 'destination-assigned'
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white scale-105'
-                      : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'}
-            `}
-                >
-                  ASSIGNED BY DESTINATION
-                  {activeTab === 'destination-assigned' && (
-                    <span className="absolute -bottom-2 left-6 right-6 h-1 bg-blue-500 rounded-full hidden sm:block" />
-                  )}
-                </button>
+            <button
+              onClick={() => setActiveTab('assigned')}
+              className={`flex-none px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
+                ${activeTab === 'assigned'
+                  ? 'bg-white text-indigo-600 shadow-sm ring-1 ring-indigo-100'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-500'}
+              `}
+            >
+              MY ASSIGNED LEAD
+            </button>
 
-                <button
-                  onClick={() => setActiveTab('transfer')}
-                  className={`relative flex-shrink-0 px-4 sm:px-6 py-2 rounded-full text-sm sm:text-base font-semibold transition-all duration-200 shadow-sm focus:ring-2 focus:ring-blue-400
-              ${activeTab === 'transfer'
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white scale-105'
-                      : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'}
-            `}
-                >
-                  TRANSFER TO OPERATION
-                  {activeTab === 'transfer' && (
-                    <span className="absolute -bottom-2 left-6 right-6 h-1 bg-blue-500 rounded-full hidden sm:block" />
-                  )}
-                </button>
-              </div>
-            </div>
+            <button
+              onClick={() => setActiveTab('destination-assigned')}
+              className={`flex-none px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
+                ${activeTab === 'destination-assigned'
+                  ? 'bg-white text-indigo-600 shadow-sm ring-1 ring-indigo-100'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-500'}
+              `}
+            >
+              ASSIGNED BY DESTINATION
+            </button>
+
+            <button
+              onClick={() => setActiveTab('transfer')}
+              className={`flex-none px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
+                ${activeTab === 'transfer'
+                  ? 'bg-white text-indigo-600 shadow-sm ring-1 ring-indigo-100'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-500'}
+              `}
+            >
+              TRANSFER TO OPERATION
+            </button>
           </div>
-
-          <div className="hidden sm:block text-sm text-gray-400">&nbsp;</div>
         </div>
       </nav>
 
@@ -1700,258 +1691,144 @@ const EmployeeLeads = () => {
 
       {activeTab === "my-leads" && (
         <>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
-            <div className="flex items-center gap-3 w-full bg-white/80 rounded-full px-4 py-2 shadow border border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-1 sm:mb-2 mt-0">
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full sm:w-auto bg-white rounded-2xl p-1.5 sm:p-2 shadow-sm border border-gray-100">
               <input
                 type="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by name, destination or phone"
-                className="w-full sm:w-72 px-4 py-2 rounded-full text-base border-0 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100"
+                className="w-full sm:w-80 px-4 py-2 sm:py-2.5 rounded-xl text-sm border border-gray-100 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder-gray-400"
               />
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 rounded-full text-base bg-gray-100 border-0 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              >
-                <option value="">All Status</option>
-                <option value="Interested">Interested</option>
-                <option value="Not Interested">Not Interested</option>
-                <option value="Connected">Connected</option>
-                <option value="Not Connected">Not Connected</option>
-                <option value="Follow Up">Follow Up</option>
-              </select>
-              <button onClick={() => { setSearchQuery(""); setStatusFilter(""); }} className="flex items-center gap-2 px-4 py-2 rounded-full font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all">Clear</button>
+              <div className="flex gap-2 w-full sm:w-auto">
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="w-full sm:w-auto px-4 py-2 sm:py-2.5 rounded-xl text-sm border border-gray-100 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer text-gray-700"
+                >
+                  <option value="">All Status</option>
+                  <option value="Interested">Interested</option>
+                  <option value="Not Interested">Not Interested</option>
+                  <option value="Connected">Connected</option>
+                  <option value="Not Connected">Not Connected</option>
+                  <option value="Follow Up">Follow Up</option>
+                </select>
+                <button 
+                  onClick={() => { setSearchQuery(""); setStatusFilter(""); }} 
+                  className="flex items-center justify-center px-4 py-2 sm:py-2.5 rounded-xl text-sm font-semibold bg-gray-50 border border-gray-100 text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-all"
+                >
+                  Clear
+                </button>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-2 px-6 py-2 rounded-full font-semibold bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-md hover:scale-105 transition-all">
-                <Plus className="w-5 h-5" /> Add Lead
+            <div className="flex items-center gap-2 mt-1 sm:mt-0">
+              <button 
+                onClick={() => setIsAddModalOpen(true)} 
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2 sm:py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
+              >
+                <Plus className="w-4 h-4" /> Add Lead
               </button>
             </div>
           </div>
 
           {/* Sub-Navbar for Status Filters */}
-          {/* <div className="mt-4 flex gap-3 bg-white/80 backdrop-blur-lg rounded-full px-3 py-2 shadow border border-gray-200 w-fit">
-            <button
-              onClick={() => setSubNavFilter('all')}
-              className={`relative px-4 py-1 rounded-full text-base font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 ${subNavFilter === 'all' ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-md scale-105' : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'}`}
+          <div className="mb-1 sm:mb-2 w-full max-w-full overflow-hidden">
+            <div 
+              className="flex flex-row overflow-x-auto whitespace-nowrap gap-1 sm:gap-2 bg-white p-1 rounded-xl shadow-sm border border-gray-100 w-full sm:w-fit [&::-webkit-scrollbar]:hidden"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              All
-              {subNavFilter === 'all' && <span className="absolute -bottom-2 left-5 right-5 h-1 bg-blue-500 rounded-full" />}
-            </button>
-            <button
-              onClick={() => setSubNavFilter('follow-up')}
-              className={`relative px-5 py-2 rounded-full text-base font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 ${subNavFilter === 'follow-up' ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-md scale-105' : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'}`}
-            >
-              Follow Up
-              {subNavFilter === 'follow-up' && <span className="absolute -bottom-2 left-5 right-5 h-1 bg-blue-500 rounded-full" />}
-            </button>
-            <button
-              onClick={() => setSubNavFilter('interested')}
-              className={`relative px-5 py-2 rounded-full text-base font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 ${subNavFilter === 'interested' ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-md scale-105' : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'}`}
-            >
-              Interested
-              {subNavFilter === 'interested' && <span className="absolute -bottom-2 left-5 right-5 h-1 bg-blue-500 rounded-full" />}
-            </button>
-            <button
-              onClick={() => setSubNavFilter('connected')}
-              className={`relative px-5 py-2 rounded-full text-base font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 ${subNavFilter === 'connected' ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-md scale-105' : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'}`}
-            >
-              Connected
-              {subNavFilter === 'connected' && <span className="absolute -bottom-2 left-5 right-5 h-1 bg-blue-500 rounded-full" />}
-            </button>
-            <button
-              onClick={() => setSubNavFilter('not-interested')}
-              className={`relative px-5 py-2 rounded-full text-base font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 ${subNavFilter === 'not-interested' ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-md scale-105' : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'}`}
-            >
-              Not Interested
-              {subNavFilter === 'not-interested' && <span className="absolute -bottom-2 left-5 right-5 h-1 bg-blue-500 rounded-full" />}
-            </button>
-            <button
-              onClick={() => setSubNavFilter('not-connected')}
-              className={`relative px-5 py-2 rounded-full text-base font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 ${subNavFilter === 'not-connected' ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-md scale-105' : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'}`}
-            >
-              Not Connected
-              {subNavFilter === 'not-connected' && <span className="absolute -bottom-2 left-5 right-5 h-1 bg-blue-500 rounded-full" />}
-            </button>
-          </div> */}
-
-          <div className="mt-4 min-w-full overflow-x-auto scrollbar-hidde">
-            <div
-              className="
-      flex gap-2 sm:gap-3
-      bg-white/80 backdrop-blur-lg
-      rounded-full
-      px-2 sm:px-3 py-2
-      shadow border border-gray-200
-      w-max
-    "
-            >
-              {/* ALL */}
-              <button
-                onClick={() => setSubNavFilter('all')}
-                className={`relative flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-sm sm:text-base font-semibold transition-all duration-200 focus:ring-2 focus:ring-blue-400
-        ${subNavFilter === 'all'
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-md scale-105'
-                    : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'}
-      `}
-              >
-                All
-                {subNavFilter === 'all' && (
-                  <span className="absolute -bottom-2 left-4 right-4 h-1 bg-blue-500 rounded-full hidden sm:block" />
-                )}
-              </button>
-
-              {/* FOLLOW UP */}
-              <button
-                onClick={() => setSubNavFilter('follow-up')}
-                className={`relative flex-shrink-0 px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-sm sm:text-base font-semibold transition-all duration-200 focus:ring-2 focus:ring-blue-400
-        ${subNavFilter === 'follow-up'
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-md scale-105'
-                    : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'}
-      `}
-              >
-                Follow Up
-                {subNavFilter === 'follow-up' && (
-                  <span className="absolute -bottom-2 left-5 right-5 h-1 bg-blue-500 rounded-full hidden sm:block" />
-                )}
-              </button>
-
-              {/* INTERESTED */}
-              <button
-                onClick={() => setSubNavFilter('interested')}
-                className={`relative flex-shrink-0 px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-sm sm:text-base font-semibold transition-all duration-200 focus:ring-2 focus:ring-blue-400
-        ${subNavFilter === 'interested'
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-md scale-105'
-                    : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'}
-      `}
-              >
-                Interested
-                {subNavFilter === 'interested' && (
-                  <span className="absolute -bottom-2 left-5 right-5 h-1 bg-blue-500 rounded-full hidden sm:block" />
-                )}
-              </button>
-
-              {/* CONNECTED */}
-              <button
-                onClick={() => setSubNavFilter('connected')}
-                className={`relative flex-shrink-0 px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-sm sm:text-base font-semibold transition-all duration-200 focus:ring-2 focus:ring-blue-400
-        ${subNavFilter === 'connected'
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-md scale-105'
-                    : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'}
-      `}
-              >
-                Connected
-                {subNavFilter === 'connected' && (
-                  <span className="absolute -bottom-2 left-5 right-5 h-1 bg-blue-500 rounded-full hidden sm:block" />
-                )}
-              </button>
-
-              {/* NOT INTERESTED */}
-              <button
-                onClick={() => setSubNavFilter('not-interested')}
-                className={`relative flex-shrink-0 px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-sm sm:text-base font-semibold transition-all duration-200 focus:ring-2 focus:ring-blue-400
-        ${subNavFilter === 'not-interested'
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-md scale-105'
-                    : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'}
-      `}
-              >
-                Not Interested
-                {subNavFilter === 'not-interested' && (
-                  <span className="absolute -bottom-2 left-5 right-5 h-1 bg-blue-500 rounded-full hidden sm:block" />
-                )}
-              </button>
-
-              {/* NOT CONNECTED */}
-              <button
-                onClick={() => setSubNavFilter('not-connected')}
-                className={`relative flex-shrink-0 px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-sm sm:text-base font-semibold transition-all duration-200 focus:ring-2 focus:ring-blue-400
-        ${subNavFilter === 'not-connected'
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-md scale-105'
-                    : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600'}
-      `}
-              >
-                Not Connected
-                {subNavFilter === 'not-connected' && (
-                  <span className="absolute -bottom-2 left-5 right-5 h-1 bg-blue-500 rounded-full hidden sm:block" />
-                )}
-              </button>
+              {[
+                { id: 'all', label: 'All' },
+                { id: 'follow-up', label: 'Follow Up' },
+                { id: 'interested', label: 'Interested' },
+                { id: 'connected', label: 'Connected' },
+                { id: 'not-interested', label: 'Not Interested' },
+                { id: 'not-connected', label: 'Not Connected' },
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setSubNavFilter(tab.id)}
+                  className={`flex-none relative px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300
+                    ${subNavFilter === tab.id
+                      ? 'bg-indigo-50 text-indigo-700 shadow-sm ring-1 ring-indigo-200/50'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-600'}
+                  `}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
           </div>
 
 
-          <div className="mt-4 overflow-x-auto w-full">
-            {loading ? <p>Loading leads...</p> :
-              error || filteredLeads.length === 0 ? <p className="text-gray-600">Please Enter Leads</p> :
-                <div className="rounded-3xl shadow-lg border border-gray-200  bg-white/90">
-                  <table className="min-w-full">
-                    <thead className="bg-gradient-to-r from-blue-50 to-blue-100">
+          <div className="mt-0 w-full">
+            {loading ? <div className="p-8 text-center"><p className="text-gray-500 font-medium">Loading leads...</p></div> :
+              error || filteredLeads.length === 0 ? <div className="p-12 text-center bg-gray-50 rounded-2xl border border-gray-100"><p className="text-gray-500 font-medium text-lg">No leads found.</p></div> :
+                <div className="rounded-2xl shadow-sm border border-gray-100 bg-white overflow-hidden">
+                  <div className="overflow-x-auto w-full max-w-full">
+                    <table className="min-w-[800px] w-full divide-y divide-gray-100">
+                    <thead className="bg-gray-50/50">
                       <tr>
-                        {/* <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Email</th> */}
-                        <th className="px-6 py-3 text-left whitespace-nowrap text-xs font-bold text-gray-700 uppercase tracking-wider">Contact Information</th>
-                        <th className="px-6 py-3 text-left whitespace-nowrap text-xs font-bold text-gray-700 uppercase tracking-wider">Departure</th>
-                        <th className="px-6 py-3 text-left whitespace-nowrap text-xs font-bold text-gray-700 uppercase tracking-wider">Destination</th>
-                        <th className="px-6 py-3 text-left whitespace-nowrap text-xs font-bold text-gray-700 uppercase tracking-wider">Travel Date</th>
-                        <th className="px-6 py-3 text-center whitespace-nowrap text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
-                        {/* <th className="px-6 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Assign to</th> */}
-                        {userRole && (userRole.toLowerCase() === "superadmin" || userRole.toLowerCase() === "admin") && (<th className="px-6 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Assign to</th>)}
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact Information</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Departure</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Destination</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Travel Date</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                        {userRole && (userRole.toLowerCase() === "superadmin" || userRole.toLowerCase() === "admin") && (<th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Assign to</th>)}
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-gray-100">
                       {filteredLeads.map((lead) => (
-                        <tr key={lead._id} className="hover:bg-blue-50 transition-colors group">
-                          {/* <td className="px-6 py-3 border-b border-gray-100 font-medium text-gray-900">{lead.name}</td>
-                      <td className="px-6 py-3 border-b border-gray-100 text-gray-700">{lead.email}</td> */}
-                          <td className="px-6 py-3 border-b border-gray-100 text-gray-700">
-                            <div className="flex flex-col gap-0.5">
-                              <span className="font-semibold text-slate-900 text-base leading-tight">{lead.name || "—"}</span>
-                              <span className="text-sm text-slate-600">{lead.email || "—"}</span>
-                              <span className="text-xs text-slate-400">{lead.phone || "—"}</span>
+                        <tr key={lead._id} className="hover:bg-indigo-50/30 transition-colors group">
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap">
+                            <div className="flex flex-col gap-1">
+                              <span className="font-semibold text-gray-900 text-sm">{lead.name || "—"}</span>
+                              <span className="text-xs text-gray-500">{lead.email || "—"}</span>
+                              <span className="text-xs text-gray-400 font-medium">{lead.phone || "—"}</span>
                             </div>
                           </td>
-                          <td className="px-6 py-3 border-b border-gray-100 text-gray-700">{lead.departureCity}</td>
-                          <td className="px-6 py-3 border-b border-gray-100 text-gray-700">{lead.destination}</td>
-                          <td className="px-6 py-3 border-b border-gray-100 text-gray-700">{formatDate(lead.expectedTravelDate)}</td>
-                          <td className="px-6 py-3 border-b border-gray-100 text-center">
-                            <div className="flex justify-center gap-2 flex-col sm:flex-row">
-                              <div className="flex flex-col justify-center gap-2">
-                                <div className="">
-                                  <button onClick={() => handleView(lead)} className="p-2 mx-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 shadow-sm transition-all" title="View Lead"><Eye size={16} /></button>
-                                  <button onClick={() => handleEdit(lead)} className="p-2 mx-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 shadow-sm transition-all" title="Edit Lead"><Edit2 size={16} /></button>
-                                  <button onClick={() => handleAddMessage(lead)} className="p-2 mx-2 rounded-full bg-purple-100 text-purple-600 hover:bg-purple-200 shadow-sm transition-all" title="Add Message"><MessageSquare size={16} /></button>
-                                  {lead.leadInterestStatus === "Follow Up" && (
-                                    <>
-                                      <button onClick={() => handleAddDetails(lead)} className="px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 shadow-sm transition-all text-xs font-semibold" title="Add Details">Details</button>
-                                    </>
-                                  )}
-                                </div>
-                                <div className="flex">
-                                  <div className="flex flex-col sm:flex-row gap-2">
-                                    <select
-                                      value={lead.leadInterestStatus || ""}
-                                      onChange={(e) => handleStatusChange(lead._id, e.target.value)}
-                                      disabled={statusSavingId === lead._id}
-                                      className={`px-3 py-2 rounded-full text-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 cursor-pointer transition-all ${statusSavingId === lead._id ? 'bg-blue-50 border-blue-400 text-gray-600 cursor-not-allowed opacity-70' : 'border border-gray-200'} ${lead.leadInterestStatus ? 'font-semibold text-blue-600' : 'text-gray-500'}`}
-                                    >
-                                      <option value="">Select Status</option>
-                                      <option value="Interested">Interested</option>
-                                      <option value="Not Interested">Not Interested</option>
-                                      <option value="Connected">Connected</option>
-                                      <option value="Not Connected">Not Connected</option>
-                                      <option value="Follow Up">Follow Up</option>
-                                    </select>
-                                  </div>
-                                  {lead.leadInterestStatus === "Follow Up" && (
-                                    <button onClick={() => handleConfirmTransfer(lead)} className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 hover:bg-yellow-200 shadow-sm transition-all text-xs font-semibold" title="Confirm Transfer">Confirm</button>
-                                  )}
-                                </div>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.departureCity || "—"}</td>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.destination || "—"}</td>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">
+                            {formatDate(lead.expectedTravelDate)}
+                          </td>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3">
+                            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                              <div className="flex items-center gap-2">
+                                <ActionDropdown
+                                  isOpen={openDropdownId === lead._id}
+                                  onToggle={() => setOpenDropdownId(openDropdownId === lead._id ? null : lead._id)}
+                                  options={[
+                                    { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleView(lead) },
+                                    { label: "Edit", icon: <Edit2 size={14} className="text-emerald-500" />, onClick: () => handleEdit(lead) },
+                                    { label: "Message", icon: <MessageSquare size={14} className="text-amber-500" />, onClick: () => handleAddMessage(lead) },
+                                    { label: "Details", icon: <span className="text-indigo-500 font-bold ml-1 mr-0.5">D</span>, onClick: () => handleAddDetails(lead), show: lead.leadInterestStatus === "Follow Up" },
+                                    { label: "Confirm Transfer", icon: <span className="text-rose-500 font-bold ml-1 mr-0.5">C</span>, onClick: () => handleConfirmTransfer(lead), show: lead.leadInterestStatus === "Follow Up", className: "text-rose-700 font-medium" },
+                                  ]}
+                                />
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <select
+                                  value={lead.leadInterestStatus || ""}
+                                  onChange={(e) => handleStatusChange(lead._id, e.target.value)}
+                                  disabled={statusSavingId === lead._id}
+                                  className={`px-3 py-1.5 rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer transition-all border outline-none
+                                    ${statusSavingId === lead._id ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white border-gray-200 hover:border-gray-300'}
+                                    ${lead.leadInterestStatus === 'Interested' ? 'text-emerald-600' : lead.leadInterestStatus === 'Follow Up' ? 'text-amber-600' : 'text-gray-700'}
+                                  `}
+                                >
+                                  <option value="">Status</option>
+                                  <option value="Interested">Interested</option>
+                                  <option value="Not Interested">Not Interested</option>
+                                  <option value="Connected">Connected</option>
+                                  <option value="Not Connected">Not Connected</option>
+                                  <option value="Follow Up">Follow Up</option>
+                                </select>
                               </div>
                             </div>
                           </td>
-                          <td>
-
-                            {userRole && userRole.toLowerCase() === "superadmin" && (
+                          {userRole && userRole.toLowerCase() === "superadmin" && (
+                            <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-center">
                               <select
                                 value={lead.assignedEmployee || ""}
                                 onChange={(e) => {
@@ -1960,22 +1837,22 @@ const EmployeeLeads = () => {
                                     setSelectedEmployeeForAssign(e.target.value);
                                   }
                                 }}
-                                className="px-3 py-2 rounded-full text-sm focus:ring-2 focus:ring-green-400 focus:border-green-400 cursor-pointer transition-all bg-green-50 border border-gray-200"
+                                className="px-3 py-1.5 w-full max-w-[140px] rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer transition-all bg-white border border-gray-200 hover:border-gray-300 text-gray-700 outline-none"
                               >
-                                <option value="">Assign to Employee</option>
+                                <option value="">Assign Employee</option>
                                 {allEmployees.map((emp) => (
                                   <option key={emp._id} value={emp._id}>
                                     {emp.fullName || emp.name || "Unknown"}
                                   </option>
                                 ))}
                               </select>
-                            )}
-
-                          </td>
+                            </td>
+                          )}
                         </tr>
                       ))}
                     </tbody>
                   </table>
+                  </div>
                 </div>}
           </div>
         </>
@@ -1990,68 +1867,72 @@ const EmployeeLeads = () => {
             <p className="text-gray-600">{userRole && userRole.toLowerCase() === 'superadmin' ? 'No special leads created yet.' : 'No special leads assigned to you yet.'}</p>
           ) : (
             <>
-              <div className="mt-4 overflow-x-auto">
-                <div className="rounded-3xl shadow-lg border border-gray-200 overflow-hidden bg-white/90">
-                  <table className="min-w-full">
-                    <thead className="bg-gradient-to-r from-blue-50 to-blue-100">
+              <div className="mt-4 w-full">
+                <div className="rounded-2xl shadow-sm border border-gray-100 bg-white overflow-hidden">
+                  <div className="overflow-x-auto w-full max-w-full">
+                    <table className="min-w-[800px] w-full divide-y divide-gray-100">
+                    <thead className="bg-gray-50/50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Contact Information</th>
-                        <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Departure</th>
-                        <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Destination</th>
-                        <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Travel Date</th>
-                        <th className="px-6 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
-                        {userRole && userRole.toLowerCase() === "superadmin" && (<th className="px-6 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Assign to</th>)}
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact Information</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Departure</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Destination</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Travel Date</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                        {userRole && userRole.toLowerCase() === "superadmin" && (<th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Assign to</th>)}
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-gray-100">
                       {specialLeads.map((lead) => (
-                        <tr key={lead._id} className="hover:bg-blue-50 transition-colors group">
-                          <td className="px-6 py-3 border-b border-gray-100 text-gray-700">
-                            <div className="flex flex-col gap-0.5">
-                              <span className="font-semibold text-slate-900 text-base leading-tight">{lead.name || "—"}</span>
-                              <span className="text-sm text-slate-600">{lead.email || "—"}</span>
-                              <span className="text-xs text-slate-400">{lead.phone || "—"}</span>
+                        <tr key={lead._id} className="hover:bg-indigo-50/30 transition-colors group">
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap">
+                            <div className="flex flex-col gap-1">
+                              <span className="font-semibold text-gray-900 text-sm">{lead.name || "—"}</span>
+                              <span className="text-xs text-gray-500">{lead.email || "—"}</span>
+                              <span className="text-xs text-gray-400 font-medium">{lead.phone || "—"}</span>
                             </div>
                           </td>
-                          <td className="px-6 py-3 border-b border-gray-100">{lead.departureCity || "—"}</td>
-                          <td className="px-6 py-3 border-b border-gray-100">{lead.destination || "—"}</td>
-                          <td className="px-6 py-3 border-b border-gray-100">{formatDate(lead.expectedTravelDate)}</td>
-                          <td className="px-6 py-3 border-b border-gray-100 text-center">
-                            <div className="flex justify-center gap-2 flex-col sm:flex-row">
-                              <div className="flex flex-col justify-center gap-2">
-                                <div className="">
-                                  <button onClick={() => handleView(lead)} className="p-2 mx-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 shadow-sm transition-all" title="View Lead"><Eye size={16} /></button>
-                                  <button onClick={() => handleEdit(lead)} className="p-2 mx-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 shadow-sm transition-all" title="Edit Lead"><Edit2 size={16} /></button>
-                                  <button onClick={() => handleAddMessage(lead)} className="p-2 mx-2 rounded-full bg-purple-100 text-purple-600 hover:bg-purple-200 shadow-sm transition-all" title="Add Message"><MessageSquare size={16} /></button>
-                                  {lead.leadInterestStatus === "Follow Up" && (
-                                    <>
-                                      <button onClick={() => handleAddDetails(lead)} className="px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 shadow-sm transition-all text-xs font-semibold" title="Add Details">Details</button>
-                                    </>
-                                  )}
-                                </div>
-                                <div className="flex flex-col sm:flex-row gap-2">
-                                  <select
-                                    value={lead.leadInterestStatus || ""}
-                                    onChange={(e) => handleStatusChange(lead._id, e.target.value)}
-                                    disabled={statusSavingId === lead._id}
-                                    className={`px-3 py-2 rounded-full text-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 cursor-pointer transition-all ${statusSavingId === lead._id ? 'bg-blue-50 border-blue-400 text-gray-600 cursor-not-allowed opacity-70' : 'border border-gray-200'} ${lead.leadInterestStatus ? 'font-semibold text-blue-600' : 'text-gray-500'}`}
-                                  >
-                                    <option value="">Select Status</option>
-                                    <option value="Interested">Interested</option>
-                                    <option value="Not Interested">Not Interested</option>
-                                    <option value="Connected">Connected</option>
-                                    <option value="Not Connected">Not Connected</option>
-                                    <option value="Follow Up">Follow Up</option>
-                                  </select>
-                                  {lead.leadInterestStatus === "Follow Up" && (
-                                    <button onClick={() => handleSpecialConfirmTransfer(lead)} className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 hover:bg-yellow-200 shadow-sm transition-all text-xs font-semibold" title="Confirm Transfer">Confirm</button>
-                                  )}
-                                </div>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.departureCity || "—"}</td>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.destination || "—"}</td>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">
+                            {formatDate(lead.expectedTravelDate)}
+                          </td>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3">
+                            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                              <div className="flex items-center gap-2">
+                                <ActionDropdown
+                                  isOpen={openDropdownId === lead._id}
+                                  onToggle={() => setOpenDropdownId(openDropdownId === lead._id ? null : lead._id)}
+                                  options={[
+                                    { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleView(lead) },
+                                    { label: "Edit", icon: <Edit2 size={14} className="text-emerald-500" />, onClick: () => handleEdit(lead) },
+                                    { label: "Message", icon: <MessageSquare size={14} className="text-amber-500" />, onClick: () => handleAddMessage(lead) },
+                                    { label: "Details", icon: <span className="text-indigo-500 font-bold ml-1 mr-0.5">D</span>, onClick: () => handleAddDetails(lead), show: lead.leadInterestStatus === "Follow Up" },
+                                    { label: "Confirm Transfer", icon: <span className="text-rose-500 font-bold ml-1 mr-0.5">C</span>, onClick: () => handleSpecialConfirmTransfer(lead), show: lead.leadInterestStatus === "Follow Up", className: "text-rose-700 font-medium" },
+                                  ]}
+                                />
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <select
+                                  value={lead.leadInterestStatus || ""}
+                                  onChange={(e) => handleStatusChange(lead._id, e.target.value)}
+                                  disabled={statusSavingId === lead._id}
+                                  className={`px-3 py-1.5 rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer transition-all border outline-none
+                                    ${statusSavingId === lead._id ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white border-gray-200 hover:border-gray-300'}
+                                    ${lead.leadInterestStatus === 'Interested' ? 'text-emerald-600' : lead.leadInterestStatus === 'Follow Up' ? 'text-amber-600' : 'text-gray-700'}
+                                  `}
+                                >
+                                  <option value="">Status</option>
+                                  <option value="Interested">Interested</option>
+                                  <option value="Not Interested">Not Interested</option>
+                                  <option value="Connected">Connected</option>
+                                  <option value="Not Connected">Not Connected</option>
+                                  <option value="Follow Up">Follow Up</option>
+                                </select>
                               </div>
                             </div>
                           </td>
                           {userRole && userRole.toLowerCase() === "superadmin" && (
-                            <td className="px-6 py-3 border-b border-gray-100 text-center">
+                            <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-center">
                               <select
                                 value={lead.assignedEmployee || ""}
                                 onChange={(e) => {
@@ -2060,11 +1941,9 @@ const EmployeeLeads = () => {
                                     setSelectedEmployeeForAssign(e.target.value);
                                   }
                                 }}
-                                className="px-3 py-2 rounded-full text-sm focus:ring-2 focus:ring-green-400 focus:border-green-400 cursor-pointer transition-all bg-green-50 border border-gray-200"
+                                className="px-3 py-1.5 w-full max-w-[140px] rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer transition-all bg-white border border-gray-200 hover:border-gray-300 text-gray-700 outline-none"
                               >
-                                <option value="">
-                                  {lead.assignedEmployee ? 'Reassign' : 'Assign to Employee'}
-                                </option>
+                                <option value="">Assign Employee</option>
                                 {allEmployees.map((emp) => (
                                   <option key={emp._id} value={emp._id}>
                                     {emp.fullName || emp.name || "Unknown"}
@@ -2079,6 +1958,7 @@ const EmployeeLeads = () => {
                   </table>
                 </div>
               </div>
+            </div>
             </>
           )}
         </>
@@ -2093,36 +1973,46 @@ const EmployeeLeads = () => {
             <p className="text-gray-600">You have no assigned leads yet.</p>
           ) : (
             <>
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse border">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="px-4 py-2 border">Name</th>
-                      <th className="px-4 py-2 border">Email</th>
-                      <th className="px-4 py-2 border">Phone</th>
-                      <th className="px-4 py-2 border">Departure</th>
-                      <th className="px-4 py-2 border">Destination</th>
-                      <th className="px-4 py-2 border">Travel Date</th>
-                      <th className="px-4 py-2 border text-center">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {visibleAssignedLeads.map((lead) => (
-                      <tr key={lead._id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-4 py-2 border">{lead.name}</td>
-                        <td className="px-4 py-2 border">{lead.email}</td>
-                        <td className="px-4 py-2 border">{lead.phone}</td>
-                        <td className="px-4 py-2 border">{lead.departureCity || "-"}</td>
-                        <td className="px-4 py-2 border">{lead.destination}</td>
-                        <td className="px-4 py-2 border">{formatDate(lead.expectedTravelDate)}</td>
-                        <td className="px-4 py-2 border text-center">
-                          <div className="flex justify-center gap-2">
-                            <button onClick={() => handleView(lead)} className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200" title="View Lead"><Eye size={16} /></button>
-                            <button onClick={() => handleEditAssigned(lead)} className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200" title="Edit Lead"><Edit2 size={16} /></button>
-                          </div>
-                        </td>
+              <div className="mt-4 w-full">
+                <div className="rounded-2xl shadow-sm border border-gray-100 bg-white overflow-hidden">
+                  <div className="overflow-x-auto w-full max-w-full">
+                    <table className="min-w-[800px] w-full divide-y divide-gray-100">
+                    <thead className="bg-gray-50/50">
+                      <tr>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact Information</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Departure</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Destination</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Travel Date</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
-                    ))}
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {visibleAssignedLeads.map((lead) => (
+                        <tr key={lead._id} className="hover:bg-indigo-50/30 transition-colors group">
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap">
+                            <div className="flex flex-col gap-1">
+                              <span className="font-semibold text-gray-900 text-sm">{lead.name || "—"}</span>
+                              <span className="text-xs text-gray-500">{lead.email || "—"}</span>
+                              <span className="text-xs text-gray-400 font-medium">{lead.phone || "—"}</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.departureCity || "—"}</td>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.destination || "—"}</td>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{formatDate(lead.expectedTravelDate)}</td>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 text-center">
+                            <div className="flex justify-center gap-2">
+                              <ActionDropdown
+                                isOpen={openDropdownId === lead._id}
+                                onToggle={() => setOpenDropdownId(openDropdownId === lead._id ? null : lead._id)}
+                                options={[
+                                  { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleView(lead) },
+                                  { label: "Edit", icon: <Edit2 size={14} className="text-emerald-500" />, onClick: () => handleEditAssigned(lead) }
+                                ]}
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
                     {/* Edit Assigned Lead Modal */}
                     {editAssignedLead && (
                       <Modal isOpen={true} onClose={closeModal} size="large">
@@ -2144,10 +2034,12 @@ const EmployeeLeads = () => {
                       </Modal>
                     )}
                   </tbody>
-                </table>
+                  </table>
+                </div>
               </div>
+            </div>
 
-              {/* Pagination controls */}
+            {/* Pagination controls */}
               <div className="flex items-center justify-between mt-3">
                 <div className="text-sm text-gray-600">
                   Showing {Math.min((currentPage - 1) * pageSize + 1, filteredAssignedLeads.length || 0)} to {Math.min(currentPage * pageSize, filteredAssignedLeads.length || 0)} of {filteredAssignedLeads.length || 0} leads
@@ -2197,78 +2089,52 @@ const EmployeeLeads = () => {
           )}
 
           {!loading && transferLeads.length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-gray-300">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Name</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Email</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Phone</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Destination</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Status</th>
-                    <th className="border border-gray-300 px-4 py-2 text-center">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transferLeads.map((lead) => (
-                    <tr key={lead._id} className="hover:bg-gray-50">
-                      <td className="border border-gray-300 px-4 py-2">{lead.name}</td>
-                      <td className="border border-gray-300 px-4 py-2">{lead.email}</td>
-                      <td className="border border-gray-300 px-4 py-2">{lead.phone}</td>
-                      <td className="border border-gray-300 px-4 py-2">{lead.destination}</td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm">
-                          {lead.leadStatus || "Pending"}
-                        </span>
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        <div className="flex gap-2 justify-center flex-wrap">
-                          {/* View Button */}
-                          <button
-                            onClick={() => handleViewLead(lead)}
-                            className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition flex items-center justify-center"
-                            title="View Lead Details"
-                          >
-                            <Eye size={18} />
-                          </button>
-
-                          {/* Edit Button */}
-                          {/* <button
-                            onClick={() => { setSelectedLead(lead); setEditModalOpen(true); }}
-                            className="bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700 transition flex items-center justify-center"
-                            title="Edit Lead"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 11l6 6L21 11l-6-6-6 6z" />
-                            </svg>
-                          </button> */}
-
-                          {/* Upload Documents Button */}
-                          {/* <button
-                            onClick={() => handleUploadDocuments(lead)}
-                            className="bg-orange-500 text-white p-2 rounded hover:bg-orange-600 transition flex items-center justify-center"
-                            title="Upload Documents"
-                          >
-                            <FileUp size={18} />
-                          </button> */}
-
-                          {/* Move Button */}
-                          {/* <button
-                            type="button"
-                            onClick={() => handleMoveLead(lead)}
-                            className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition flex items-center justify-center"
-                            title="Move Lead"
-                          >
-                            <Move size={18} />
-                          </button> */}
-
-                        </div>
-                      </td>
+            <div className="mt-4 w-full">
+              <div className="rounded-2xl shadow-sm border border-gray-100 bg-white overflow-hidden">
+                <div className="overflow-x-auto w-full max-w-full">
+                  <table className="min-w-[800px] w-full divide-y divide-gray-100">
+                  <thead className="bg-gray-50/50">
+                    <tr>
+                      <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact Information</th>
+                      <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Destination</th>
+                      <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {transferLeads.map((lead) => (
+                      <tr key={lead._id} className="hover:bg-indigo-50/30 transition-colors group">
+                        <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap">
+                          <div className="flex flex-col gap-1">
+                            <span className="font-semibold text-gray-900 text-sm">{lead.name || "—"}</span>
+                            <span className="text-xs text-gray-500">{lead.email || "—"}</span>
+                            <span className="text-xs text-gray-400 font-medium">{lead.phone || "—"}</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.destination || "—"}</td>
+                        <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">
+                          <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
+                            {lead.leadStatus || "Pending"}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2 sm:px-6 sm:py-3 text-center">
+                          <div className="flex justify-center gap-2 flex-wrap">
+                            <ActionDropdown
+                              isOpen={openDropdownId === lead._id}
+                              onToggle={() => setOpenDropdownId(openDropdownId === lead._id ? null : lead._id)}
+                              options={[
+                                { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleViewLead(lead) }
+                              ]}
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
+          </div>
           )}
         </div>
       )}
@@ -2282,36 +2148,46 @@ const EmployeeLeads = () => {
             <p className="text-gray-600">You have no leads assigned by destination yet.</p>
           ) : (
             <>
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse border">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="px-4 py-2 border">Name</th>
-                      <th className="px-4 py-2 border">Email</th>
-                      <th className="px-4 py-2 border">Phone</th>
-                      <th className="px-4 py-2 border">Departure</th>
-                      <th className="px-4 py-2 border">Destination</th>
-                      <th className="px-4 py-2 border">Travel Date</th>
-                      <th className="px-4 py-2 border text-center">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {destinationAssignedLeads.map((lead) => (
-                      <tr key={lead._id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-4 py-2 border">{lead.name}</td>
-                        <td className="px-4 py-2 border">{lead.email}</td>
-                        <td className="px-4 py-2 border">{lead.phone}</td>
-                        <td className="px-4 py-2 border">{lead.departureCity || "-"}</td>
-                        <td className="px-4 py-2 border">{lead.destination}</td>
-                        <td className="px-4 py-2 border">{formatDate(lead.expectedTravelDate)}</td>
-                        <td className="px-4 py-2 border text-center">
-                          <div className="flex justify-center gap-2">
-                            <button onClick={() => handleView(lead)} className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200" title="View Lead"><Eye size={16} /></button>
-                            <button onClick={() => handleEditDestAssigned(lead)} className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200" title="Edit Lead"><Edit2 size={16} /></button>
-                          </div>
-                        </td>
+              <div className="mt-4 w-full">
+                <div className="rounded-2xl shadow-sm border border-gray-100 bg-white overflow-hidden">
+                  <div className="overflow-x-auto w-full max-w-full">
+                    <table className="min-w-[800px] w-full divide-y divide-gray-100">
+                    <thead className="bg-gray-50/50">
+                      <tr>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact Information</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Departure</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Destination</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Travel Date</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
-                    ))}
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {destinationAssignedLeads.map((lead) => (
+                        <tr key={lead._id} className="hover:bg-indigo-50/30 transition-colors group">
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap">
+                            <div className="flex flex-col gap-1">
+                              <span className="font-semibold text-gray-900 text-sm">{lead.name || "—"}</span>
+                              <span className="text-xs text-gray-500">{lead.email || "—"}</span>
+                              <span className="text-xs text-gray-400 font-medium">{lead.phone || "—"}</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.departureCity || "—"}</td>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.destination || "—"}</td>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{formatDate(lead.expectedTravelDate)}</td>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 text-center">
+                            <div className="flex justify-center gap-2">
+                              <ActionDropdown
+                                isOpen={openDropdownId === lead._id}
+                                onToggle={() => setOpenDropdownId(openDropdownId === lead._id ? null : lead._id)}
+                                options={[
+                                  { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleView(lead) },
+                                  { label: "Edit", icon: <Edit2 size={14} className="text-emerald-500" />, onClick: () => handleEditDestAssigned(lead) }
+                                ]}
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
                     {/* Edit Destination Assigned Lead Modal */}
                     {editDestAssignedLead && (
                       <Modal isOpen={true} onClose={closeModal} size="large">
@@ -2335,6 +2211,8 @@ const EmployeeLeads = () => {
                   </tbody>
                 </table>
               </div>
+            </div>
+          </div>
             </>
           )}
         </>

@@ -265,76 +265,84 @@ const TrainingMaterial = () => {
 
   // small components
   const Filters = () => (
-    <div className="md:col-span-1 space-y-3">
+    <div className="md:col-span-1 space-y-5 bg-white/90 p-5 rounded-2xl shadow-xl border border-slate-100 h-fit sticky top-4">
       <div>
-        <label className="block text-sm font-medium text-gray-600 mb-1">Company</label>
-        <select className="w-full rounded-md border px-3 py-2" value={selectedCompany} onChange={(e) => { setSelectedCompany(e.target.value); setSelectedDepartment(''); }} aria-label="Filter by company">
+        <label className="block text-sm font-semibold text-slate-700 mb-2">Company</label>
+        <select className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none" value={selectedCompany} onChange={(e) => { setSelectedCompany(e.target.value); setSelectedDepartment(''); }} aria-label="Filter by company">
           <option value="">All Companies</option>
           {companies.map((c) => (<option key={c._id} value={c._id}>{c.companyName}</option>))}
         </select>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-600 mb-1">Department</label>
-        <select className="w-full rounded-md border px-3 py-2" value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)} aria-label="Filter by department">
+        <label className="block text-sm font-semibold text-slate-700 mb-2">Department</label>
+        <select className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none" value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)} aria-label="Filter by department">
           <option value="">All Departments</option>
           {departments.map((d) => <option key={d._id} value={d._id}>{d.dep}</option>)}
         </select>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-600 mb-1">Type</label>
+        <label className="block text-sm font-semibold text-slate-700 mb-2">Type</label>
         <div className="flex flex-wrap gap-2">
           {["", "image", "video", "pdf", "ppt"].map((t) => (
-            <button key={t} onClick={() => setFileTypeFilter(t)} className={`px-3 py-1 rounded-md text-sm border ${fileTypeFilter === t ? 'bg-blue-50 border-blue-400 text-blue-700' : 'bg-white border-gray-200 text-gray-600'}`} aria-pressed={fileTypeFilter === t}>
+            <button key={t} onClick={() => setFileTypeFilter(t)} className={`px-4 py-1.5 rounded-lg text-sm font-medium border transition-all ${fileTypeFilter === t ? 'bg-indigo-50 border-indigo-400 text-indigo-700 shadow-sm' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`} aria-pressed={fileTypeFilter === t}>
               {t === '' ? 'All' : t.charAt(0).toUpperCase() + t.slice(1)}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="text-sm text-gray-500 mt-3">{filtered.length} result(s)</div>
+      <div className="pt-4 border-t border-slate-100">
+        <div className="text-sm font-medium text-slate-500">{filtered.length} result(s) found</div>
+      </div>
     </div>
   );
 
   const MaterialCard = ({ tut }) => {
     const url = tut.fileUrl || tut.cloudinaryUrl;
     return (
-      <article className="bg-white border rounded-lg shadow-sm overflow-hidden" role="article" aria-labelledby={`title-${tut._id}`}>
-        <div className="relative h-48 bg-gray-100">
+      <article className="bg-white/90 border border-slate-100 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all overflow-hidden flex flex-col h-full" role="article" aria-labelledby={`title-${tut._id}`}>
+        <div className="relative h-48 bg-slate-50 flex-shrink-0">
           {tut.fileType === 'image' ? (
             <img src={`${import.meta.env.VITE_API_URL}/api/media/preview?key=${tut.key}`} alt={tut.originalName || tut.title} className="w-full h-full object-cover" loading="lazy" />
           ) : tut.fileType === 'video' ? (
             <video src={`${import.meta.env.VITE_API_URL}/api/media/preview?key=${tut.key}`} muted className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-400"><FileText className="w-12 h-12" /></div>
+            <div className="w-full h-full flex items-center justify-center text-slate-300"><FileText className="w-16 h-16" /></div>
           )}
 
           <div className="absolute top-3 right-3 flex gap-2">
-            <button onClick={() => openPreview(tut)} title="Preview" className="bg-white/80 hover:bg-white px-2 py-1 rounded-md flex items-center gap-2 text-sm" aria-label={`Preview ${tut.title}`}><ExternalLink className="w-4 h-4" /></button>
+            <button onClick={() => openPreview(tut)} title="Preview" className="bg-white/90 backdrop-blur hover:bg-white px-2.5 py-1.5 rounded-lg flex items-center gap-2 text-sm font-medium text-slate-700 shadow-sm transition-all hover:text-indigo-600" aria-label={`Preview ${tut.title}`}>
+              <ExternalLink className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
-        <div className="p-4">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex-1">
-              <h4 id={`title-${tut._id}`} className="font-semibold text-sm mb-1">{tut.title}</h4>
-              <div className="text-xs text-gray-500">{tut.company?.companyName || 'Unknown'} • {tut.department?.dep || '—'}</div>
+        <div className="p-5 flex flex-col flex-grow">
+          <div className="flex items-start justify-between gap-3 mb-2">
+            <div className="flex-1 min-w-0">
+              <h4 id={`title-${tut._id}`} className="font-bold text-slate-900 truncate">{tut.title}</h4>
+              <div className="text-xs font-medium text-slate-500 mt-1 truncate">
+                {tut.company?.companyName || 'Unknown'} • {tut.department?.dep || '—'}
+              </div>
             </div>
-            <div className="text-xs text-gray-400">{formatDate(tut.createdAt)}</div>
+            <div className="text-xs font-semibold text-slate-400 whitespace-nowrap">{formatDate(tut.createdAt)}</div>
           </div>
 
-          <div className="mt-3 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              {tut.fileType === 'image' && <Image className="w-4 h-4" />}
-              {tut.fileType === 'video' && <Video className="w-4 h-4" />}
-              {tut.fileType === 'pdf' && <FileText className="w-4 h-4" />}
-              {tut.fileType === 'ppt' && <File className="w-4 h-4" />}
-              <span>{tut.originalName || 'Material'}</span>
+          <div className="mt-auto pt-4 flex items-center justify-between border-t border-slate-100">
+            <div className="flex items-center gap-2 text-sm font-medium text-slate-600 truncate mr-3">
+              {tut.fileType === 'image' && <Image className="w-4 h-4 text-indigo-500 flex-shrink-0" />}
+              {tut.fileType === 'video' && <Video className="w-4 h-4 text-indigo-500 flex-shrink-0" />}
+              {tut.fileType === 'pdf' && <FileText className="w-4 h-4 text-indigo-500 flex-shrink-0" />}
+              {tut.fileType === 'ppt' && <File className="w-4 h-4 text-indigo-500 flex-shrink-0" />}
+              <span className="truncate">{tut.originalName || 'Material'}</span>
             </div>
 
-            <div className="flex items-center gap-2">
-              <a href={`${import.meta.env.VITE_API_URL}/api/media/preview?key=${tut.key}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-blue-600"><Download className="w-4 h-4" /> Open</a>
+            <div className="flex items-center flex-shrink-0">
+              <a href={`${import.meta.env.VITE_API_URL}/api/media/preview?key=${tut.key}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors">
+                <Download className="w-4 h-4" /> Open
+              </a>
             </div>
           </div>
         </div>
@@ -414,37 +422,41 @@ const TrainingMaterial = () => {
   );
 
   return (
-    <div className="max-w-6xl mx-auto mt-8 p-6 bg-white rounded-2xl shadow-lg">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-3xl font-bold">Training Materials</h2>
-
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by title..." className="pl-10 pr-3 py-2 rounded-lg border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Search training materials" />
+    <div className="min-h-screen bg-gradient-to-br from-[#f6f8fa] to-[#e9ecef] p-4 sm:p-8">
+      <div className="w-full max-w-7xl mx-auto space-y-6">
+        
+        {/* Header section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-3xl font-black text-slate-900 tracking-tight leading-tight drop-shadow-sm">Training Materials</h2>
+            <p className="mt-1 text-sm font-medium text-slate-600">Access and review all training resources across departments.</p>
+          </div>
+          <div className="relative w-full md:w-auto">
+             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-400 w-5 h-5" />
+             <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by title..." className="w-full md:w-72 pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white shadow-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder-slate-400 font-medium" aria-label="Search training materials" />
           </div>
         </div>
-      </div>
 
-      <div className="grid md:grid-cols-4 gap-4 mb-6">
-        <Filters />
+        <div className="grid md:grid-cols-4 gap-6">
+          <Filters />
 
-        <div className="md:col-span-3">
-          {loading ? (
-            <div className="flex items-center justify-center p-20"><div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500" /></div>
-          ) : error ? (
-            <div className="p-6 bg-rose-50 border border-rose-100 rounded-md text-rose-700">{error}</div>
-          ) : filtered.length === 0 ? (
-            <div className="p-6 bg-gray-50 rounded-md text-center text-gray-500">No materials found.</div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((tut) => <MaterialCard key={tut._id} tut={tut} />)}
-            </div>
-          )}
+          <div className="md:col-span-3">
+            {loading ? (
+              <div className="flex items-center justify-center p-20"><div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-600" /></div>
+            ) : error ? (
+              <div className="p-6 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 shadow-sm">{error}</div>
+            ) : filtered.length === 0 ? (
+              <div className="p-12 bg-white/60 rounded-2xl border border-slate-100 text-center text-slate-500 font-medium shadow-sm">No materials found matching your criteria.</div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filtered.map((tut) => <MaterialCard key={tut._id} tut={tut} />)}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
-      {preview && <PreviewModal />}
+        {preview && <PreviewModal />}
+      </div>
     </div>
   );
 };

@@ -21,7 +21,7 @@ const MainUserManagement = () => {
     ];
 
     return (
-        <div className="bg-[#f8fafc] min-h-dvh py-4 sm:px-6 lg:px-8">
+        <div className="bg-[#f8fafc] min-h-dvh py-4 px-4 sm:px-6 lg:px-8">
             <div className="flex w-full flex-col gap-6">
                 {/* Header */}
                 <div>

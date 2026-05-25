@@ -458,30 +458,25 @@ const LeadCards = ({ activeTab, selectedEmployeeId }) => {
         return (
           <div
             key={index}
-            className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-6 shadow-sm transition-all duration-300 hover:shadow-lg ${card.border || ""}`}
+            className={`flex-none w-[150px] md:w-auto snap-start group relative overflow-hidden rounded-xl p-4 sm:p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 bg-gradient-to-br ${card.gradient} ${card.border || ""}`}
           >
-            {/* Icon */}
-            <div className="mb-4 flex items-start justify-between">
-              <div className={`rounded-xl ${card.iconBg} p-2.5`}>
-                <Icon className={`h-5 w-5 ${card.iconColor}`} />
+            <div className="relative z-10 flex flex-col items-start h-full">
+              <div className={`rounded-lg sm:rounded-xl ${card.iconBg} p-1.5 sm:p-2 mb-2 sm:mb-4 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shadow-inner`}>
+                <Icon className={`h-4 w-4 sm:h-5 sm:w-5 ${card.iconColor}`} />
               </div>
-            </div>
-
-            {/* Content */}
-            <div>
-              <div className={`mb-1 text-xs font-medium tracking-wide ${card.textColor || "text-gray-600"}`}>
+              
+              <div className={`text-[10px] sm:text-xs font-bold tracking-wider uppercase mb-0.5 sm:mb-1 leading-tight line-clamp-1 ${card.textColor || "text-gray-700"}`}>
                 {card.title}
               </div>
-              <div className={`mb-2 text-3xl font-bold ${card.textColor || "text-gray-900"}`}>
+              
+              <div className={`text-3xl sm:text-4xl font-extrabold tracking-tight mb-1 sm:mb-2 ${card.textColor || "text-gray-900"}`}>
                 {card.value}
               </div>
-              <div className={`text-xs ${card.textColor ? "text-white/80" : "text-gray-500"}`}>
+              
+              <div className={`text-[10px] sm:text-xs mt-auto font-medium leading-tight line-clamp-2 ${card.textColor ? "text-white/90" : "text-gray-600"}`}>
                 {card.subtitle}
               </div>
             </div>
-
-            {/* Decorative element */}
-            <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/5"></div>
           </div>
         );
       })}

@@ -94,51 +94,61 @@ const MyLeadCard = () => {
 
   const cards = [
     {
-      title: "ALL LEADS",
+      title: "All Leads",
       value: stats.totalLeads,
       subtitle: "All leads assigned to you",
-      gradient: "from-blue-50 to-blue-100",
-      border: "border-blue-200",
+      bgClass: "bg-[#eaf2ff]",
+      textClass: "text-[#3a4b6b]",
+      valueClass: "text-[#1a2333]",
+      subtitleClass: "text-[#6b7b9e]",
       icon: TrendingUp,
-      iconBg: "bg-blue-500/10",
-      iconColor: "text-blue-600",
+      iconBg: "bg-[#d4e4ff]",
+      iconColor: "text-[#3b82f6]",
     },
     {
-      title: "FOLLOW UP",
+      title: "Follow Up",
       value: stats.followUp,
       subtitle: "Leads needing follow up",
-      gradient: "from-yellow-400 to-yellow-500",
-      textColor: "text-white",
+      bgClass: "bg-[#fbbc05]",
+      textClass: "text-white",
+      valueClass: "text-white",
+      subtitleClass: "text-white/80",
       icon: MessageSquare,
       iconBg: "bg-white/20",
       iconColor: "text-white",
     },
     {
-      title: "INTERESTED",
+      title: "Interested",
       value: stats.interested,
       subtitle: "Interested leads",
-      gradient: "from-green-400 to-green-500",
-      textColor: "text-white",
+      bgClass: "bg-[#2ed668]",
+      textClass: "text-white",
+      valueClass: "text-white",
+      subtitleClass: "text-white/80",
       icon: Flame,
       iconBg: "bg-white/20",
       iconColor: "text-white",
     },
     {
-      title: "CONNECTED",
+      title: "Connected",
       value: stats.connected,
       subtitle: "Leads you connected with",
-      gradient: "from-blue-400 to-blue-500",
-      textColor: "text-white",
+      bgClass: "bg-[#4285f4]",
+      textClass: "text-white",
+      valueClass: "text-white",
+      subtitleClass: "text-white/80",
       icon: ThermometerSun,
       iconBg: "bg-white/20",
       iconColor: "text-white",
     },
     {
-      title: "NOT CONNECTED",
+      title: "Not Connected",
       value: stats.notConnected,
       subtitle: "Leads not yet connected",
-      gradient: "from-gray-400 to-gray-500",
-      textColor: "text-white",
+      bgClass: "bg-[#808694]",
+      textClass: "text-white",
+      valueClass: "text-white",
+      subtitleClass: "text-white/80",
       icon: Snowflake,
       iconBg: "bg-white/20",
       iconColor: "text-white",
@@ -146,34 +156,35 @@ const MyLeadCard = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 w-full mb-6">
+    <div 
+      className="flex flex-row overflow-x-auto md:grid md:grid-cols-3 lg:grid-cols-5 gap-3 w-full mb-3 pb-2 snap-x [&::-webkit-scrollbar]:hidden"
+      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+    >
       {cards.map((card, index) => {
         const Icon = card.icon;
         return (
           <div
             key={index}
-            className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-6 shadow-sm transition-all duration-300 hover:shadow-lg ${card.border || ""}`}
+            className={`flex-none w-[150px] md:w-auto snap-start group relative overflow-hidden rounded-xl p-3 sm:p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 ${card.bgClass} ${card.textClass}`}
+
           >
-            {/* Icon */}
-            <div className="mb-4 flex items-start justify-between">
-              <div className={`rounded-xl ${card.iconBg} p-2.5`}>
-                <Icon className={`h-5 w-5 ${card.iconColor}`} />
+            <div className="relative z-10 flex flex-col items-start h-full">
+              <div className={`rounded-lg sm:rounded-xl ${card.iconBg} p-1.5 sm:p-2 mb-2 sm:mb-4 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shadow-inner`}>
+                <Icon className={`h-4 w-4 sm:h-5 sm:w-5 ${card.iconColor}`} />
               </div>
-            </div>
-            {/* Content */}
-            <div>
-              <div className={`mb-1 text-xs font-medium tracking-wide ${card.textColor || "text-gray-600"}`}>
+              
+              <div className={`text-[9px] sm:text-[11px] font-bold tracking-wider uppercase mb-0.5 sm:mb-1 leading-tight line-clamp-1`}>
                 {card.title}
               </div>
-              <div className={`mb-2 text-3xl font-bold ${card.textColor || "text-gray-900"}`}>
+              
+              <div className={`text-2xl sm:text-3xl font-extrabold tracking-tight mb-1 sm:mb-2 ${card.valueClass}`}>
                 {card.value}
               </div>
-              <div className={`text-xs ${card.textColor ? "text-white/80" : "text-gray-500"}`}>
+              
+              <div className={`text-[9px] sm:text-[11px] mt-auto font-medium leading-tight ${card.subtitleClass} line-clamp-2`}>
                 {card.subtitle}
               </div>
             </div>
-            {/* Decorative element */}
-            <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/5"></div>
           </div>
         );
       })}
