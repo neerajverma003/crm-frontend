@@ -54,11 +54,11 @@ const SuperAdminAttendance = () => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const targetDate = new Date(date);
-        targetDate.setHours(0,0,0,0);
+        targetDate.setHours(0, 0, 0, 0);
 
-        if(targetDate > today){
+        if (targetDate > today) {
             alert("Future date attendance cannot be edited");
-            return; 
+            return;
         }
 
         setSelectedDateForEdit({
@@ -81,11 +81,11 @@ const SuperAdminAttendance = () => {
                 // Update existing record
                 const attendance = selectedDateForEdit.records[0];
                 const isAdmin = selectedUser?.userType === "Admin";
-                const endpoint = isAdmin 
+                const endpoint = isAdmin
                     ? `${import.meta.env.VITE_API_URL}/adminAttendance/editAttendance/${attendance._id}`
                     : `${import.meta.env.VITE_API_URL}/attendance/${attendance._id}`;
                 const method = isAdmin ? "PUT" : "PATCH";
-                
+
                 const res = await fetch(endpoint, {
                     method: method,
                     headers: {
@@ -105,7 +105,7 @@ const SuperAdminAttendance = () => {
                 if (selectedUser?._id) {
                     fetchMonthlyAttendance(selectedUser);
                 }
-                        } else {
+            } else {
                 // create new record (Dynamic check for Admin & Employee)
                 let url = `${import.meta.env.VITE_API_URL}/attendance`;
                 let bodydata = {
@@ -122,8 +122,8 @@ const SuperAdminAttendance = () => {
                         date: new Date(selectedDateForEdit.date),
                         ...updatedData
                     };
-                } 
-               
+                }
+
                 const res = await fetch(url, {
                     method: "POST",
                     headers: {
@@ -333,13 +333,13 @@ const SuperAdminAttendance = () => {
             return local.toISOString().slice(0, 16);
         };
 
-               const [clockIn, setClockIn] = useState(() => {
+        const [clockIn, setClockIn] = useState(() => {
             if (dayRecords && dayRecords.length > 0) {
                 return formatLocalDateTime(dayRecords[0]?.clockIn);
             }
             // selected date ko 10:00 AM ke sath set karein
             const defaultClockIn = new Date(date);
-            defaultClockIn.setHours(10, 0, 0, 0); 
+            defaultClockIn.setHours(10, 0, 0, 0);
             return formatLocalDateTime(defaultClockIn);
         });
 
@@ -349,16 +349,16 @@ const SuperAdminAttendance = () => {
             }
             // selected date ko 19:00 (6:00 PM) ke sath set karein
             const defaultClockOut = new Date(date);
-            defaultClockOut.setHours(19, 0, 0, 0); 
+            defaultClockOut.setHours(19, 0, 0, 0);
             return formatLocalDateTime(defaultClockOut);
         });
 
-               const [status, setStatus] = useState(dayRecords && dayRecords.length > 0 ? dayRecords[0]?.status : "Present");
+        const [status, setStatus] = useState(dayRecords && dayRecords.length > 0 ? dayRecords[0]?.status : "Present");
 
         // Add this useEffect here:
         useEffect(() => {
             if (!clockIn) return;
-            
+
             // Extract HH:MM from format "YYYY-MM-DDTHH:mm" (timezone independent string parsing)
             const timePart = clockIn.split("T")[1];
             if (timePart) {
@@ -381,7 +381,7 @@ const SuperAdminAttendance = () => {
                 } else if (totalMinutes > 720 && totalMinutes <= 840) {
                     calculatedStatus = "Half Day";
                 }
-                
+
                 setStatus(calculatedStatus);
             }
         }, [clockIn]); // Runs automatically when modal opens AND when clockIn time changes
@@ -684,7 +684,8 @@ const SuperAdminAttendance = () => {
             gracePresent: 0,
             late: 0,
             absent: 0,
-             halfDay:0,
+            halfDay: 0,
+            sunday: 0,
             total: 0
         };
 
@@ -700,19 +701,34 @@ const SuperAdminAttendance = () => {
             return recordDate.getMonth() === monthNum && recordDate.getFullYear() === yearNum;
         });
 
+        // Deduplicate records by date to avoid counting the same day multiple times
+        const uniqueDaysMap = {};
         monthData.forEach((record) => {
+            if (record?.date) {
+                const dateObj = new Date(record.date);
+                const dateKey = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
+                // Only take the first status (or override), to ensure one count per date
+                if (!uniqueDaysMap[dateKey]) {
+                    uniqueDaysMap[dateKey] = record;
+                }
+            }
+        });
+
+
+        Object.values(uniqueDaysMap).forEach((record) => {
             const status = record?.status || "Absent";
 
             if (status === "Present") stats.present++;
             else if (status === "Grace Present" || status === "Grace") stats.gracePresent++;
             else if (status === "Late") stats.late++;
             else if (status === "Absent") stats.absent++;
-            else if(status === "Half Day") stats.halfDay++;
+            else if (status === "Half Day") stats.halfDay++;
+            else if (status === "Sunday") stats.sunday++;
         });
 
         // Total days considered as working/present-type days per requirement:
         // Present + Grace Present + Late should equal Total Days for the selected month
-        stats.total = stats.present + stats.gracePresent + stats.late + stats.halfDay;
+        stats.total = stats.present + stats.gracePresent + stats.late + stats.halfDay + stats.sunday;
 
         return stats;
     };
@@ -731,11 +747,11 @@ const SuperAdminAttendance = () => {
             const stats = calculateAttendanceStats(monthlyAttendance, currentMonth);
             const baseSalary = selectedUser?.salary || 30000;
             const perDaySalary = baseSalary / 30;
-            const presentDays = stats.present + stats.gracePresent+stats.late+(stats.halfDay*0.5);
+            const presentDays = stats.present + stats.gracePresent + stats.late + (stats.halfDay * 0.5) + stats.sunday;
             const earnedAmount = perDaySalary * presentDays;
             const totalPayable = earnedAmount + (Number(remarkAmount) || 0);
             const attendancePercentage = stats.total > 0 ? (presentDays / stats.total) * 100 : 0;
-  
+
             // Attendance Summary Object
             const attendanceSummary = {
                 present: stats.present,
@@ -1231,7 +1247,7 @@ const SuperAdminAttendance = () => {
                 <p className="text-sm text-gray-600">Monitor active and inactive employees and administrators</p>
             </div>
 
-            <SuperAdminAttendanceCard/>
+            <SuperAdminAttendanceCard />
 
             {/* Search & Filter Bar */}
             <div className="mb-6 rounded-xl border border-gray-100 bg-white p-4 shadow-md">
@@ -1272,11 +1288,10 @@ const SuperAdminAttendance = () => {
             <div className="mb-6 flex flex-wrap gap-3">
                 <button
                     onClick={() => setActiveTab("active")}
-                    className={`relative flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 ${
-                        activeTab === "active"
+                    className={`relative flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 ${activeTab === "active"
                             ? "bg-emerald-50 text-emerald-600 shadow-md"
                             : "bg-white text-gray-600 hover:bg-gray-50 hover:shadow-sm"
-                    }`}
+                        }`}
                 >
                     <CheckCircle size={18} />
                     Active ({totalActive})
@@ -1285,9 +1300,8 @@ const SuperAdminAttendance = () => {
 
                 <button
                     onClick={() => setActiveTab("inactive")}
-                    className={`relative flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 ${
-                        activeTab === "inactive" ? "bg-rose-50 text-rose-600 shadow-md" : "bg-white text-gray-600 hover:bg-gray-50 hover:shadow-sm"
-                    }`}
+                    className={`relative flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 ${activeTab === "inactive" ? "bg-rose-50 text-rose-600 shadow-md" : "bg-white text-gray-600 hover:bg-gray-50 hover:shadow-sm"
+                        }`}
                 >
                     <XCircle size={18} />
                     Inactive ({totalInactive})
@@ -1436,9 +1450,9 @@ const SuperAdminAttendance = () => {
                                                     <span className="font-mono font-semibold text-emerald-600">
                                                         {attendance?.clockIn
                                                             ? new Date(attendance.clockIn).toLocaleTimeString("en-IN", {
-                                                                  hour: "2-digit",
-                                                                  minute: "2-digit",
-                                                              })
+                                                                hour: "2-digit",
+                                                                minute: "2-digit",
+                                                            })
                                                             : "--:--"}
                                                     </span>
                                                 </div>
@@ -1447,9 +1461,9 @@ const SuperAdminAttendance = () => {
                                                     <span className="font-mono font-semibold text-rose-600">
                                                         {attendance?.clockOut
                                                             ? new Date(attendance.clockOut).toLocaleTimeString("en-IN", {
-                                                                  hour: "2-digit",
-                                                                  minute: "2-digit",
-                                                              })
+                                                                hour: "2-digit",
+                                                                minute: "2-digit",
+                                                            })
                                                             : "--:--"}
                                                     </span>
                                                 </div>
@@ -1716,6 +1730,12 @@ const SuperAdminAttendance = () => {
                                                         color: "bg-rose-100 text-rose-700",
                                                         bgColor: "bg-rose-50",
                                                     },
+                                                    {
+                                                        label: "Sunday",
+                                                        value: stats.sunday,
+                                                        color: "bg-pink-100 text-pink-700",
+                                                        bgColor: "bg-pink-50",
+                                                    },
                                                 ];
 
                                                 return (
@@ -1760,7 +1780,7 @@ const SuperAdminAttendance = () => {
                                                 const stats = calculateAttendanceStats(monthlyAttendance, currentMonth);
                                                 const monthlyBaseSalary = selectedUser?.salary || 30000; // Fetch from user management, fallback to 30000
                                                 const perDaySalary = monthlyBaseSalary / 30; // Assuming 30 working days per month
-                                                const presentDays = stats.present + stats.gracePresent + stats.late + (stats.halfDay * 0.5); // Count present and grace present as working days
+                                                const presentDays = stats.present + stats.gracePresent + stats.late + (stats.halfDay * 0.5) + stats.sunday; // Count present and grace present as working days
                                                 const totalEarned = perDaySalary * presentDays;
                                                 const finalPayable = totalEarned + (Number(remarkAmount) || 0);
 
