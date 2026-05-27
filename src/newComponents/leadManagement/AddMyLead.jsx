@@ -95,6 +95,89 @@ const ActionDropdown = ({ isOpen, onToggle, options }) => {
   );
 };
 
+// 🧩 Mobile Lead Card Component
+const MobileLeadCard = ({ 
+  lead, 
+  index, 
+  actionsDropdownOptions = [], 
+  statusSelect = null, 
+  assignSelect = null, 
+  statusBadge = null,
+  openDropdownId,
+  setOpenDropdownId,
+  formatDate
+}) => {
+  return (
+    <div className="bg-white rounded-2xl border border-gray-150 p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col gap-3 relative overflow-visible">
+      {/* Index Badge */}
+      <div className="absolute top-4 right-4 bg-indigo-50 text-indigo-700 font-bold text-xs px-2.5 py-1 rounded-full">
+        # {index + 1}
+      </div>
+
+      {/* Lead Contact Info */}
+      <div className="flex flex-col gap-1 border-b border-gray-50 pb-3 pr-12">
+        <h4 className="font-bold text-gray-900 text-base leading-tight">
+          {lead.name || "—"}
+        </h4>
+        <span className="text-xs text-gray-500 break-all">{lead.email || "—"}</span>
+        <span className="text-xs text-indigo-600 font-semibold">{lead.phone || "—"}</span>
+      </div>
+
+      {/* Travel Details */}
+      <div className="space-y-2 text-sm">
+        <div className="flex justify-between">
+          <span className="text-gray-500 font-medium text-xs">Departure:</span>
+          <span className="text-gray-900 font-semibold text-xs">{lead.departureCity || "—"}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-500 font-medium text-xs">Destination:</span>
+          <span className="text-gray-900 font-semibold text-xs">{lead.destination || "—"}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-500 font-medium text-xs">Travel Date:</span>
+          <span className="text-gray-900 font-semibold text-xs">{formatDate(lead.expectedTravelDate)}</span>
+        </div>
+        {statusBadge && (
+          <div className="flex justify-between items-center">
+            <span className="text-gray-500 font-medium text-xs">Status:</span>
+            {statusBadge}
+          </div>
+        )}
+      </div>
+
+      {/* Selects / Action Row */}
+      {(statusSelect || assignSelect || actionsDropdownOptions.length > 0) && (
+        <div className="flex flex-col gap-2 border-t border-gray-100 pt-3 mt-1">
+          {assignSelect && (
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-gray-500 text-xs font-semibold">Assign to:</span>
+              <div className="flex-1 max-w-[180px]">{assignSelect}</div>
+            </div>
+          )}
+          
+          <div className="flex items-center justify-between gap-2 mt-1">
+            {statusSelect ? (
+              <div className="flex-1">{statusSelect}</div>
+            ) : (
+              <div />
+            )}
+            
+            {actionsDropdownOptions.length > 0 && (
+              <div className="relative">
+                <ActionDropdown
+                  isOpen={openDropdownId === lead._id}
+                  onToggle={() => setOpenDropdownId(openDropdownId === lead._id ? null : lead._id)}
+                  options={actionsDropdownOptions}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // 🧩 Modal Component
 const Modal = ({ isOpen, onClose, size = "large", children }) => {
   if (!isOpen) return null;
@@ -1764,94 +1847,166 @@ const EmployeeLeads = () => {
           <div className="mt-0 w-full">
             {loading ? <div className="p-8 text-center"><p className="text-gray-500 font-medium">Loading leads...</p></div> :
               error || filteredLeads.length === 0 ? <div className="p-12 text-center bg-gray-50 rounded-2xl border border-gray-100"><p className="text-gray-500 font-medium text-lg">No leads found.</p></div> :
-                <div className="rounded-2xl shadow-sm border border-gray-100 bg-white overflow-hidden">
-                  <div className="overflow-x-auto w-full max-w-full">
-                    <table className="min-w-[800px] w-full divide-y divide-gray-100">
-                    <thead className="bg-gray-50/50">
-                      <tr>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact Information</th>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Departure</th>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Destination</th>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Travel Date</th>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-                        {userRole && (userRole.toLowerCase() === "superadmin" || userRole.toLowerCase() === "admin") && (<th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Assign to</th>)}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {filteredLeads.map((lead) => (
-                        <tr key={lead._id} className="hover:bg-indigo-50/30 transition-colors group">
-                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap">
-                            <div className="flex flex-col gap-1">
-                              <span className="font-semibold text-gray-900 text-sm">{lead.name || "—"}</span>
-                              <span className="text-xs text-gray-500">{lead.email || "—"}</span>
-                              <span className="text-xs text-gray-400 font-medium">{lead.phone || "—"}</span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.departureCity || "—"}</td>
-                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.destination || "—"}</td>
-                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">
-                            {formatDate(lead.expectedTravelDate)}
-                          </td>
-                          <td className="px-4 py-2 sm:px-6 sm:py-3">
-                            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                              <div className="flex items-center gap-2">
-                                <ActionDropdown
-                                  isOpen={openDropdownId === lead._id}
-                                  onToggle={() => setOpenDropdownId(openDropdownId === lead._id ? null : lead._id)}
-                                  options={[
-                                    { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleView(lead) },
-                                    { label: "Edit", icon: <Edit2 size={14} className="text-emerald-500" />, onClick: () => handleEdit(lead) },
-                                    { label: "Message", icon: <MessageSquare size={14} className="text-amber-500" />, onClick: () => handleAddMessage(lead) },
-                                    { label: "Details", icon: <span className="text-indigo-500 font-bold ml-1 mr-0.5">D</span>, onClick: () => handleAddDetails(lead), show: lead.leadInterestStatus === "Follow Up" },
-                                    { label: "Confirm Transfer", icon: <span className="text-rose-500 font-bold ml-1 mr-0.5">C</span>, onClick: () => handleConfirmTransfer(lead), show: lead.leadInterestStatus === "Follow Up", className: "text-rose-700 font-medium" },
-                                  ]}
-                                />
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <select
-                                  value={lead.leadInterestStatus || ""}
-                                  onChange={(e) => handleStatusChange(lead._id, e.target.value)}
-                                  disabled={statusSavingId === lead._id}
-                                  className={`px-3 py-1.5 rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer transition-all border outline-none
-                                    ${statusSavingId === lead._id ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white border-gray-200 hover:border-gray-300'}
-                                    ${lead.leadInterestStatus === 'Interested' ? 'text-emerald-600' : lead.leadInterestStatus === 'Follow Up' ? 'text-amber-600' : 'text-gray-700'}
-                                  `}
-                                >
-                                  <option value="">Status</option>
-                                  <option value="Interested">Interested</option>
-                                  <option value="Not Interested">Not Interested</option>
-                                  <option value="Connected">Connected</option>
-                                  <option value="Not Connected">Not Connected</option>
-                                  <option value="Follow Up">Follow Up</option>
-                                </select>
-                              </div>
-                            </div>
-                          </td>
-                          {userRole && userRole.toLowerCase() === "superadmin" && (
-                            <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-center">
-                              <select
-                                value={lead.assignedEmployee || ""}
-                                onChange={(e) => {
-                                  if (e.target.value) {
-                                    setAssignEmployeeModal({ isOpen: true, lead });
-                                    setSelectedEmployeeForAssign(e.target.value);
-                                  }
-                                }}
-                                className="px-3 py-1.5 w-full max-w-[140px] rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer transition-all bg-white border border-gray-200 hover:border-gray-300 text-gray-700 outline-none"
-                              >
-                                <option value="">Assign Employee</option>
-                                {allEmployees.map((emp) => (
-                                  <option key={emp._id} value={emp._id}>
-                                    {emp.fullName || emp.name || "Unknown"}
-                                  </option>
-                                ))}
-                              </select>
-                            </td>
-                          )}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                 <div className="w-full">
+                  {/* Desktop view: Table */}
+                  <div className="hidden md:block rounded-2xl shadow-sm border border-gray-100 bg-white overflow-hidden">
+                    <div className="overflow-x-auto w-full max-w-full">
+                      <table className="min-w-[800px] w-full divide-y divide-gray-100">
+                        <thead className="bg-gray-50/50">
+                          <tr>
+                            <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact Information</th>
+                            <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Departure</th>
+                            <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Destination</th>
+                            <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Travel Date</th>
+                            <th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                            {userRole && (userRole.toLowerCase() === "superadmin" || userRole.toLowerCase() === "admin") && (<th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Assign to</th>)}
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {filteredLeads.map((lead) => (
+                            <tr key={lead._id} className="hover:bg-indigo-50/30 transition-colors group">
+                              <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap">
+                                <div className="flex flex-col gap-1">
+                                  <span className="font-semibold text-gray-900 text-sm">{lead.name || "—"}</span>
+                                  <span className="text-xs text-gray-500">{lead.email || "—"}</span>
+                                  <span className="text-xs text-gray-400 font-medium">{lead.phone || "—"}</span>
+                                </div>
+                              </td>
+                              <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.departureCity || "—"}</td>
+                              <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.destination || "—"}</td>
+                              <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">
+                                {formatDate(lead.expectedTravelDate)}
+                              </td>
+                              <td className="px-4 py-2 sm:px-6 sm:py-3">
+                                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                                  <div className="flex items-center gap-2">
+                                    <ActionDropdown
+                                      isOpen={openDropdownId === lead._id}
+                                      onToggle={() => setOpenDropdownId(openDropdownId === lead._id ? null : lead._id)}
+                                      options={[
+                                        { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleView(lead) },
+                                        { label: "Edit", icon: <Edit2 size={14} className="text-emerald-500" />, onClick: () => handleEdit(lead) },
+                                        { label: "Message", icon: <MessageSquare size={14} className="text-amber-500" />, onClick: () => handleAddMessage(lead) },
+                                        { label: "Details", icon: <span className="text-indigo-500 font-bold ml-1 mr-0.5">D</span>, onClick: () => handleAddDetails(lead), show: lead.leadInterestStatus === "Follow Up" },
+                                        { label: "Confirm Transfer", icon: <span className="text-rose-500 font-bold ml-1 mr-0.5">C</span>, onClick: () => handleConfirmTransfer(lead), show: lead.leadInterestStatus === "Follow Up", className: "text-rose-700 font-medium" },
+                                      ]}
+                                    />
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <select
+                                      value={lead.leadInterestStatus || ""}
+                                      onChange={(e) => handleStatusChange(lead._id, e.target.value)}
+                                      disabled={statusSavingId === lead._id}
+                                      className={`px-3 py-1.5 rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer transition-all border outline-none
+                                        ${statusSavingId === lead._id ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white border-gray-200 hover:border-gray-300'}
+                                        ${lead.leadInterestStatus === 'Interested' ? 'text-emerald-600' : lead.leadInterestStatus === 'Follow Up' ? 'text-amber-600' : 'text-gray-700'}
+                                      `}
+                                    >
+                                      <option value="">Status</option>
+                                      <option value="Interested">Interested</option>
+                                      <option value="Not Interested">Not Interested</option>
+                                      <option value="Connected">Connected</option>
+                                      <option value="Not Connected">Not Connected</option>
+                                      <option value="Follow Up">Follow Up</option>
+                                    </select>
+                                  </div>
+                                </div>
+                              </td>
+                              {userRole && userRole.toLowerCase() === "superadmin" && (
+                                <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-center">
+                                  <select
+                                    value={lead.assignedEmployee || ""}
+                                    onChange={(e) => {
+                                      if (e.target.value) {
+                                        setAssignEmployeeModal({ isOpen: true, lead });
+                                        setSelectedEmployeeForAssign(e.target.value);
+                                      }
+                                    }}
+                                    className="px-3 py-1.5 w-full max-w-[140px] rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer transition-all bg-white border border-gray-200 hover:border-gray-300 text-gray-700 outline-none"
+                                  >
+                                    <option value="">Assign Employee</option>
+                                    {allEmployees.map((emp) => (
+                                      <option key={emp._id} value={emp._id}>
+                                        {emp.fullName || emp.name || "Unknown"}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </td>
+                              )}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Mobile view: Card layout */}
+                  <div className="block md:hidden space-y-4">
+                    {filteredLeads.map((lead, index) => (
+                      <MobileLeadCard
+                        key={lead._id}
+                        lead={lead}
+                        index={index}
+                        openDropdownId={openDropdownId}
+                        setOpenDropdownId={setOpenDropdownId}
+                        formatDate={formatDate}
+                        statusBadge={
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border
+                            ${lead.leadInterestStatus === 'Interested' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 
+                              lead.leadInterestStatus === 'Follow Up' ? 'bg-amber-50 text-amber-700 border-amber-100' : 
+                              'bg-gray-50 text-gray-700 border-gray-100'}`}
+                          >
+                            {lead.leadInterestStatus || "New"}
+                          </span>
+                        }
+                        statusSelect={
+                          <select
+                            value={lead.leadInterestStatus || ""}
+                            onChange={(e) => handleStatusChange(lead._id, e.target.value)}
+                            disabled={statusSavingId === lead._id}
+                            className={`px-3 py-2 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer transition-all border w-full outline-none
+                              ${statusSavingId === lead._id ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white border-gray-200 hover:border-gray-300'}
+                              ${lead.leadInterestStatus === 'Interested' ? 'text-emerald-600' : lead.leadInterestStatus === 'Follow Up' ? 'text-amber-600' : 'text-gray-700'}
+                            `}
+                          >
+                            <option value="">Status</option>
+                            <option value="Interested">Interested</option>
+                            <option value="Not Interested">Not Interested</option>
+                            <option value="Connected">Connected</option>
+                            <option value="Not Connected">Not Connected</option>
+                            <option value="Follow Up">Follow Up</option>
+                          </select>
+                        }
+                        assignSelect={
+                          userRole && (userRole.toLowerCase() === "superadmin" || userRole.toLowerCase() === "admin") ? (
+                            <select
+                              value={lead.assignedEmployee || ""}
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  setAssignEmployeeModal({ isOpen: true, lead });
+                                  setSelectedEmployeeForAssign(e.target.value);
+                                }
+                              }}
+                              className="px-3 py-1.5 w-full rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer transition-all bg-white border border-gray-200 hover:border-gray-300 text-gray-700 outline-none"
+                            >
+                              <option value="">Assign Employee</option>
+                              {allEmployees.map((emp) => (
+                                <option key={emp._id} value={emp._id}>
+                                  {emp.fullName || emp.name || "Unknown"}
+                                </option>
+                              ))}
+                            </select>
+                          ) : null
+                        }
+                        actionsDropdownOptions={[
+                          { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleView(lead) },
+                          { label: "Edit", icon: <Edit2 size={14} className="text-emerald-500" />, onClick: () => handleEdit(lead) },
+                          { label: "Message", icon: <MessageSquare size={14} className="text-amber-500" />, onClick: () => handleAddMessage(lead) },
+                          { label: "Details", icon: <span className="text-indigo-500 font-bold ml-1 mr-0.5">D</span>, onClick: () => handleAddDetails(lead), show: lead.leadInterestStatus === "Follow Up" },
+                          { label: "Confirm Transfer", icon: <span className="text-rose-500 font-bold ml-1 mr-0.5">C</span>, onClick: () => handleConfirmTransfer(lead), show: lead.leadInterestStatus === "Follow Up", className: "text-rose-700 font-medium" },
+                        ]}
+                      />
+                    ))}
                   </div>
                 </div>}
           </div>
@@ -1867,72 +2022,138 @@ const EmployeeLeads = () => {
             <p className="text-gray-600">{userRole && userRole.toLowerCase() === 'superadmin' ? 'No special leads created yet.' : 'No special leads assigned to you yet.'}</p>
           ) : (
             <>
-              <div className="mt-4 w-full">
-                <div className="rounded-2xl shadow-sm border border-gray-100 bg-white overflow-hidden">
-                  <div className="overflow-x-auto w-full max-w-full">
-                    <table className="min-w-[800px] w-full divide-y divide-gray-100">
-                    <thead className="bg-gray-50/50">
-                      <tr>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact Information</th>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Departure</th>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Destination</th>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Travel Date</th>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-                        {userRole && userRole.toLowerCase() === "superadmin" && (<th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Assign to</th>)}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {specialLeads.map((lead) => (
-                        <tr key={lead._id} className="hover:bg-indigo-50/30 transition-colors group">
-                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap">
-                            <div className="flex flex-col gap-1">
-                              <span className="font-semibold text-gray-900 text-sm">{lead.name || "—"}</span>
-                              <span className="text-xs text-gray-500">{lead.email || "—"}</span>
-                              <span className="text-xs text-gray-400 font-medium">{lead.phone || "—"}</span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.departureCity || "—"}</td>
-                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.destination || "—"}</td>
-                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">
-                            {formatDate(lead.expectedTravelDate)}
-                          </td>
-                          <td className="px-4 py-2 sm:px-6 sm:py-3">
-                            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                              <div className="flex items-center gap-2">
-                                <ActionDropdown
-                                  isOpen={openDropdownId === lead._id}
-                                  onToggle={() => setOpenDropdownId(openDropdownId === lead._id ? null : lead._id)}
-                                  options={[
-                                    { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleView(lead) },
-                                    { label: "Edit", icon: <Edit2 size={14} className="text-emerald-500" />, onClick: () => handleEdit(lead) },
-                                    { label: "Message", icon: <MessageSquare size={14} className="text-amber-500" />, onClick: () => handleAddMessage(lead) },
-                                    { label: "Details", icon: <span className="text-indigo-500 font-bold ml-1 mr-0.5">D</span>, onClick: () => handleAddDetails(lead), show: lead.leadInterestStatus === "Follow Up" },
-                                    { label: "Confirm Transfer", icon: <span className="text-rose-500 font-bold ml-1 mr-0.5">C</span>, onClick: () => handleSpecialConfirmTransfer(lead), show: lead.leadInterestStatus === "Follow Up", className: "text-rose-700 font-medium" },
-                                  ]}
-                                />
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <select
-                                  value={lead.leadInterestStatus || ""}
-                                  onChange={(e) => handleStatusChange(lead._id, e.target.value)}
-                                  disabled={statusSavingId === lead._id}
-                                  className={`px-3 py-1.5 rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer transition-all border outline-none
-                                    ${statusSavingId === lead._id ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white border-gray-200 hover:border-gray-300'}
-                                    ${lead.leadInterestStatus === 'Interested' ? 'text-emerald-600' : lead.leadInterestStatus === 'Follow Up' ? 'text-amber-600' : 'text-gray-700'}
-                                  `}
-                                >
-                                  <option value="">Status</option>
-                                  <option value="Interested">Interested</option>
-                                  <option value="Not Interested">Not Interested</option>
-                                  <option value="Connected">Connected</option>
-                                  <option value="Not Connected">Not Connected</option>
-                                  <option value="Follow Up">Follow Up</option>
-                                </select>
-                              </div>
-                            </div>
-                          </td>
-                          {userRole && userRole.toLowerCase() === "superadmin" && (
-                            <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-center">
+                  <div className="mt-4 w-full">
+                    {/* Desktop View: Table */}
+                    <div className="hidden md:block rounded-2xl shadow-sm border border-gray-100 bg-white overflow-hidden">
+                      <div className="overflow-x-auto w-full max-w-full">
+                        <table className="min-w-[800px] w-full divide-y divide-gray-100">
+                          <thead className="bg-gray-50/50">
+                            <tr>
+                              <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact Information</th>
+                              <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Departure</th>
+                              <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Destination</th>
+                              <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Travel Date</th>
+                              <th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                              {userRole && userRole.toLowerCase() === "superadmin" && (<th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Assign to</th>)}
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-100">
+                            {specialLeads.map((lead) => (
+                              <tr key={lead._id} className="hover:bg-indigo-50/30 transition-colors group">
+                                <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap">
+                                  <div className="flex flex-col gap-1">
+                                    <span className="font-semibold text-gray-900 text-sm">{lead.name || "—"}</span>
+                                    <span className="text-xs text-gray-500">{lead.email || "—"}</span>
+                                    <span className="text-xs text-gray-400 font-medium">{lead.phone || "—"}</span>
+                                  </div>
+                                </td>
+                                <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.departureCity || "—"}</td>
+                                <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.destination || "—"}</td>
+                                <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">
+                                  {formatDate(lead.expectedTravelDate)}
+                                </td>
+                                <td className="px-4 py-2 sm:px-6 sm:py-3">
+                                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                                    <div className="flex items-center gap-2">
+                                      <ActionDropdown
+                                        isOpen={openDropdownId === lead._id}
+                                        onToggle={() => setOpenDropdownId(openDropdownId === lead._id ? null : lead._id)}
+                                        options={[
+                                          { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleView(lead) },
+                                          { label: "Edit", icon: <Edit2 size={14} className="text-emerald-500" />, onClick: () => handleEdit(lead) },
+                                          { label: "Message", icon: <MessageSquare size={14} className="text-amber-500" />, onClick: () => handleAddMessage(lead) },
+                                          { label: "Details", icon: <span className="text-indigo-500 font-bold ml-1 mr-0.5">D</span>, onClick: () => handleAddDetails(lead), show: lead.leadInterestStatus === "Follow Up" },
+                                          { label: "Confirm Transfer", icon: <span className="text-rose-500 font-bold ml-1 mr-0.5">C</span>, onClick: () => handleSpecialConfirmTransfer(lead), show: lead.leadInterestStatus === "Follow Up", className: "text-rose-700 font-medium" },
+                                        ]}
+                                      />
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <select
+                                        value={lead.leadInterestStatus || ""}
+                                        onChange={(e) => handleStatusChange(lead._id, e.target.value)}
+                                        disabled={statusSavingId === lead._id}
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer transition-all border outline-none
+                                          ${statusSavingId === lead._id ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white border-gray-200 hover:border-gray-300'}
+                                          ${lead.leadInterestStatus === 'Interested' ? 'text-emerald-600' : lead.leadInterestStatus === 'Follow Up' ? 'text-amber-600' : 'text-gray-700'}
+                                        `}
+                                      >
+                                        <option value="">Status</option>
+                                        <option value="Interested">Interested</option>
+                                        <option value="Not Interested">Not Interested</option>
+                                        <option value="Connected">Connected</option>
+                                        <option value="Not Connected">Not Connected</option>
+                                        <option value="Follow Up">Follow Up</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                </td>
+                                {userRole && userRole.toLowerCase() === "superadmin" && (
+                                  <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-center">
+                                    <select
+                                      value={lead.assignedEmployee || ""}
+                                      onChange={(e) => {
+                                        if (e.target.value) {
+                                          setAssignEmployeeModal({ isOpen: true, lead });
+                                          setSelectedEmployeeForAssign(e.target.value);
+                                        }
+                                      }}
+                                      className="px-3 py-1.5 w-full max-w-[140px] rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer transition-all bg-white border border-gray-200 hover:border-gray-300 text-gray-700 outline-none"
+                                    >
+                                      <option value="">Assign Employee</option>
+                                      {allEmployees.map((emp) => (
+                                        <option key={emp._id} value={emp._id}>
+                                          {emp.fullName || emp.name || "Unknown"}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </td>
+                                )}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* Mobile View: Card Layout */}
+                    <div className="block md:hidden space-y-4">
+                      {specialLeads.map((lead, index) => (
+                        <MobileLeadCard
+                          key={lead._id}
+                          lead={lead}
+                          index={index}
+                          openDropdownId={openDropdownId}
+                          setOpenDropdownId={setOpenDropdownId}
+                          formatDate={formatDate}
+                          statusBadge={
+                            <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border
+                              ${lead.leadInterestStatus === 'Interested' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 
+                                lead.leadInterestStatus === 'Follow Up' ? 'bg-amber-50 text-amber-700 border-amber-100' : 
+                                'bg-gray-50 text-gray-700 border-gray-100'}`}
+                            >
+                              {lead.leadInterestStatus || "New"}
+                            </span>
+                          }
+                          statusSelect={
+                            <select
+                              value={lead.leadInterestStatus || ""}
+                              onChange={(e) => handleStatusChange(lead._id, e.target.value)}
+                              disabled={statusSavingId === lead._id}
+                              className={`px-3 py-2 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer transition-all border w-full outline-none
+                                ${statusSavingId === lead._id ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white border-gray-200 hover:border-gray-300'}
+                                ${lead.leadInterestStatus === 'Interested' ? 'text-emerald-600' : lead.leadInterestStatus === 'Follow Up' ? 'text-amber-600' : 'text-gray-700'}
+                              `}
+                            >
+                              <option value="">Status</option>
+                              <option value="Interested">Interested</option>
+                              <option value="Not Interested">Not Interested</option>
+                              <option value="Connected">Connected</option>
+                              <option value="Not Connected">Not Connected</option>
+                              <option value="Follow Up">Follow Up</option>
+                            </select>
+                          }
+                          assignSelect={
+                            userRole && userRole.toLowerCase() === "superadmin" ? (
                               <select
                                 value={lead.assignedEmployee || ""}
                                 onChange={(e) => {
@@ -1941,7 +2162,7 @@ const EmployeeLeads = () => {
                                     setSelectedEmployeeForAssign(e.target.value);
                                   }
                                 }}
-                                className="px-3 py-1.5 w-full max-w-[140px] rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer transition-all bg-white border border-gray-200 hover:border-gray-300 text-gray-700 outline-none"
+                                className="px-3 py-1.5 w-full rounded-lg text-xs font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer transition-all bg-white border border-gray-200 hover:border-gray-300 text-gray-700 outline-none"
                               >
                                 <option value="">Assign Employee</option>
                                 {allEmployees.map((emp) => (
@@ -1950,15 +2171,19 @@ const EmployeeLeads = () => {
                                   </option>
                                 ))}
                               </select>
-                            </td>
-                          )}
-                        </tr>
+                            ) : null
+                          }
+                          actionsDropdownOptions={[
+                            { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleView(lead) },
+                            { label: "Edit", icon: <Edit2 size={14} className="text-emerald-500" />, onClick: () => handleEdit(lead) },
+                            { label: "Message", icon: <MessageSquare size={14} className="text-amber-500" />, onClick: () => handleAddMessage(lead) },
+                            { label: "Details", icon: <span className="text-indigo-500 font-bold ml-1 mr-0.5">D</span>, onClick: () => handleAddDetails(lead), show: lead.leadInterestStatus === "Follow Up" },
+                            { label: "Confirm Transfer", icon: <span className="text-rose-500 font-bold ml-1 mr-0.5">C</span>, onClick: () => handleSpecialConfirmTransfer(lead), show: lead.leadInterestStatus === "Follow Up", className: "text-rose-700 font-medium" },
+                          ]}
+                        />
                       ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
+                    </div>
+                  </div>
             </>
           )}
         </>
@@ -1974,45 +2199,69 @@ const EmployeeLeads = () => {
           ) : (
             <>
               <div className="mt-4 w-full">
-                <div className="rounded-2xl shadow-sm border border-gray-100 bg-white overflow-hidden">
-                  <div className="overflow-x-auto w-full max-w-full">
-                    <table className="min-w-[800px] w-full divide-y divide-gray-100">
-                    <thead className="bg-gray-50/50">
-                      <tr>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact Information</th>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Departure</th>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Destination</th>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Travel Date</th>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {visibleAssignedLeads.map((lead) => (
-                        <tr key={lead._id} className="hover:bg-indigo-50/30 transition-colors group">
-                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap">
-                            <div className="flex flex-col gap-1">
-                              <span className="font-semibold text-gray-900 text-sm">{lead.name || "—"}</span>
-                              <span className="text-xs text-gray-500">{lead.email || "—"}</span>
-                              <span className="text-xs text-gray-400 font-medium">{lead.phone || "—"}</span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.departureCity || "—"}</td>
-                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.destination || "—"}</td>
-                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{formatDate(lead.expectedTravelDate)}</td>
-                          <td className="px-4 py-2 sm:px-6 sm:py-3 text-center">
-                            <div className="flex justify-center gap-2">
-                              <ActionDropdown
-                                isOpen={openDropdownId === lead._id}
-                                onToggle={() => setOpenDropdownId(openDropdownId === lead._id ? null : lead._id)}
-                                options={[
-                                  { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleView(lead) },
-                                  { label: "Edit", icon: <Edit2 size={14} className="text-emerald-500" />, onClick: () => handleEditAssigned(lead) }
-                                ]}
-                              />
-                            </div>
-                          </td>
+                  {/* Desktop View: Table */}
+                  <div className="hidden md:block rounded-2xl shadow-sm border border-gray-100 bg-white overflow-hidden">
+                    <div className="overflow-x-auto w-full max-w-full">
+                      <table className="min-w-[800px] w-full divide-y divide-gray-100">
+                      <thead className="bg-gray-50/50">
+                        <tr>
+                          <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact Information</th>
+                          <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Departure</th>
+                          <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Destination</th>
+                          <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Travel Date</th>
+                          <th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
-                      ))}
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {visibleAssignedLeads.map((lead) => (
+                          <tr key={lead._id} className="hover:bg-indigo-50/30 transition-colors group">
+                            <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap">
+                              <div className="flex flex-col gap-1">
+                                <span className="font-semibold text-gray-900 text-sm">{lead.name || "—"}</span>
+                                <span className="text-xs text-gray-500">{lead.email || "—"}</span>
+                                <span className="text-xs text-gray-400 font-medium">{lead.phone || "—"}</span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.departureCity || "—"}</td>
+                            <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.destination || "—"}</td>
+                            <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{formatDate(lead.expectedTravelDate)}</td>
+                            <td className="px-4 py-2 sm:px-6 sm:py-3 text-center">
+                              <div className="flex justify-center gap-2">
+                                <ActionDropdown
+                                  isOpen={openDropdownId === lead._id}
+                                  onToggle={() => setOpenDropdownId(openDropdownId === lead._id ? null : lead._id)}
+                                  options={[
+                                    { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleView(lead) },
+                                    { label: "Edit", icon: <Edit2 size={14} className="text-emerald-500" />, onClick: () => handleEditAssigned(lead) }
+                                  ]}
+                                />
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Mobile View: Card Layout */}
+                  <div className="block md:hidden space-y-4">
+                    {visibleAssignedLeads.map((lead, index) => (
+                      <MobileLeadCard
+                        key={lead._id}
+                        lead={lead}
+                        index={index}
+                        openDropdownId={openDropdownId}
+                        setOpenDropdownId={setOpenDropdownId}
+                        formatDate={formatDate}
+                        actionsDropdownOptions={[
+                          { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleView(lead) },
+                          { label: "Edit", icon: <Edit2 size={14} className="text-emerald-500" />, onClick: () => handleEditAssigned(lead) }
+                        ]}
+                      />
+                    ))}
+                  </div>
+
                     {/* Edit Assigned Lead Modal */}
                     {editAssignedLead && (
                       <Modal isOpen={true} onClose={closeModal} size="large">
@@ -2033,11 +2282,7 @@ const EmployeeLeads = () => {
                         </div>
                       </Modal>
                     )}
-                  </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
+                  </div>
 
             {/* Pagination controls */}
               <div className="flex items-center justify-between mt-3">
@@ -2090,48 +2335,73 @@ const EmployeeLeads = () => {
 
           {!loading && transferLeads.length > 0 && (
             <div className="mt-4 w-full">
-              <div className="rounded-2xl shadow-sm border border-gray-100 bg-white overflow-hidden">
-                <div className="overflow-x-auto w-full max-w-full">
-                  <table className="min-w-[800px] w-full divide-y divide-gray-100">
-                  <thead className="bg-gray-50/50">
-                    <tr>
-                      <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact Information</th>
-                      <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Destination</th>
-                      <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                      <th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {transferLeads.map((lead) => (
-                      <tr key={lead._id} className="hover:bg-indigo-50/30 transition-colors group">
-                        <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap">
-                          <div className="flex flex-col gap-1">
-                            <span className="font-semibold text-gray-900 text-sm">{lead.name || "—"}</span>
-                            <span className="text-xs text-gray-500">{lead.email || "—"}</span>
-                            <span className="text-xs text-gray-400 font-medium">{lead.phone || "—"}</span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.destination || "—"}</td>
-                        <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">
-                          <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
-                            {lead.leadStatus || "Pending"}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2 sm:px-6 sm:py-3 text-center">
-                          <div className="flex justify-center gap-2 flex-wrap">
-                            <ActionDropdown
-                              isOpen={openDropdownId === lead._id}
-                              onToggle={() => setOpenDropdownId(openDropdownId === lead._id ? null : lead._id)}
-                              options={[
-                                { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleViewLead(lead) }
-                              ]}
-                            />
-                          </div>
-                        </td>
+              <div className="mt-4 w-full">
+                {/* Desktop View: Table */}
+                <div className="hidden md:block rounded-2xl shadow-sm border border-gray-100 bg-white overflow-hidden">
+                  <div className="overflow-x-auto w-full max-w-full">
+                    <table className="min-w-[800px] w-full divide-y divide-gray-100">
+                    <thead className="bg-gray-50/50">
+                      <tr>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact Information</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Destination</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {transferLeads.map((lead) => (
+                        <tr key={lead._id} className="hover:bg-indigo-50/30 transition-colors group">
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap">
+                            <div className="flex flex-col gap-1">
+                              <span className="font-semibold text-gray-900 text-sm">{lead.name || "—"}</span>
+                              <span className="text-xs text-gray-500">{lead.email || "—"}</span>
+                              <span className="text-xs text-gray-400 font-medium">{lead.phone || "—"}</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.destination || "—"}</td>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">
+                            <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
+                              {lead.leadStatus || "Pending"}
+                            </span>
+                          </td>
+                          <td className="px-4 py-2 sm:px-6 sm:py-3 text-center">
+                            <div className="flex justify-center gap-2 flex-wrap">
+                              <ActionDropdown
+                                isOpen={openDropdownId === lead._id}
+                                onToggle={() => setOpenDropdownId(openDropdownId === lead._id ? null : lead._id)}
+                                options={[
+                                  { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleViewLead(lead) }
+                                ]}
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Mobile View: Card Layout */}
+              <div className="block md:hidden space-y-4">
+                {transferLeads.map((lead, index) => (
+                  <MobileLeadCard
+                    key={lead._id}
+                    lead={lead}
+                    index={index}
+                    openDropdownId={openDropdownId}
+                    setOpenDropdownId={setOpenDropdownId}
+                    formatDate={formatDate}
+                    statusBadge={
+                      <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 font-semibold">
+                        {lead.leadStatus || "Pending"}
+                      </span>
+                    }
+                    actionsDropdownOptions={[
+                      { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleViewLead(lead) }
+                    ]}
+                  />
+                ))}
               </div>
             </div>
           </div>
@@ -2149,70 +2419,90 @@ const EmployeeLeads = () => {
           ) : (
             <>
               <div className="mt-4 w-full">
-                <div className="rounded-2xl shadow-sm border border-gray-100 bg-white overflow-hidden">
-                  <div className="overflow-x-auto w-full max-w-full">
-                    <table className="min-w-[800px] w-full divide-y divide-gray-100">
-                    <thead className="bg-gray-50/50">
-                      <tr>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact Information</th>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Departure</th>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Destination</th>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Travel Date</th>
-                        <th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {destinationAssignedLeads.map((lead) => (
-                        <tr key={lead._id} className="hover:bg-indigo-50/30 transition-colors group">
-                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap">
-                            <div className="flex flex-col gap-1">
-                              <span className="font-semibold text-gray-900 text-sm">{lead.name || "—"}</span>
-                              <span className="text-xs text-gray-500">{lead.email || "—"}</span>
-                              <span className="text-xs text-gray-400 font-medium">{lead.phone || "—"}</span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.departureCity || "—"}</td>
-                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.destination || "—"}</td>
-                          <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{formatDate(lead.expectedTravelDate)}</td>
-                          <td className="px-4 py-2 sm:px-6 sm:py-3 text-center">
-                            <div className="flex justify-center gap-2">
-                              <ActionDropdown
-                                isOpen={openDropdownId === lead._id}
-                                onToggle={() => setOpenDropdownId(openDropdownId === lead._id ? null : lead._id)}
-                                options={[
-                                  { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleView(lead) },
-                                  { label: "Edit", icon: <Edit2 size={14} className="text-emerald-500" />, onClick: () => handleEditDestAssigned(lead) }
-                                ]}
-                              />
-                            </div>
-                          </td>
+                {/* Desktop View: Table */}
+                <div className="hidden md:block rounded-2xl shadow-sm border border-gray-100 bg-white overflow-hidden">
+                    <div className="overflow-x-auto w-full max-w-full">
+                      <table className="min-w-[800px] w-full divide-y divide-gray-100">
+                      <thead className="bg-gray-50/50">
+                        <tr>
+                          <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact Information</th>
+                          <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Departure</th>
+                          <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Destination</th>
+                          <th className="px-4 py-2 sm:px-6 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Travel Date</th>
+                          <th className="px-4 py-2 sm:px-6 sm:py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
-                      ))}
-                    {/* Edit Destination Assigned Lead Modal */}
-                    {editDestAssignedLead && (
-                      <Modal isOpen={true} onClose={closeModal} size="large">
-                        <div className="flex flex-col h-full max-h-[95vh]">
-                          <div className="p-4 border-b flex justify-between items-center">
-                            <h2 className="text-lg font-bold text-gray-900">Edit Lead (Assigned by Destination)</h2>
-                            <button onClick={closeModal} className="text-gray-600 hover:text-gray-800"><X size={20} /></button>
-                          </div>
-                          <div className="flex-1 overflow-y-auto p-4">
-                            <LeadForm
-                              initialData={editDestAssignedLead}
-                              onSubmit={handleUpdateDestAssignedLead}
-                              onClose={closeModal}
-                              isEditing={true}
-                            />
-                            <div className="text-xs text-gray-500 mt-2">This lead was automatically assigned to you based on destination matching.</div>
-                          </div>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {destinationAssignedLeads.map((lead) => (
+                          <tr key={lead._id} className="hover:bg-indigo-50/30 transition-colors group">
+                            <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap">
+                              <div className="flex flex-col gap-1">
+                                <span className="font-semibold text-gray-900 text-sm">{lead.name || "—"}</span>
+                                <span className="text-xs text-gray-500">{lead.email || "—"}</span>
+                                <span className="text-xs text-gray-400 font-medium">{lead.phone || "—"}</span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.departureCity || "—"}</td>
+                            <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{lead.destination || "—"}</td>
+                            <td className="px-4 py-2 sm:px-6 sm:py-3 whitespace-nowrap text-sm text-gray-700">{formatDate(lead.expectedTravelDate)}</td>
+                            <td className="px-4 py-2 sm:px-6 sm:py-3 text-center">
+                              <div className="flex justify-center gap-2">
+                                <ActionDropdown
+                                  isOpen={openDropdownId === lead._id}
+                                  onToggle={() => setOpenDropdownId(openDropdownId === lead._id ? null : lead._id)}
+                                  options={[
+                                    { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleView(lead) },
+                                    { label: "Edit", icon: <Edit2 size={14} className="text-emerald-500" />, onClick: () => handleEditDestAssigned(lead) }
+                                  ]}
+                                />
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Mobile View: Card Layout */}
+                  <div className="block md:hidden space-y-4">
+                    {destinationAssignedLeads.map((lead, index) => (
+                      <MobileLeadCard
+                        key={lead._id}
+                        lead={lead}
+                        index={index}
+                        openDropdownId={openDropdownId}
+                        setOpenDropdownId={setOpenDropdownId}
+                        formatDate={formatDate}
+                        actionsDropdownOptions={[
+                          { label: "View", icon: <Eye size={14} className="text-blue-500" />, onClick: () => handleView(lead) },
+                          { label: "Edit", icon: <Edit2 size={14} className="text-emerald-500" />, onClick: () => handleEditDestAssigned(lead) }
+                        ]}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Edit Destination Assigned Lead Modal */}
+                  {editDestAssignedLead && (
+                    <Modal isOpen={true} onClose={closeModal} size="large">
+                      <div className="flex flex-col h-full max-h-[95vh]">
+                        <div className="p-4 border-b flex justify-between items-center">
+                          <h2 className="text-lg font-bold text-gray-900">Edit Lead (Assigned by Destination)</h2>
+                          <button onClick={closeModal} className="text-gray-600 hover:text-gray-800"><X size={20} /></button>
                         </div>
-                      </Modal>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+                        <div className="flex-1 overflow-y-auto p-4">
+                          <LeadForm
+                            initialData={editDestAssignedLead}
+                            onSubmit={handleUpdateDestAssignedLead}
+                            onClose={closeModal}
+                            isEditing={true}
+                          />
+                          <div className="text-xs text-gray-500 mt-2">This lead was automatically assigned to you based on destination matching.</div>
+                        </div>
+                      </div>
+                    </Modal>
+                  )}
+                  </div>
             </>
           )}
         </>

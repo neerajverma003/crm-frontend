@@ -791,52 +791,207 @@ const TaskAssign = () => {
               <p className="text-gray-600 text-lg">No tasks found</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Task Title</th>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Assigned To</th>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Priority</th>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Status</th>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Due Date</th>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {tasks.map((task) => (
-                    <>
-                      <tr
-                        key={task._id}
-                        className="hover:bg-gray-50 transition cursor-pointer"
-                        onClick={() => toggleExpandedTask(task._id)}
-                      >
-                        <td className="px-6 py-4">
-                        <div className="flex items-start gap-2">
-                          <FiChevronDown
-                            className={`mt-1 text-gray-500 transition-transform ${expandedTaskId === task._id ? "rotate-180" : "rotate-0"}`}
-                          />
-                          <div>
-                            <div className="text-sm font-semibold text-gray-900">{task.taskTitle}</div>
-                            <div className="text-xs text-gray-600 mt-1">{task.description?.substring(0, 50)}...</div>
+            <>
+              {/* Desktop view: Table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Task Title</th>
+                      <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Assigned To</th>
+                      <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Priority</th>
+                      <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Status</th>
+                      <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Due Date</th>
+                      <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {tasks.map((task) => (
+                      <React.Fragment key={task._id}>
+                        <tr
+                          className="hover:bg-gray-50 transition cursor-pointer"
+                          onClick={() => toggleExpandedTask(task._id)}
+                        >
+                          <td className="px-6 py-4">
+                          <div className="flex items-start gap-2">
+                            <FiChevronDown
+                              className={`mt-1 text-gray-500 transition-transform ${expandedTaskId === task._id ? "rotate-180" : "rotate-0"}`}
+                            />
+                            <div>
+                              <div className="text-sm font-semibold text-gray-900">{task.taskTitle}</div>
+                              <div className="text-xs text-gray-600 mt-1">{task.description?.substring(0, 50)}...</div>
+                            </div>
                           </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm font-semibold text-gray-900">
+                            {getAssigneeName(task.assignedTo)}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getPriorityColor(task.priority)}`}>
+                            {task.priority}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <select
+                            value={task.taskStatus}
+                            onChange={(e) => handleStatusChange(task._id, e.target.value)}
+                            className={`px-3 py-1 text-xs font-semibold rounded-full border-0 cursor-pointer ${getStatusColor(task.taskStatus)}`}
+                          >
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                            <option value="On Hold">On Hold</option>
+                            <option value="Cancelled">Cancelled</option>
+                          </select>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-900 font-semibold">
+                            {new Date(task.dueDate).toLocaleDateString()}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleViewHistory(task);
+                              }}
+                              className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition"
+                              title="View History"
+                            >
+                              <FiSearch size={18} />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEdit(task);
+                              }}
+                              className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition"
+                              title="Edit Task"
+                            >
+                              <FiEdit2 size={18} />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(task._id);
+                              }}
+                              className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition"
+                              title="Delete Task"
+                            >
+                              <FiTrash2 size={18} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                      {expandedTaskId === task._id && (
+                        <tr className="bg-slate-50 transition-all duration-300">
+                          <td colSpan="6" className="px-6 py-4">
+                            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                              <div className="flex items-center justify-between mb-4">
+                                <div>
+                                  <h3 className="text-lg font-semibold text-gray-900">Task Details</h3>
+                                  <p className="text-sm text-gray-500">
+                                    {task.contentType === "numbers" ? "Numbers table" : "Full description"}
+                                  </p>
+                                </div>
+                                <span className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-1 text-sm font-medium text-indigo-700">
+                                  {task.contentType === "numbers" ? "Numbers" : "Description"}
+                                </span>
+                              </div>
+                              {task.contentType !== "numbers" ? (
+                                <div className="text-sm text-gray-700 whitespace-pre-line">
+                                  {task.description || "No description provided."}
+                                </div>
+                              ) : (
+                                <div className="overflow-x-auto">
+                                  <table className="w-full border-collapse">
+                                    <thead>
+                                      <tr className="bg-indigo-50">
+                                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Row</th>
+                                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 1</th>
+                                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 2</th>
+                                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 3</th>
+                                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 4</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {(
+                                        task.numberData && task.numberData.length > 0
+                                          ? task.numberData
+                                          : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "" }))
+                                      ).map((row, index) => (
+                                        <tr key={`${task._id}-detail-${index}`} className="odd:bg-white even:bg-slate-50">
+                                          <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700 font-semibold">{row.row || index + 1}</td>
+                                          <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700">{row.col1 || ""}</td>
+                                          <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700">{row.col2 || ""}</td>
+                                          <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700">{row.col3 || ""}</td>
+                                          <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700">{row.col4 || ""}</td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile view: Cards list */}
+              <div className="block md:hidden space-y-4 p-4">
+                {tasks.map((task) => (
+                  <div
+                    key={task._id}
+                    className="bg-white rounded-xl border border-gray-150 p-4 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col gap-3 relative overflow-visible cursor-pointer"
+                    onClick={() => toggleExpandedTask(task._id)}
+                  >
+                    {/* Header: Title and Chevron */}
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="flex-1">
+                        <h4 className="font-bold text-gray-900 text-sm leading-tight">
+                          {task.taskTitle}
+                        </h4>
+                        <div className="text-xs text-gray-600 mt-1">
+                          {task.description ? `${task.description.substring(0, 50)}...` : "No description"}
                         </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm font-semibold text-gray-900">
-                          {getAssigneeName(task.assignedTo)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getPriorityColor(task.priority)}`}>
+                      </div>
+                      <FiChevronDown
+                        className={`text-gray-500 transition-transform ${expandedTaskId === task._id ? "rotate-180" : "rotate-0"}`}
+                        size={18}
+                      />
+                    </div>
+
+                    {/* Meta Row: Assigned to, Due Date, Priority */}
+                    <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-gray-50">
+                      <div>
+                        <span className="text-gray-500 font-medium block">Assigned To:</span>
+                        <span className="text-gray-950 font-semibold">{getAssigneeName(task.assignedTo)}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 font-medium block">Due Date:</span>
+                        <span className="text-gray-950 font-semibold">{new Date(task.dueDate).toLocaleDateString()}</span>
+                      </div>
+                      <div className="mt-1">
+                        <span className="text-gray-500 font-medium block mb-0.5">Priority:</span>
+                        <span className={`inline-block px-2.5 py-0.5 text-[10px] font-semibold rounded-full ${getPriorityColor(task.priority)}`}>
                           {task.priority}
                         </span>
-                      </td>
-                      <td className="px-6 py-4">
+                      </div>
+                      <div className="mt-1">
+                        <span className="text-gray-500 font-medium block mb-0.5">Status:</span>
                         <select
                           value={task.taskStatus}
+                          onClick={(e) => e.stopPropagation()}
                           onChange={(e) => handleStatusChange(task._id, e.target.value)}
-                          className={`px-3 py-1 text-xs font-semibold rounded-full border-0 cursor-pointer ${getStatusColor(task.taskStatus)}`}
+                          className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border-0 cursor-pointer ${getStatusColor(task.taskStatus)}`}
                         >
                           <option value="Pending">Pending</option>
                           <option value="In Progress">In Progress</option>
@@ -844,105 +999,80 @@ const TaskAssign = () => {
                           <option value="On Hold">On Hold</option>
                           <option value="Cancelled">Cancelled</option>
                         </select>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900 font-semibold">
-                          {new Date(task.dueDate).toLocaleDateString()}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleViewHistory(task);
-                            }}
-                            className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition"
-                            title="View History"
-                          >
-                            <FiSearch size={18} />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEdit(task);
-                            }}
-                            className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition"
-                            title="Edit Task"
-                          >
-                            <FiEdit2 size={18} />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(task._id);
-                            }}
-                            className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition"
-                            title="Delete Task"
-                          >
-                            <FiTrash2 size={18} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                      </div>
+                    </div>
+
+                    {/* Actions Row */}
+                    <div className="flex justify-end gap-2 pt-2 border-t border-gray-50" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={() => handleViewHistory(task)}
+                        className="flex items-center gap-1 px-2.5 py-1.5 bg-green-50 text-green-700 border border-green-100 rounded-lg text-[11px] font-medium hover:bg-green-100 transition"
+                      >
+                        <FiSearch size={12} /> History
+                      </button>
+                      <button
+                        onClick={() => handleEdit(task)}
+                        className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 text-blue-700 border border-blue-100 rounded-lg text-[11px] font-medium hover:bg-blue-100 transition"
+                      >
+                        <FiEdit2 size={12} /> Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(task._id)}
+                        className="flex items-center gap-1 px-2.5 py-1.5 bg-red-50 text-red-700 border border-red-100 rounded-lg text-[11px] font-medium hover:bg-red-100 transition"
+                      >
+                        <FiTrash2 size={12} /> Delete
+                      </button>
+                    </div>
+
+                    {/* Expanded details container */}
                     {expandedTaskId === task._id && (
-                      <tr className="bg-slate-50 transition-all duration-300">
-                        <td colSpan="6" className="px-6 py-4">
-                          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                            <div className="flex items-center justify-between mb-4">
-                              <div>
-                                <h3 className="text-lg font-semibold text-gray-900">Task Details</h3>
-                                <p className="text-sm text-gray-500">
-                                  {task.contentType === "numbers" ? "Numbers table" : "Full description"}
-                                </p>
-                              </div>
-                              <span className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-1 text-sm font-medium text-indigo-700">
-                                {task.contentType === "numbers" ? "Numbers" : "Description"}
-                              </span>
-                            </div>
-                            {task.contentType !== "numbers" ? (
-                              <div className="text-sm text-gray-700 whitespace-pre-line">
-                                {task.description || "No description provided."}
-                              </div>
-                            ) : (
-                              <div className="overflow-x-auto">
-                                <table className="w-full border-collapse">
-                                  <thead>
-                                    <tr className="bg-indigo-50">
-                                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Row</th>
-                                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 1</th>
-                                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 2</th>
-                                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 3</th>
-                                      <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 4</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {(
-                                      task.numberData && task.numberData.length > 0
-                                        ? task.numberData
-                                        : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "" }))
-                                    ).map((row, index) => (
-                                      <tr key={`${task._id}-detail-${index}`} className="odd:bg-white even:bg-slate-50">
-                                        <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700 font-semibold">{row.row || index + 1}</td>
-                                        <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700">{row.col1 || ""}</td>
-                                        <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700">{row.col2 || ""}</td>
-                                        <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700">{row.col3 || ""}</td>
-                                        <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700">{row.col4 || ""}</td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
-                              </div>
-                            )}
+                      <div className="mt-2 pt-3 border-t border-gray-100 transition-all duration-300" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between mb-2">
+                          <h5 className="font-semibold text-gray-900 text-xs">Task Details</h5>
+                          <span className="inline-flex items-center rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-medium text-indigo-700">
+                            {task.contentType === "numbers" ? "Numbers" : "Description"}
+                          </span>
+                        </div>
+                        {task.contentType !== "numbers" ? (
+                          <div className="text-xs text-gray-700 whitespace-pre-line bg-gray-50 p-2.5 rounded-lg border border-gray-100">
+                            {task.description || "No description provided."}
                           </div>
-                        </td>
-                      </tr>
+                        ) : (
+                          <div className="overflow-x-auto bg-gray-50 rounded-lg border border-gray-100">
+                            <table className="w-full border-collapse">
+                              <thead>
+                                <tr className="bg-indigo-50">
+                                  <th className="border border-gray-200 px-2 py-1 text-left text-[10px] font-semibold uppercase text-gray-600">Row</th>
+                                  <th className="border border-gray-200 px-2 py-1 text-left text-[10px] font-semibold uppercase text-gray-600">Col 1</th>
+                                  <th className="border border-gray-200 px-2 py-1 text-left text-[10px] font-semibold uppercase text-gray-600">Col 2</th>
+                                  <th className="border border-gray-200 px-2 py-1 text-left text-[10px] font-semibold uppercase text-gray-600">Col 3</th>
+                                  <th className="border border-gray-200 px-2 py-1 text-left text-[10px] font-semibold uppercase text-gray-600">Col 4</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {(
+                                  task.numberData && task.numberData.length > 0
+                                    ? task.numberData
+                                    : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "" }))
+                                ).map((row, index) => (
+                                  <tr key={`${task._id}-detail-${index}`} className="bg-white odd:bg-gray-50">
+                                    <td className="border border-gray-200 px-2 py-1 text-[10px] text-gray-700 font-semibold">{row.row || index + 1}</td>
+                                    <td className="border border-gray-200 px-2 py-1 text-[10px] text-gray-700">{row.col1 || ""}</td>
+                                    <td className="border border-gray-200 px-2 py-1 text-[10px] text-gray-700">{row.col2 || ""}</td>
+                                    <td className="border border-gray-200 px-2 py-1 text-[10px] text-gray-700">{row.col3 || ""}</td>
+                                    <td className="border border-gray-200 px-2 py-1 text-[10px] text-gray-700">{row.col4 || ""}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
                     )}
-                    </>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
 

@@ -150,7 +150,8 @@ const Employee = () => {
             </div>
           </div>
           
-          <div className="rounded border overflow-auto max-h-[75vh] relative">
+          {/* Desktop View: Table */}
+          <div className="hidden md:block rounded border overflow-auto max-h-[75vh] relative">
             <table className="w-full table-auto">
               <thead className="sticky top-0 bg-gray-100">
                 <tr>
@@ -196,7 +197,7 @@ const Employee = () => {
                       <div className="flex items-center gap-1">
                         <button className="text-gray-500 hover:text-gray-700">
                           <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M18 2H9c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H9V4h9v12zM3 15v-2h2v2H3zm0-5.5h2v2H3v-2zM10 20h2v2h-2v-2zm-7-1.5v-2h2v2H3zM5 22c-1.1 0-2-.9-2-2h2v2zm3.5 0h-2v-2h2v2zm5 0v-2h2c0 1.1-.9 2-2 2zM5 6v2H3c0-1.1.9-2 2-2z"></path>
+                            <path d="M18 2H9c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H9V4h9v12zM3 15v-2h2v2H3zm0-5.5h2v2H3v-2zM10 20h2v2-h-2v-2zm-7-1.5v-2h2v2H3zM5 22c-1.1 0-2-.9-2-2h2v2zm3.5 0h-2v-2h2v2zm5 0v-2h2c0 1.1-.9 2-2 2zM5 6v2H3c0-1.1.9-2 2-2z"></path>
                           </svg>
                         </button>
                         {employee.email}
@@ -236,6 +237,91 @@ const Employee = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile View: Cards */}
+          <div className="block md:hidden space-y-4">
+            {employees.map((employee, index) => (
+              <div key={employee.id} className="bg-white rounded-2xl border border-gray-150 p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col gap-3 relative overflow-hidden">
+                <div className="absolute top-4 right-4 bg-blue-50 text-blue-700 font-bold text-xs px-2.5 py-1 rounded-full">
+                  # {index + 1}
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-300 border border-slate-200">
+                    <img src={employee.profileImage} alt={employee.name} className="h-full w-full object-cover" />
+                  </div>
+                  <div>
+                    <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-medium">{employee.id}</span>
+                    <h4 className="font-bold text-gray-900 text-base leading-tight mt-1">{employee.name}</h4>
+                  </div>
+                </div>
+
+                <div className="space-y-2 border-t border-gray-100 pt-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Position:</span>
+                    <span className="text-gray-900 font-semibold">{employee.position}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Department:</span>
+                    <span className="text-gray-900 font-semibold">{employee.department}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Account:</span>
+                    <span className="text-gray-900 font-semibold">{employee.account}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500">Status:</span>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                      employee.status === 'active' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {employee.status}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Contact:</span>
+                    <span className="text-gray-900 font-semibold">{employee.contact}</span>
+                  </div>
+                  <div className="flex flex-col gap-1 border-t border-gray-50 pt-2">
+                    <span className="text-gray-500">Email:</span>
+                    <span className="text-gray-900 font-medium break-all">{employee.email}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 border-t border-gray-100 pt-3 mt-1">
+                  <button 
+                    className="flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl transition-all font-semibold text-xs border border-blue-100"
+                    onClick={() => handleViewClick(employee)}
+                  >
+                    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path fillRule="evenodd" clipRule="evenodd" d="M16 9C16 11.2091 14.2091 13 12 13C9.79086 13 8 11.2091 8 9C8 6.79086 9.79086 5 12 5C14.2091 5 16 6.79086 16 9ZM14 9C14 10.1046 13.1046 11 12 11C10.8954 11 10 10.1046 10 9C10 7.89543 10.8954 7 12 7C13.1046 7 14 7.89543 14 9Z"></path>
+                      <path fillRule="evenodd" clipRule="evenodd" d="M12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1ZM3 12C3 14.0902 3.71255 16.014 4.90798 17.5417C6.55245 15.3889 9.14627 14 12.0645 14C14.9448 14 17.5092 15.3531 19.1565 17.4583C20.313 15.9443 21 14.0524 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12ZM12 21C9.84977 21 7.87565 20.2459 6.32767 18.9878C7.59352 17.1812 9.69106 16 12.0645 16C14.4084 16 16.4833 17.1521 17.7538 18.9209C16.1939 20.2191 14.1881 21 12 21Z"></path>
+                    </svg>
+                    <span>View</span>
+                  </button>
+                  <button 
+                    className="flex items-center justify-center gap-1.5 px-3 py-2 bg-yellow-50 hover:bg-yellow-100 text-yellow-700 rounded-xl transition-all font-semibold text-xs border border-yellow-100"
+                    onClick={() => handleEditClick(employee)}
+                  >
+                    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M14 14.252V16.3414C13.3744 16.1203 12.7013 16 12 16C8.68629 16 6 18.6863 6 22H4C4 17.5817 7.58172 14 12 14C12.6906 14 13.3608 14.0875 14 14.252ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11ZM18 17V14H20V17H23V19H20V22H18V19H15V17H18Z"></path>
+                    </svg>
+                    <span>Edit</span>
+                  </button>
+                  <button 
+                    className="flex items-center justify-center gap-1.5 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl transition-all font-semibold text-xs border border-red-100"
+                    onClick={() => handleDeleteClick(employee.id)}
+                  >
+                    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
+                    </svg>
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
           
           <div className="mt-4 p-2 bg-gray-50 rounded">
