@@ -476,16 +476,16 @@ const Sidebar = () => {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed top-4 z-[9999] p-2 text-black transition-all md:hidden ${isOpen ? "left-1/2" : "left-4"}`}
+        className={`fixed top-4 z-[9999] p-2 text-black transition-all lg:hidden ${isOpen ? "left-1/2" : "left-4"}`}
       >
         {isOpen ? <FiX size={24} /> : <FiMenu size={24} />}
       </button>
 
-      {isOpen && <div className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm md:hidden" onClick={() => setIsOpen(false)}></div>}
+      {isOpen && <div className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm lg:hidden" onClick={() => setIsOpen(false)}></div>}
 
       <aside
         className={`fixed top-0 left-0 z-40 h-screen w-[280px] bg-gradient-to-br from-blue-50 via-white to-indigo-50 shadow-xl transition-all duration-300 flex flex-col ${
-          isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0 md:w-[270px]"
+          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0 lg:w-[270px]"
         }`}
       >
         <div className="px-6 py-8 border-b border-blue-200/60">

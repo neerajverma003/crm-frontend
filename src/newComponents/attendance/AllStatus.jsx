@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-const roles = ["All Status", "Present", "Absent", "Late", "Half Day"];
+const roles = ["All Status", "Present", "Absent", "Late", "Half Day", "CL"];
 
 const AllStatus = () => {
   const [role, setRole] = useState("All Roles");

@@ -75,23 +75,25 @@ const SelectField = ({ name, options, required, value, error, onChange }) => (
 // 🧩 Action Dropdown Component
 const ActionDropdown = ({ isOpen, onToggle, options }) => {
   return (
-    <div className="relative">
-      <button onClick={onToggle} className="px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-all text-xs font-semibold flex items-center gap-1 border border-indigo-100">
-        Actions <svg className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" /></svg>
-      </button>
-      {isOpen && (
-        <>
-          <div className="fixed inset-0 z-[40]" onClick={onToggle}></div>
-          <div className="absolute right-0 sm:right-auto sm:left-0 top-full mt-1 w-36 bg-white rounded-xl shadow-lg border border-gray-100 z-[50] py-1 flex flex-col gap-0.5">
-            {options.map((opt, i) => opt.show !== false && (
-              <button key={i} onClick={() => { opt.onClick(); onToggle(); }} className={`flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 transition-colors w-full text-left ${opt.className || "text-gray-700"}`}>
-                {opt.icon} {opt.label}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
+    <select
+      className="px-3 py-1.5 w-[100px] rounded-lg bg-indigo-50 text-indigo-700 font-semibold text-xs border border-indigo-100 outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500/20"
+      value=""
+      onChange={(e) => {
+        const val = e.target.value;
+        if (val !== "") {
+          options[val].onClick();
+          e.target.value = "";
+          if (onToggle) onToggle();
+        }
+      }}
+    >
+      <option value="" disabled hidden>Actions</option>
+      {options.map((opt, i) => opt.show !== false && (
+        <option key={i} value={i} className={opt.className || "text-gray-700"}>
+          {opt.label}
+        </option>
+      ))}
+    </select>
   );
 };
 

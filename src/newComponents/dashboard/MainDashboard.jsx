@@ -728,12 +728,23 @@
 // );
 
 
-import { BarChart3, Clock4, UserCheck, Users, TrendingUp, TrendingDown, UserPlus } from "lucide-react";
+import { FaChartBar, FaClock, FaUserCheck, FaUsers, FaArrowUp, FaArrowDown, FaUserPlus, FaCalendarCheck, FaChartLine } from "react-icons/fa";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+const performanceData = [
+  { name: 'Mon', score: 40 },
+  { name: 'Tue', score: 65 },
+  { name: 'Wed', score: 45 },
+  { name: 'Thu', score: 95 },
+  { name: 'Fri', score: 60 },
+  { name: 'Sat', score: 85 },
+  { name: 'Sun', score: 100 },
+];
 
 const MainDashboard = () => {
     const navigate = useNavigate();
@@ -1249,11 +1260,20 @@ const MainDashboard = () => {
         fetchTasksForDashboard();
     }, [id]);
     return (
-        <div className="flex-1 bg-[#f8fafc] px-4 md:px-8">
+        <div className="flex-1 bg-[#f8fafc] px-4 py-6 md:px-8">
             <ToastContainer
                 position="top-right"
                 autoClose={3000}
             />
+            
+            {/* Welcome Header */}
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
+                    <p className="mt-1 text-sm text-gray-500">Welcome back, {userName.split(" ")[0]}. Here is your overview for today.</p>
+                </div>
+            </div>
+
             {/* Dashboard Overview */}
             {/* <div className="sticky top-0 z-50 mb-6 flex flex-wrap items-center justify-between rounded-2xl bg-white p-6 shadow-sm">
                 <div className="flex items-center gap-4">
@@ -1283,86 +1303,28 @@ const MainDashboard = () => {
 
             {/* Main Content */}
             {/* <div className="grid grid-cols-1 gap-6 lg:grid-cols-3"> */}
-            {/* Recent Leads */}
-            <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Stat Cards */}
+            <div className="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-3">
                 <StatCard
                     title="Conversion Rate"
                     value="12.5%"
-                    sub="+8.5% yesterday"
-                    icon={<TrendingUp className="h-8 w-8 bg-green-200 text-green-600" />}
+                    sub="8.5% yesterday"
+                    icon={<FaChartLine className="h-5 w-5" />}
                     positive
                 />
                 <StatCard
                     title="Team Size"
                     value="24"
                     sub="20 Active"
-                    icon={<Users className="h-6 w-6 text-blue-600" />}
+                    icon={<FaUsers className="h-5 w-5" />}
                 />
                 <StatCard
                     title="Monthly Growth"
                     value="8.2%"
-                    sub="+4.3% yesterday"
-                    icon={<TrendingUp className="h-8 w-8 bg-green-200 text-green-600" />}
+                    sub="4.3% yesterday"
+                    icon={<FaChartLine className="h-5 w-5" />}
                     positive
                 />
-                <div className="rounded-2xl bg-white p-4 shadow-sm">
-                    <div className="flex">
-                        <h4 className="mb-2 text-sm font-semibold text-gray-700">Attendance</h4>
-                        {/* <Clock4 className="h-8 w-8 text-orange-500 sm:ml-32" /> */}
-                        {/* <input
-                            type="date"
-                            value={selectedDate}
-                            onChange={(e) => setSelectedDate(e.target.value)}
-                            className="ml-5 rounded-md border px-2 py-1 text-sm "
-                        /> */}
-                    </div>
-                    <p className="mb-3 text-xs text-gray-400">Current Session</p>
-                    <div className="mb-2 flex flex-col gap-1">
-                        <p className="text-xs font-medium text-gray-600">Time</p>
-                        <p className="text-2xl font-bold text-gray-900">{time}</p>
-                    </div>
-                    <div className="mb-4 flex flex-col gap-1">
-                        <p className="text-xs font-medium text-gray-600">Elapsed Time</p>
-                        <p className="text-lg font-bold text-blue-600">{elapsedTime}</p>
-                    </div>
-
-                    {/* Clock In/Out Times Display */}
-                    <div className="mb-4 flex flex-col gap-2">
-                        <div className="flex items-center gap-2 text-xs">
-                            <span
-                                className={`rounded px-2 py-1 font-medium ${
-                                    !todayRecord?.clockIn ? "bg-gray-50 text-gray-600" : "bg-blue-50 text-blue-700"
-                                }`}
-                            >
-                                IN: {formatTime(todayRecord?.clockIn)}
-                            </span>
-                            <span
-                                className={`rounded px-2 py-1 font-medium ${
-                                    !todayRecord?.clockOut ? "bg-gray-50 text-gray-600" : "bg-amber-50 text-amber-700"
-                                }`}
-                            >
-                                OUT: {formatTime(todayRecord?.clockOut)}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                        <button 
-                            onClick={() => handleClockAction("in")}
-                            disabled={loadingClock}
-                            className="flex-1 rounded-lg bg-gray-100 py-2 text-sm font-semibold hover:bg-gray-200 disabled:opacity-50"
-                        >
-                            Clock In
-                        </button>
-                        <button 
-                            onClick={() => handleClockAction("out")}
-                            disabled={loadingClock}
-                            className="flex-1 rounded-lg bg-red-400 py-2 text-sm font-semibold text-white hover:bg-red-500 disabled:opacity-50"
-                        >
-                            Clock Out
-                        </button>
-                    </div>
-                </div>
             </div>
 
             {/* Attendance */}
@@ -1408,110 +1370,159 @@ const MainDashboard = () => {
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 {/* PERFORMANCE */}
-                <div className="rounded-2xl bg-white p-6 shadow-sm lg:col-span-2">
-                    <div className="mb-4 flex items-center justify-between">
+                <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm lg:col-span-2 flex flex-col">
+                    <div className="mb-6 flex items-center justify-between">
                         <div>
-                            <h3 className="font-semibold text-gray-900">Performance Report</h3>
-                            <p className="text-xs text-gray-500">Efficiency trends (last 7 days)</p>
+                            <h3 className="text-base font-semibold text-gray-900">Performance Overview</h3>
+                            <p className="text-xs text-gray-500 mt-1">Efficiency trends over the last 7 days</p>
                         </div>
-                        <p className="text-sm font-semibold text-green-600">94% Above Average</p>
                     </div>
 
-                    {/* Chart placeholder */}
-                    <div className="relative h-52 w-full rounded-xl bg-blue-50">
-                        <div className="absolute left-6 top-6 rounded-lg bg-white px-4 py-2 text-sm shadow">
-                            <strong>176</strong> <br />
-                            additional text
-                        </div>
+                    {/* Real Recharts Chart */}
+                    <div className="relative flex-1 w-full mt-4 min-h-[220px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart
+                                data={performanceData}
+                                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                            >
+                                <defs>
+                                    <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                                    </linearGradient>
+                                </defs>
+                                <XAxis 
+                                    dataKey="name" 
+                                    axisLine={false} 
+                                    tickLine={false} 
+                                    tick={{ fontSize: 12, fill: '#6b7280' }} 
+                                    dy={10}
+                                />
+                                <YAxis 
+                                    axisLine={false} 
+                                    tickLine={false} 
+                                    tick={{ fontSize: 12, fill: '#6b7280' }} 
+                                />
+                                <CartesianGrid vertical={false} stroke="#f3f4f6" strokeDasharray="3 3" />
+                                <Tooltip 
+                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                    itemStyle={{ color: '#4f46e5', fontWeight: 'bold' }}
+                                />
+                                <Area 
+                                    type="monotone" 
+                                    dataKey="score" 
+                                    stroke="#6366f1" 
+                                    strokeWidth={3}
+                                    fillOpacity={1} 
+                                    fill="url(#colorScore)" 
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
                     </div>
                 </div>
 
-                {/* TODAY TASKS */}
-                <div className="rounded-2xl bg-white p-6 shadow-sm">
-                    <h3 className="mb-4 font-semibold text-gray-900">Today’s Tasks</h3>
-
-                    <div className="space-y-4">
-                        <div>
-                            <h4 className="mb-2 text-sm font-semibold text-gray-700">Present</h4>
-                            {todayTasks && todayTasks.length > 0 ? (
-                                todayTasks.map((t) => (
-                                    <div key={t._id} className="mb-4 p-3 border border-gray-200 rounded-lg bg-gray-50">
-                                        <p className="text-xs font-bold text-blue-600 mb-1">Due: {new Date(t.dueDate).toLocaleDateString()}</p>
-                                        <p className="text-base font-bold text-gray-900 mb-2">{t.taskTitle}</p>
-                                        <p className="text-sm text-gray-700 mb-2">{t.description || "No description provided."}</p>
-                                        <div className="flex justify-end">
-                                            <span className={`text-xs font-medium px-3 py-1 rounded-full ${getPriorityColor(t.priority)}`}>{t.priority || "Medium"}</span>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <p className="text-sm text-gray-500">No tasks for today.</p>
-                            )}
+                {/* ATTENDANCE WIDGET */}
+                <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm lg:col-span-1 flex flex-col justify-between">
+                    <div>
+                        <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
+                            <h4 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                                <FaClock className="text-gray-400" />
+                                Current Session
+                            </h4>
+                            <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Active
+                            </span>
+                        </div>
+                        
+                        <div className="mb-6 grid grid-cols-2 gap-4">
+                            <div>
+                                <p className="text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Current Time</p>
+                                <p className="text-xl font-bold text-gray-900">{time}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Elapsed Time</p>
+                                <p className="text-xl font-bold text-indigo-600">{elapsedTime}</p>
+                            </div>
                         </div>
 
-                        <div>
-                            <h4 className="mb-2 text-sm font-semibold text-gray-700">Last 7 Days</h4>
-                            {last7Tasks && last7Tasks.length > 0 ? (
-                                last7Tasks.map((t) => (
-                                    <div key={t._id} className="mb-4 p-3 border border-gray-200 rounded-lg bg-gray-50">
-                                        <p className="text-xs font-bold text-blue-600 mb-1">Due: {new Date(t.dueDate).toLocaleDateString()}</p>
-                                        <p className="text-base font-bold text-gray-900 mb-2">{t.taskTitle}</p>
-                                        <p className="text-sm text-gray-700 mb-2">{t.description || "No description provided."}</p>
-                                        <div className="flex justify-end">
-                                            <span className={`text-xs font-medium px-3 py-1 rounded-full ${getPriorityColor(t.priority)}`}>{t.priority || "Medium"}</span>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <p className="text-sm text-gray-500">No tasks in the last 7 days.</p>
-                            )}
+                        {/* Clock In/Out Times Display */}
+                        <div className="mb-6 rounded-lg bg-gray-50 border border-gray-100 p-4">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs font-medium text-gray-500">Clock In</span>
+                                <span className="text-sm font-semibold text-gray-900">{formatTime(todayRecord?.clockIn)}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-medium text-gray-500">Clock Out</span>
+                                <span className="text-sm font-semibold text-gray-900">{formatTime(todayRecord?.clockOut)}</span>
+                            </div>
                         </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                        <button 
+                            onClick={() => handleClockAction("in")}
+                            disabled={loadingClock}
+                            className="flex-1 rounded-lg border border-gray-300 bg-white py-2.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-all disabled:opacity-50"
+                        >
+                            Clock In
+                        </button>
+                        <button 
+                            onClick={() => handleClockAction("out")}
+                            disabled={loadingClock}
+                            className="flex-1 rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-all disabled:opacity-50"
+                        >
+                            Clock Out
+                        </button>
                     </div>
                 </div>
             </div>
 
             {/* ================= BOTTOM GRID ================= */}
             <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-                {/* NEWS */}
-                <div className="rounded-2xl bg-white p-6 shadow-sm lg:col-span-2">
-                    <h3 className="mb-4 font-semibold text-gray-900">News & Announcements</h3>
+                {/* TODAY TASKS */}
+                <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm lg:col-span-2">
+                    <h3 className="mb-4 text-base font-semibold text-gray-900">Today's Tasks</h3>
 
-                    {[1, 2, 3, 4].map((i) => (
-                        <div
-                            key={i}
-                            className="flex items-start gap-4 border-b py-3 last:border-none"
-                        >
-                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-100">
-                                <BarChart3 className="text-yellow-600" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-semibold">Quarterly Team Retreat</p>
-                                <p className="text-xs text-gray-500">Offering features like dark/light modes, charts, customizable layouts.</p>
-                            </div>
-                            <span className="ml-auto text-xs text-gray-400">2 Hours</span>
+                    <div className="space-y-3">
+                        <div>
+                            {todayTasks && todayTasks.length > 0 ? (
+                                todayTasks.map((t) => (
+                                    <div key={t._id} className="mb-3 p-4 border border-gray-100 rounded-lg bg-gray-50/50 hover:bg-gray-50 transition-colors">
+                                        <div className="flex justify-between items-start mb-1">
+                                            <p className="text-sm font-semibold text-gray-900">{t.taskTitle}</p>
+                                            <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full ${getPriorityColor(t.priority)}`}>{t.priority || "Medium"}</span>
+                                        </div>
+                                        <div className="flex items-center gap-4 mb-2">
+                                            <p className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                                                <FaCalendarCheck className="text-gray-400" /> Due: {new Date(t.dueDate).toLocaleDateString()}
+                                            </p>
+                                        </div>
+                                        <p className="text-xs text-gray-600 line-clamp-2">{t.description || "No description provided."}</p>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-sm text-gray-500 py-4 text-center border-t border-gray-100">No tasks assigned for today.</p>
+                            )}
                         </div>
-                    ))}
+                    </div>
                 </div>
 
-                {/* LEAD SUMMARY */}
-                <div className="rounded-2xl bg-white p-6 shadow-sm">
-                    <h3 className="mb-4 font-semibold text-gray-900">Lead Summary</h3>
+                {/* NEWS */}
+                <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+                    <h3 className="mb-4 text-base font-semibold text-gray-900">Announcements</h3>
 
-                    <LeadBar
-                        title="Follow up"
-                        percent={75}
-                        color="red"
-                    />
-                    <LeadBar
-                        title="Interested"
-                        percent={45}
-                        color="blue"
-                    />
-                    <LeadBar
-                        title="Connected"
-                        percent={90}
-                        color="green"
-                    />
+                    {[1, 2, 3].map((i) => (
+                        <div
+                            key={i}
+                            className="flex flex-col gap-1 border-b border-gray-100 py-3 last:border-none last:pb-0"
+                        >
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-semibold text-gray-900">Quarterly Team Retreat</p>
+                                <p className="text-[10px] text-gray-400 font-medium">2h ago</p>
+                            </div>
+                            <p className="text-xs text-gray-500 leading-relaxed">New updates to our internal tools including modern UI, dark mode, and charts.</p>
+                        </div>
+                    ))}
                 </div>
             </div>
             {/* Quick Actions */}
@@ -1529,20 +1540,20 @@ const MainDashboard = () => {
                     {/* Clock In/Out */}
                     <button
                         onClick={() => navigate("/attendance")}
-                        className="flex h-24 transform flex-col items-center justify-center rounded-lg border-2 border-gray-200 transition-all duration-200 hover:scale-105 hover:border-green-300 hover:bg-green-50"
+                        className="flex h-20 flex-col items-center justify-center rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:border-indigo-500 hover:bg-indigo-50"
                     >
-                        <Clock4 className="mb-2 h-6 w-6 text-gray-600" />
-                        <span className="font-semibold text-gray-700">Clock In/Out</span>
+                        <FaClock className="mb-1.5 h-5 w-5 text-gray-500" />
+                        <span className="text-xs font-semibold text-gray-700">Clock In/Out</span>
                     </button>
 
                     {/* Add User (Admin Only) */}
                     {(role === "admin" || role === "superAdmin") && (
                         <button
                             onClick={() => navigate("/user-management")}
-                            className="flex h-24 transform flex-col items-center justify-center rounded-lg border-2 border-gray-200 transition-all duration-200 hover:scale-105 hover:border-indigo-300 hover:bg-indigo-50"
+                            className="flex h-20 flex-col items-center justify-center rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:border-indigo-500 hover:bg-indigo-50"
                         >
-                            <UserPlus className="mb-2 h-6 w-6 text-gray-600" />
-                            <span className="font-semibold text-gray-700">Add User</span>
+                            <FaUserPlus className="mb-1.5 h-5 w-5 text-gray-500" />
+                            <span className="text-xs font-semibold text-gray-700">Add User</span>
                         </button>
                     )}
                 </div>
@@ -1556,13 +1567,19 @@ export default MainDashboard;
 /* ================= REUSABLE COMPONENTS ================= */
 
 const StatCard = ({ title, value, sub, icon, positive, negative }) => (
-    <div className="rounded-2xl bg-white p-4 shadow-sm">
-        <div className="mb-2 flex items-center justify-between">
+    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
+        <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-semibold text-gray-600">{title}</p>
-            <div className="rounded-lg bg-gray-100 p-2 text-gray-600">{icon}</div>
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-50 text-gray-500">
+                {icon}
+            </div>
         </div>
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
-        <p className={`text-xs ${positive ? "text-green-600" : negative ? "text-red-600" : "text-gray-500"}`}>{sub}</p>
+        <div>
+            <p className="text-2xl font-bold text-gray-900 mb-1">{value}</p>
+            <p className={`text-xs font-medium flex items-center gap-1 ${positive ? "text-emerald-600" : negative ? "text-red-600" : "text-gray-500"}`}>
+                {positive ? <FaArrowUp /> : negative ? <FaArrowDown /> : null} {sub}
+            </p>
+        </div>
     </div>
 );
 

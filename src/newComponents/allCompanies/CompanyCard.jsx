@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { MdMail, MdPhone, MdLanguage, MdPeople, MdVisibility, MdEdit, MdDelete } from "react-icons/md";
 import PropTypes from 'prop-types';
 
@@ -90,90 +91,106 @@ const CompanyCard = ({
 
   return (
     <div 
-      className="group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-xl hover:border-gray-300 transition-all duration-300 overflow-hidden"
+      className="group relative bg-white rounded-2xl shadow-sm border border-slate-200/60 hover:shadow-xl hover:border-indigo-300 transition-all duration-300 overflow-hidden flex flex-col h-full -translate-y-0 hover:-translate-y-1"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {/* Decorative background blur */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-125 duration-500 ease-out opacity-60 pointer-events-none" />
+
       {/* Top Row with Status Badge */}
-      {/* Top Row with Status Badge */}
-      <div className="p-4 sm:p-6 pb-4">
-        <div className="flex justify-between items-start mb-4 gap-2">
+      <div className="relative z-10 p-5 sm:p-6 pb-4 flex-1">
+        <div className="flex justify-between items-start mb-5 gap-2">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 rounded-lg bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center font-semibold overflow-hidden border border-blue-200">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center font-bold text-xl text-slate-700 shadow-inner overflow-hidden border border-slate-200/50 group-hover:shadow-md transition-shadow">
               {/* Show logo if available, otherwise initial letter */}
               {logoKey || logo ? (
                 <img 
                   src={logoKey ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${logoKey}` : logo} 
                   alt={`${displayName} logo`} 
-                  className="w-full h-full object-contain p-1" 
+                  className="w-full h-full object-contain p-2" 
                 />
               ) : (
-                <span className="text-lg sm:text-xl font-bold text-blue-600">{displayName[0] || "?"}</span>
+                <span className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-blue-600 text-white shadow-sm">
+                  {displayName[0]?.toUpperCase() || "?"}
+                </span>
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <h2 className="font-bold text-gray-900 truncate text-sm sm:text-base">{displayName}</h2>
-              <p className="text-xs text-gray-500 mt-1 truncate">{industry || "Not specified"}</p>
+              <h2 className="font-bold text-slate-800 text-sm sm:text-lg truncate group-hover:text-indigo-600 transition-colors">{displayName}</h2>
+              <p className="text-xs sm:text-sm font-medium text-slate-500 mt-0.5 truncate">{industry || "Industry Not Set"}</p>
             </div>
           </div>
-          <span
-            className={`flex-shrink-0 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold whitespace-nowrap ${
-              displayStatus === "Active"
-                ? "bg-green-100 text-green-700"
-                : "bg-amber-100 text-amber-700"
-            }`}
-          >
+          
+          {/* Status Badge */}
+          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border whitespace-nowrap flex-shrink-0 ${
+            displayStatus === 'Active' 
+              ? 'bg-emerald-50 text-emerald-700 border-emerald-200/60' 
+              : 'bg-amber-50 text-amber-700 border-amber-200/60'
+          }`}>
+            <div className={`w-1.5 h-1.5 rounded-full ${displayStatus === 'Active' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
             {displayStatus}
-          </span>
+          </div>
         </div>
 
         {/* Contact Info */}
-        <div className="space-y-2.5 mb-2">
-          <div className="flex items-center gap-2.5 text-xs text-gray-600 hover:text-gray-900 transition-colors group/link min-w-0">
-            <MdMail size={14} className="text-gray-400 group-hover/link:text-blue-600 flex-shrink-0" />
-            <span className="truncate">{email || "No email"}</span>
-          </div>
-          <div className="flex items-center gap-2.5 text-xs text-gray-600 hover:text-gray-900 transition-colors group/link min-w-0">
-            <MdPhone size={14} className="text-gray-400 group-hover/link:text-blue-600 flex-shrink-0" />
-            <span className="truncate">{phoneNumber || "No phone"}</span>
-          </div>
-          <div className="flex items-center gap-2.5 text-xs text-gray-600 hover:text-gray-900 transition-colors group/link min-w-0">
-            <MdLanguage size={14} className="text-gray-400 group-hover/link:text-blue-600 flex-shrink-0" />
-            <span className="truncate">{website ? website.replace(/^https?:\/\//, "") : "No website"}</span>
-          </div>
-          <div className="flex items-center gap-2.5 text-xs text-gray-600 min-w-0">
-            <MdPeople size={14} className="text-gray-400 flex-shrink-0" />
-            <span className="truncate">{numberOfEmployees || 0} {numberOfEmployees === 1 ? "employee" : "employees"}</span>
+        <div className="space-y-3.5 text-sm text-slate-600 mb-2">
+          {email && (
+            <div className="flex items-center gap-3 hover:text-indigo-600 transition-colors group/item min-w-0">
+              <div className="p-1.5 rounded-md bg-slate-50 text-slate-400 group-hover/item:bg-indigo-50 group-hover/item:text-indigo-500 transition-colors flex-shrink-0">
+                <MdMail size={16} />
+              </div>
+              <span className="truncate">{email}</span>
+            </div>
+          )}
+          {phoneNumber && (
+            <div className="flex items-center gap-3 hover:text-indigo-600 transition-colors group/item min-w-0">
+              <div className="p-1.5 rounded-md bg-slate-50 text-slate-400 group-hover/item:bg-indigo-50 group-hover/item:text-indigo-500 transition-colors flex-shrink-0">
+                <MdPhone size={16} />
+              </div>
+              <span className="truncate">{phoneNumber}</span>
+            </div>
+          )}
+          {website && (
+            <div className="flex items-center gap-3 hover:text-indigo-600 transition-colors group/item min-w-0">
+              <div className="p-1.5 rounded-md bg-slate-50 text-slate-400 group-hover/item:bg-indigo-50 group-hover/item:text-indigo-500 transition-colors flex-shrink-0">
+                <MdLanguage size={16} />
+              </div>
+              <span className="truncate">{website.replace(/^https?:\/\//, "")}</span>
+            </div>
+          )}
+          <div className="flex items-center gap-3 hover:text-indigo-600 transition-colors group/item min-w-0">
+            <div className="p-1.5 rounded-md bg-slate-50 text-slate-400 group-hover/item:bg-indigo-50 group-hover/item:text-indigo-500 transition-colors flex-shrink-0">
+              <MdPeople size={16} />
+            </div>
+            <span className="truncate">{numberOfEmployees || 0} Employees</span>
           </div>
         </div>
       </div>
 
-      {/* Divider */}
-      <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
-
       {/* Deals & Value Section */}
-      <div className="p-6 pt-4 bg-gradient-to-br from-white to-gray-50">
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-blue-50 rounded-lg p-3 text-center border border-blue-100">
-            <p className="font-bold text-lg text-blue-600">{deals}</p>
-            <p className="text-xs text-blue-600/70 font-medium">Deals</p>
+      <div className="relative z-10 p-5 pt-0 mt-4 border-t border-slate-100 flex flex-col gap-4 bg-white">
+        <div className="grid grid-cols-2 gap-3 pt-4">
+          <div className="bg-indigo-50/50 rounded-xl p-3 text-center border border-indigo-100/50">
+            <p className="font-bold text-lg text-indigo-700">{deals}</p>
+            <p className="text-xs text-indigo-600/70 font-semibold uppercase tracking-wider">Deals</p>
           </div>
-          <div className="bg-green-50 rounded-lg p-3 text-center border border-green-100">
-            <p className="font-bold text-lg text-green-600">{value}</p>
-            <p className="text-xs text-green-600/70 font-medium">Value</p>
+          <div className="bg-emerald-50/50 rounded-xl p-3 text-center border border-emerald-100/50">
+            <p className="font-bold text-lg text-emerald-700">{value}</p>
+            <p className="text-xs text-emerald-600/70 font-semibold uppercase tracking-wider">Value</p>
           </div>
         </div>
 
         {/* Actions */}
         <div className={`flex gap-2 transition-all duration-300 ${
-          isHovered ? "opacity-100" : "opacity-80"
+          isHovered ? "opacity-100" : "opacity-0 sm:opacity-100"
         }`}>
           <button
             onClick={handleView}
             title="View details"
-            className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 p-2.5 rounded-lg transition-all duration-200 flex items-center justify-center group/btn"
+            className="flex-1 bg-slate-50 hover:bg-indigo-50 text-slate-500 hover:text-indigo-600 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center group/btn shadow-sm"
           >
-            <MdVisibility size={16} className="group-hover/btn:scale-110 transition-transform" />
+            <MdVisibility size={18} className="group-hover/btn:scale-110 transition-transform" />
           </button>
           <button
             onClick={() => {
@@ -181,22 +198,22 @@ const CompanyCard = ({
               setIsEditOpen(true);
             }}
             title="Edit company"
-            className="flex-1 bg-amber-50 hover:bg-amber-100 text-amber-600 hover:text-amber-700 p-2.5 rounded-lg transition-all duration-200 flex items-center justify-center group/btn"
+            className="flex-1 bg-slate-50 hover:bg-amber-50 text-slate-500 hover:text-amber-600 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center group/btn shadow-sm"
           >
-            <MdEdit size={16} className="group-hover/btn:scale-110 transition-transform" />
+            <MdEdit size={18} className="group-hover/btn:scale-110 transition-transform" />
           </button>
           <button
             onClick={handleDelete}
             title="Delete company"
-            className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 p-2.5 rounded-lg transition-all duration-200 flex items-center justify-center group/btn"
+            className="flex-1 bg-slate-50 hover:bg-red-50 text-slate-500 hover:text-red-600 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center group/btn shadow-sm"
           >
-            <MdDelete size={16} className="group-hover/btn:scale-110 transition-transform" />
+            <MdDelete size={18} className="group-hover/btn:scale-110 transition-transform" />
           </button>
         </div>
       </div>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-start justify-center p-4">
+      {isOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-start justify-center p-4">
           <div className="bg-white w-full h-full max-w-none rounded-none overflow-auto">
             <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 p-6 flex items-center justify-between">
               <h3 className="text-xl font-bold text-white">Company Details</h3>
@@ -351,12 +368,13 @@ const CompanyCard = ({
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Edit Modal (Full screen) */}
-      {isEditOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-start justify-center p-4">
+      {isEditOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-start justify-center p-4">
           <div className="bg-white w-full h-full max-w-none rounded-none overflow-auto">
             <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 p-6 flex items-center justify-between">
               <h3 className="text-xl font-bold text-white">Edit Company</h3>
@@ -560,7 +578,8 @@ const CompanyCard = ({
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

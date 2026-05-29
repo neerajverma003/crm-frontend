@@ -246,124 +246,6 @@ const Header = () => {
     };
 
     return (
-        // <>
-        // {role!=="employee" &&(
-        //   <header className="flex items-center justify-between bg-white shadow-md px-4 sm:px-6 py-3 h-[10vh] sticky top-0 z-30">
-        //   {/* LEFT */}
-        //   <h1 className="hidden md:block text-2xl font-semibold text-gray-700">
-        //     Dashboard Overview
-        //   </h1>
-
-        //   {/* RIGHT */}
-        //   <div className="flex items-center gap-4 sm:gap-6">
-        //     {/* USER DROPDOWN */}
-        //     <div className="hidden md:block relative" ref={dropdownRef}>
-        //       {/* Header button */}
-        //       <button
-        //         onClick={() => setShowProfile((p) => !p)}
-        //         className="flex items-center gap-3 px-3 h-[64px] w-[230px]
-        //                    rounded-full border border-gray-200 bg-white shadow-sm
-        //                    hover:bg-gray-100 transition"
-        //       >
-        //         {/* Avatar */}
-        //         <div className="flex h-[45px] w-[45px] items-center justify-center
-        //                         rounded-full bg-gray-200 text-[18px]
-        //                         font-semibold text-black">
-        //           {userName.charAt(0)?.toUpperCase() || "U"}
-        //         </div>
-
-        //         {/* Name + Role */}
-        //         <div className="flex flex-col justify-center text-left leading-tight flex-1">
-        //           <span className="text-[16px] font-medium text-gray-700">
-        //             {userName}
-        //           </span>
-        //           <span className="text-sm text-gray-400 capitalize">
-        //             {roleName}
-        //           </span>
-        //         </div>
-
-        //         {/* Arrow */}
-        //         <FiChevronDown
-        //           size={18}
-        //           className={`text-gray-500 transition-transform duration-200 ${
-        //             showProfile ? "rotate-180" : ""
-        //           }`}
-        //         />
-        //       </button>
-
-        //       {/* CAPSULE DROPDOWN */}
-        //       <AnimatePresence>
-        //         {showProfile && (
-        //           <motion.div
-        //             initial={{ opacity: 0, y: -6, scale: 0.98 }}
-        //             animate={{ opacity: 1, y: 4, scale: 1 }} // reduced gap here
-        //             exit={{ opacity: 0, y: -6, scale: 0.98 }}
-        //             transition={{ duration: 0.2 }}
-        //             className="absolute left-0 top-full mt-1 w-full
-        //                        rounded-[28px] border border-gray-200 bg-white
-        //                        shadow-[0_16px_40px_rgba(0,0,0,0.14)]
-        //                        overflow-hidden z-50"
-        //           >
-        //             {/* User Info */}
-        //             <div className="flex items-center gap-3 px-5 py-4
-        //                             bg-gray-50 border-b
-        //                             rounded-t-[28px]">
-        //               <div className="flex h-[42px] w-[42px] items-center justify-center
-        //                               rounded-full bg-gray-200 text-[16px]
-        //                               font-semibold text-black">
-        //                 {userName.charAt(0)?.toUpperCase() || "U"}
-        //               </div>
-
-        //               <div className="flex flex-col leading-tight">
-        //                 <span className="text-sm font-medium text-gray-800">
-        //                   {userName}
-        //                 </span>
-        //                 <span className="text-xs text-gray-500 capitalize">
-        //                   {roleName}
-        //                 </span>
-        //               </div>
-        //             </div>
-
-        //             {/* Actions */}
-        //             <div className="px-2 py-2">
-        //               <button
-        //                 className="w-full px-4 py-3 rounded-full
-        //                            text-left text-sm hover:bg-gray-100 transition"
-        //                 onClick={() => {
-        //                   setShowProfile(false);
-        //                   navigate("/profile");
-        //                 }}
-        //               >
-        //                 Profile
-        //               </button>
-
-        //               <button
-        //                 className="w-full px-4 py-3 rounded-full
-        //                            text-left text-sm hover:bg-gray-100 transition"
-        //                 onClick={() => {
-        //                   setShowProfile(false);
-        //                   navigate("/settings");
-        //                 }}
-        //               >
-        //                 Settings
-        //               </button>
-        //             </div>
-        //           </motion.div>
-        //         )}
-        //       </AnimatePresence>
-        //     </div>
-
-        //     {/* LOGOUT */}
-        //     <button
-        //       onClick={handleLogout}
-        //       className="rounded-md p-2 hover:bg-red-100 active:bg-red-200"
-        //     >
-        //       <FiLogOut size={22} className="text-red-600" />
-        //     </button>
-        //   </div>
-        // </header>
-        // )}
-        // </>
         <>
             {role !== "employee" && (
                 <header className="sticky top-0 z-30 h-[64px] w-full bg-white shadow-md">
@@ -385,7 +267,7 @@ const Header = () => {
                             </div>
 
                             {/* DESKTOP — Title */}
-                            <h1 className="hidden text-lg font-semibold text-gray-700 sm:block sm:text-2xl sm:ml-5">Dashboard Overview</h1>
+                            <h1 className="hidden text-lg font-semibold text-gray-700 sm:block sm:text-2xl sm:ml-14 lg:ml-2">Dashboard Overview</h1>
                         </div>
 
                         {/* RIGHT */}

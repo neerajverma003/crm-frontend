@@ -11,6 +11,8 @@ const StatusBadge = ({ status }) => {
         return "bg-blue-500 text-white"; // Half day
       case "Absent":
         return "bg-red-500 text-white"; // Absent
+      case "CL":
+        return "bg-purple-100 text-purple-700"; // Casual Leave
       default:
         return "bg-gray-300 text-gray-800"; // Fallback
     }

@@ -580,7 +580,7 @@ const router = createBrowserRouter([
         ),
       },
 
-      // ✅ Employee only
+      //  Employee only
       {
         path: "/leave-apply",
         element: (

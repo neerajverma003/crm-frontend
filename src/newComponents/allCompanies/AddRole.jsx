@@ -250,400 +250,438 @@ const AddRole = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto mt-12 p-8 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-semibold text-center mb-6">
-        Add Role, Subrole & Points
-      </h2>
-
-      {/* Tab Navigation */}
-      <div className="flex gap-4 mb-6 border-b border-gray-200">
-        <button
-          onClick={() => {
-            setActiveTab("admin");
-            setEditingId(null);
-            setRole("");
-            setSubroles([{ name: "", points: [""] }]);
-          }}
-          className={`px-6 py-2 font-semibold transition-colors ${
-            activeTab === "admin"
-              ? "border-b-2 border-black text-black"
-              : "text-gray-500 hover:text-gray-700"
-          }`}
-        >
-          Admin Roles
-        </button>
-        <button
-          onClick={() => {
-            setActiveTab("employee");
-            setEditingId(null);
-            setRole("");
-            setSubroles([{ name: "", points: [""] }]);
-          }}
-          className={`px-6 py-2 font-semibold transition-colors ${
-            activeTab === "employee"
-              ? "border-b-2 border-black text-black"
-              : "text-gray-500 hover:text-gray-700"
-          }`}
-        >
-          Employee Roles
-        </button>
-      </div>
-
-      {/* Role Input Form */}
-      <div className="flex flex-col gap-4 mb-6">
-        <div className="flex flex-col">
-          <label className="mb-1 font-medium text-gray-700">Role Name *</label>
-          <input
-            type="text"
-            placeholder="Enter role name (e.g., HR, Manager)"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-          />
+    <div className="min-h-screen bg-slate-50/50 p-4 sm:p-6 md:p-8 font-sans">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8 border-b border-slate-200/60 pb-6">
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+            Role Management
+          </h1>
+          <p className="text-slate-500 mt-2">Create and manage roles, subroles, and their associated points.</p>
         </div>
 
-        {/* Subroles Section */}
-        <div className="flex flex-col gap-3">
-          <label className="font-medium text-gray-700">Subroles</label>
-
-          {subroles.map((sub, subIndex) => (
-            <div
-              key={subIndex}
-              className="border border-gray-200 p-4 rounded-lg bg-gray-50"
+        {/* Main Content Area */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden mb-8">
+          
+          {/* Tab Navigation */}
+          <div className="flex gap-6 border-b border-slate-200/60 px-4 sm:px-6 pt-4 bg-slate-50/50 overflow-x-auto">
+            <button
+              onClick={() => {
+                setActiveTab("admin");
+                setEditingId(null);
+                setRole("");
+                setSubroles([{ name: "", points: [""] }]);
+              }}
+              className={`pb-4 font-semibold transition-colors relative ${
+                activeTab === "admin"
+                  ? "text-indigo-600"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
             >
-              <div className="flex items-center gap-2 mb-3">
-                <input
-                  type="text"
-                  placeholder={`Subrole ${subIndex + 1}`}
-                  value={sub.name}
-                  onChange={(e) => handleSubroleChange(subIndex, e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-                />
-                {subroles.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeSubroleField(subIndex)}
-                    className="text-red-500 hover:text-red-700 font-bold text-lg"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
+              Admin Roles
+              {activeTab === "admin" && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 rounded-t-md" />
+              )}
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab("employee");
+                setEditingId(null);
+                setRole("");
+                setSubroles([{ name: "", points: [""] }]);
+              }}
+              className={`pb-4 font-semibold transition-colors relative ${
+                activeTab === "employee"
+                  ? "text-indigo-600"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              Employee Roles
+              {activeTab === "employee" && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 rounded-t-md" />
+              )}
+            </button>
+          </div>
 
-              {/* Points */}
-              <div className="ml-3">
-                <label className="text-sm text-gray-600">Points</label>
-                {sub.points.map((point, pointIndex) => (
-                  <div key={pointIndex} className="flex items-center gap-2 mt-2">
-                    <input
-                      type="text"
-                      placeholder={`Point ${pointIndex + 1}`}
-                      value={point}
-                      onChange={(e) =>
-                        handlePointChange(subIndex, pointIndex, e.target.value)
-                      }
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-                    />
-                    {sub.points.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          removePointField(subIndex, pointIndex)
-                        }
-                        className="text-red-500 hover:text-red-700 font-bold text-lg"
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                ))}
+          <div className="p-4 sm:p-6 md:p-8">
+            {/* Role Input Form */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10 border-b border-slate-100 pb-10">
+              <div className="lg:col-span-1">
+                <h3 className="text-lg font-bold text-slate-800 mb-1">Create New Role</h3>
+                <p className="text-sm text-slate-500 mb-6">Define a new role and its associated subroles and points structure.</p>
+                
+                <div className="flex flex-col mb-6">
+                  <label className="mb-2 text-sm font-semibold text-slate-700">Role Name <span className="text-red-500">*</span></label>
+                  <input
+                    type="text"
+                    placeholder="e.g., HR, Manager"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    className="px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                  />
+                </div>
+                
                 <button
-                  type="button"
-                  onClick={() => addPointField(subIndex)}
-                  className="mt-2 text-sm text-blue-600 font-medium hover:underline"
+                  onClick={handleAddRole}
+                  disabled={loading}
+                  className={`w-full px-6 py-3 rounded-xl text-white font-semibold transition-all ${
+                    loading ? "bg-slate-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700 shadow-sm hover:shadow shadow-indigo-200"
+                  }`}
                 >
-                  + Add another point
+                  {loading ? "Saving..." : "Save Role"}
                 </button>
               </div>
-            </div>
-          ))}
 
-          <button
-            type="button"
-            onClick={addSubroleField}
-            className="text-sm text-blue-600 font-medium hover:underline self-start"
-          >
-            + Add another subrole
-          </button>
-        </div>
-
-        {/* Save Button */}
-        <button
-          onClick={handleAddRole}
-          disabled={loading}
-          className={`px-6 py-2 rounded-md text-white font-semibold ${
-            loading ? "bg-gray-400" : "bg-black hover:bg-gray-800"
-          } transition-colors`}
-        >
-          {loading ? "Saving..." : "Save"}
-        </button>
-      </div>
-
-      {/* Roles Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-200 text-sm">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="border border-gray-200 px-4 py-2 text-left">#</th>
-              <th className="border border-gray-200 px-4 py-2 text-left">
-                Role
-              </th>
-              <th className="border border-gray-200 px-4 py-2 text-left">
-                Subroles
-              </th>
-              <th className="border border-gray-200 px-4 py-2 text-left">
-                Points
-              </th>
-              <th className="border border-gray-200 px-4 py-2 text-left">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {(activeTab === "admin" ? roles : employeeRoles).length > 0 ? (
-              (activeTab === "admin" ? roles : employeeRoles).map((r, index) => (
-                <React.Fragment key={r._id}>
-                  <tr
-                    className="hover:bg-gray-50 cursor-pointer"
-                    onClick={() => toggleExpand(index)}
+              {/* Subroles Section */}
+              <div className="lg:col-span-2">
+                <div className="flex items-center justify-between mb-4">
+                  <label className="text-sm font-semibold text-slate-700">Subroles & Points</label>
+                  <button
+                    type="button"
+                    onClick={addSubroleField}
+                    className="text-sm text-indigo-600 font-semibold hover:text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors"
                   >
-                    <td className="border border-gray-200 px-4 py-2">
-                      {index + 1}
-                    </td>
-                    <td className="border border-gray-200 px-4 py-2">
-                      {editingId === r._id ? (
+                    + Add Subrole
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  {subroles.map((sub, subIndex) => (
+                    <div
+                      key={subIndex}
+                      className="border border-slate-200/60 p-4 sm:p-5 rounded-xl bg-slate-50/30 relative group"
+                    >
+                      {subroles.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeSubroleField(subIndex)}
+                          className="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors bg-white rounded-full p-1 border border-slate-200 shadow-sm opacity-0 group-hover:opacity-100"
+                          title="Remove Subrole"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                      )}
+                      
+                      <div className="flex items-center gap-2 sm:gap-3 mb-4 pr-8 sm:pr-10">
+                        <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm shrink-0">
+                          {subIndex + 1}
+                        </div>
                         <input
                           type="text"
-                          value={editRole}
-                          onChange={(e) => setEditRole(e.target.value)}
-                          className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                          placeholder="Subrole Name (e.g. Recruitment)"
+                          value={sub.name}
+                          onChange={(e) => handleSubroleChange(subIndex, e.target.value)}
+                          className="flex-1 min-w-0 px-3 sm:px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white text-sm sm:text-base"
                         />
-                      ) : (
-                        r.role
-                      )}
-                    </td>
-                    <td className="border border-gray-200 px-4 py-2">
-                      {r.subRole?.length || 0} subroles
-                    </td>
-                    <td className="border border-gray-200 px-4 py-2">
-                      {r.subRole?.reduce(
-                        (acc, s) => acc + (s.points?.length || 0),
-                        0
-                      )}{" "}
-                      points
-                    </td>
-                    <td className="border border-gray-200 px-4 py-2">
-                      <div className="flex gap-2">
-                        {editingId === r._id ? (
-                          <>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleUpdateRole();
-                              }}
-                              className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 text-xs font-medium"
-                            >
-                              Save
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditCancel();
-                              }}
-                              className="px-3 py-1 bg-gray-500 text-white rounded-md hover:bg-gray-600 text-xs font-medium"
-                            >
-                              Cancel
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleExpand(index);
-                              }}
-                              className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-xs font-medium"
-                              title="View Details"
-                            >
-                              View
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditStart(r);
-                              }}
-                              className="px-3 py-1 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 text-xs font-medium"
-                              title="Edit Role"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteRole(r._id);
-                              }}
-                              className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 text-xs font-medium"
-                              title="Delete Role"
-                            >
-                              Delete
-                            </button>
-                          </>
-                        )}
                       </div>
-                    </td>
-                  </tr>
 
-                  {/* Expanded Details or Edit Mode */}
-                  {expandedRow === index && editingId !== r._id && (
+                      {/* Points */}
+                      <div className="ml-8 sm:ml-11 pl-3 sm:pl-4 border-l-2 border-slate-200 space-y-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Points</label>
+                        </div>
+                        
+                        {sub.points.map((point, pointIndex) => (
+                          <div key={pointIndex} className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              placeholder={`Point ${pointIndex + 1}`}
+                              value={point}
+                              onChange={(e) =>
+                                handlePointChange(subIndex, pointIndex, e.target.value)
+                              }
+                              className="flex-1 min-w-0 px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white"
+                            />
+                            {sub.points.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  removePointField(subIndex, pointIndex)
+                                }
+                                className="text-slate-400 hover:text-red-500 p-1 bg-white rounded shadow-sm border border-slate-100"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                        
+                        <button
+                          type="button"
+                          onClick={() => addPointField(subIndex)}
+                          className="text-xs text-indigo-600 font-semibold hover:text-indigo-700 mt-3 flex items-center gap-1"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
+                          Add Point
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Roles Table */}
+            <div>
+              <h3 className="text-lg font-bold text-slate-800 mb-4">Existing Roles</h3>
+              <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
                     <tr>
-                      <td></td>
-                      <td
-                        colSpan="4"
-                        className="border border-gray-200 px-4 py-3 bg-gray-50"
-                      >
-                        {Array.isArray(r.subRole) && r.subRole.length > 0 ? (
-                          <ul className="list-disc pl-5 text-gray-700 space-y-1">
-                            {r.subRole.map((sub, i) => (
-                              <li key={i}>
-                                <span className="font-semibold">
-                                  {sub.subRoleName}
-                                </span>
-                                {sub.points?.length > 0 && (
-                                  <ul className="list-circle pl-5 text-gray-600">
-                                    {sub.points.map((p, pi) => (
-                                      <li key={pi}>{p}</li>
-                                    ))}
-                                  </ul>
-                                )}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="text-gray-500">No subroles available</p>
-                        )}
-                      </td>
+                      <th className="px-6 py-4">#</th>
+                      <th className="px-6 py-4">Role</th>
+                      <th className="px-6 py-4">Subroles</th>
+                      <th className="px-6 py-4">Points</th>
+                      <th className="px-6 py-4 text-right">Actions</th>
                     </tr>
-                  )}
-
-                  {/* Edit Mode - Editable Subroles and Points */}
-                  {editingId === r._id && (
-                    <tr>
-                      <td></td>
-                      <td
-                        colSpan="4"
-                        className="border border-gray-200 px-4 py-3 bg-blue-50"
-                      >
-                        <div className="flex flex-col gap-3">
-                          <label className="font-medium text-gray-700">Edit Subroles</label>
-
-                          {editSubroles.map((sub, subIndex) => (
-                            <div
-                              key={subIndex}
-                              className="border border-gray-200 p-3 rounded-lg bg-white"
-                            >
-                              <div className="flex items-center gap-2 mb-2">
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {(activeTab === "admin" ? roles : employeeRoles).length > 0 ? (
+                      (activeTab === "admin" ? roles : employeeRoles).map((r, index) => (
+                        <React.Fragment key={r._id}>
+                          <tr
+                            className="hover:bg-slate-50/80 cursor-pointer transition-colors"
+                            onClick={() => toggleExpand(index)}
+                          >
+                            <td className="px-6 py-4 text-slate-500 font-medium">
+                              {index + 1}
+                            </td>
+                            <td className="px-6 py-4 font-semibold text-slate-800">
+                              {editingId === r._id ? (
                                 <input
                                   type="text"
-                                  placeholder={`Subrole ${subIndex + 1}`}
-                                  value={sub.subRoleName || ""}
-                                  onChange={(e) =>
-                                    handleEditSubroleChange(subIndex, e.target.value)
-                                  }
-                                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  value={editRole}
+                                  onChange={(e) => setEditRole(e.target.value)}
+                                  className="px-3 py-1.5 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full min-w-0 max-w-[200px]"
+                                  onClick={(e) => e.stopPropagation()}
                                 />
-                                {editSubroles.length > 1 && (
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      removeEditSubroleField(subIndex)
-                                    }
-                                    className="text-red-500 hover:text-red-700 font-bold text-lg"
-                                  >
-                                    ✕
-                                  </button>
+                              ) : (
+                                r.role
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-slate-600">
+                              <span className="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full text-xs font-semibold">
+                                {r.subRole?.length || 0}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-slate-600">
+                              <span className="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-semibold">
+                                {r.subRole?.reduce(
+                                  (acc, s) => acc + (s.points?.length || 0),
+                                  0
+                                ) || 0}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex justify-end gap-2">
+                                {editingId === r._id ? (
+                                  <>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleUpdateRole();
+                                      }}
+                                      className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-xs font-semibold shadow-sm transition-colors"
+                                    >
+                                      Save
+                                    </button>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleEditCancel();
+                                      }}
+                                      className="px-3 py-1.5 bg-slate-500 text-white rounded-lg hover:bg-slate-600 text-xs font-semibold shadow-sm transition-colors"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleExpand(index);
+                                      }}
+                                      className="px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 text-xs font-semibold transition-colors"
+                                    >
+                                      {expandedRow === index ? "Hide" : "View"}
+                                    </button>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleEditStart(r);
+                                        // expand so they can see subroles while editing
+                                        if (expandedRow !== index) toggleExpand(index);
+                                      }}
+                                      className="px-3 py-1.5 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 text-xs font-semibold transition-colors"
+                                    >
+                                      Edit
+                                    </button>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteRole(r._id);
+                                      }}
+                                      className="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 text-xs font-semibold transition-colors"
+                                    >
+                                      Delete
+                                    </button>
+                                  </>
                                 )}
                               </div>
+                            </td>
+                          </tr>
 
-                              {/* Edit Points */}
-                              <div className="ml-3">
-                                <label className="text-sm text-gray-600">Points</label>
-                                {sub.points?.map((point, pointIndex) => (
-                                  <div
-                                    key={pointIndex}
-                                    className="flex items-center gap-2 mt-2"
-                                  >
-                                    <input
-                                      type="text"
-                                      placeholder={`Point ${pointIndex + 1}`}
-                                      value={point || ""}
-                                      onChange={(e) =>
-                                        handleEditPointChange(
-                                          subIndex,
-                                          pointIndex,
-                                          e.target.value
-                                        )
-                                      }
-                                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    />
-                                    {sub.points.length > 1 && (
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          removeEditPointField(subIndex, pointIndex)
-                                        }
-                                        className="text-red-500 hover:text-red-700 font-bold text-lg"
-                                      >
-                                        ✕
-                                      </button>
-                                    )}
+                          {/* Expanded Details or Edit Mode */}
+                          {expandedRow === index && editingId !== r._id && (
+                            <tr>
+                              <td colSpan="5" className="bg-slate-50/50 px-6 py-6 border-b border-slate-100">
+                                {Array.isArray(r.subRole) && r.subRole.length > 0 ? (
+                                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {r.subRole.map((sub, i) => (
+                                      <div key={i} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                        <h4 className="font-bold text-slate-800 mb-3 pb-2 border-b border-slate-100">
+                                          {sub.subRoleName}
+                                        </h4>
+                                        {sub.points?.length > 0 ? (
+                                          <ul className="space-y-2">
+                                            {sub.points.map((p, pi) => (
+                                              <li key={pi} className="text-sm text-slate-600 flex items-start gap-2">
+                                                <span className="text-indigo-400 mt-0.5">•</span>
+                                                <span className="flex-1">{p}</span>
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        ) : (
+                                          <p className="text-xs text-slate-400 italic">No points assigned</p>
+                                        )}
+                                      </div>
+                                    ))}
                                   </div>
-                                ))}
-                                <button
-                                  type="button"
-                                  onClick={() => addEditPointField(subIndex)}
-                                  className="mt-2 text-sm text-blue-600 font-medium hover:underline"
-                                >
-                                  + Add Point
-                                </button>
-                              </div>
-                            </div>
-                          ))}
+                                ) : (
+                                  <div className="text-center py-6">
+                                    <p className="text-slate-500">No subroles available for this role.</p>
+                                  </div>
+                                )}
+                              </td>
+                            </tr>
+                          )}
 
-                          <button
-                            type="button"
-                            onClick={addEditSubroleField}
-                            className="text-sm text-blue-600 font-medium hover:underline self-start"
-                          >
-                            + Add Subrole
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </React.Fragment>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan="5"
-                  className="text-center text-gray-500 py-4 border border-gray-200"
-                >
-                  No roles found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                          {/* Edit Mode - Editable Subroles and Points */}
+                          {editingId === r._id && (
+                            <tr>
+                              <td colSpan="5" className="bg-indigo-50/30 px-6 py-6 border-b border-indigo-100">
+                                <div className="max-w-4xl mx-auto">
+                                  <div className="flex items-center justify-between mb-4">
+                                    <h4 className="font-bold text-slate-800">Edit Subroles</h4>
+                                    <button
+                                      type="button"
+                                      onClick={addEditSubroleField}
+                                      className="text-xs text-indigo-600 font-semibold hover:text-indigo-700 bg-white border border-indigo-100 px-3 py-1.5 rounded-lg transition-colors shadow-sm"
+                                    >
+                                      + Add Subrole
+                                    </button>
+                                  </div>
+
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {editSubroles.map((sub, subIndex) => (
+                                      <div
+                                        key={subIndex}
+                                        className="border border-slate-200 p-4 rounded-xl bg-white shadow-sm relative group"
+                                      >
+                                        <div className="flex items-center gap-2 mb-4">
+                                          <input
+                                            type="text"
+                                            placeholder={`Subrole ${subIndex + 1}`}
+                                            value={sub.subRoleName || ""}
+                                            onChange={(e) =>
+                                              handleEditSubroleChange(subIndex, e.target.value)
+                                            }
+                                            className="flex-1 min-w-0 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-semibold text-slate-800"
+                                          />
+                                          {editSubroles.length > 1 && (
+                                            <button
+                                              type="button"
+                                              onClick={() =>
+                                                removeEditSubroleField(subIndex)
+                                              }
+                                              className="text-slate-400 hover:text-red-500 bg-slate-50 rounded p-1.5"
+                                            >
+                                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                                            </button>
+                                          )}
+                                        </div>
+
+                                        {/* Edit Points */}
+                                        <div className="pl-2 border-l-2 border-indigo-100 space-y-2">
+                                          <label className="text-xs font-semibold text-slate-500 uppercase">Points</label>
+                                          {sub.points?.map((point, pointIndex) => (
+                                            <div
+                                              key={pointIndex}
+                                              className="flex items-center gap-2"
+                                            >
+                                              <input
+                                                type="text"
+                                                placeholder={`Point ${pointIndex + 1}`}
+                                                value={point || ""}
+                                                onChange={(e) =>
+                                                  handleEditPointChange(
+                                                    subIndex,
+                                                    pointIndex,
+                                                    e.target.value
+                                                  )
+                                                }
+                                                className="flex-1 min-w-0 px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                                              />
+                                              {sub.points.length > 1 && (
+                                                <button
+                                                  type="button"
+                                                  onClick={() =>
+                                                    removeEditPointField(subIndex, pointIndex)
+                                                  }
+                                                  className="text-slate-400 hover:text-red-500"
+                                                >
+                                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                                                </button>
+                                              )}
+                                            </div>
+                                          ))}
+                                          <button
+                                            type="button"
+                                            onClick={() => addEditPointField(subIndex)}
+                                            className="text-xs text-indigo-600 font-semibold hover:text-indigo-700 mt-2 block"
+                                          >
+                                            + Add Point
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="5"
+                          className="text-center text-slate-500 py-12"
+                        >
+                          <div className="flex flex-col items-center justify-center">
+                            <svg className="w-12 h-12 text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                            <p>No roles found.</p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

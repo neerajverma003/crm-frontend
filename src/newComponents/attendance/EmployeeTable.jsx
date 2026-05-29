@@ -422,6 +422,8 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
             absent: 0,
             total: 0,
             halfDay: 0,
+            cl: 0,
+            holiday: 0,
         };
 
         if (!Array.isArray(attendanceData)) return stats;
@@ -444,6 +446,8 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
             else if (status === "Late") stats.late++;
             else if (status === "Absent") stats.absent++;
             else if (status === "Half Day") stats.halfDay++;
+            else if (status === "CL") stats.cl++;
+            else if (status === "Holiday" || status === "Holidays") stats.holiday++;
 
             stats.total++;
         });
@@ -465,7 +469,7 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
     /*  Date Attendance Edit Modal Component */
     /* -------------------------------------------------------------------------- */
     const DateAttendanceEditModal = ({ date, dayRecords, onClose, onSave }) => {
-        const statusOptions = ["Present", "Absent", "Late", "Grace Present", "Half Day","Sunday","Holidays"];
+        const statusOptions = ["Present", "Absent", "Late", "Grace Present", "Half Day","Sunday","Holidays", "CL"];
 
         const formatLocalDateTime = (dateString) => {
             if (!dateString) return "";
@@ -1555,6 +1559,18 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                                                         color: "bg-rose-100 text-rose-700",
                                                         bgColor: "bg-rose-50",
                                                     },
+                                                    {
+                                                        label: "CL",
+                                                        value: stats.cl,
+                                                        color: "bg-purple-100 text-purple-700",
+                                                        bgColor: "bg-purple-50",
+                                                    },
+                                                    {
+                                                        label: "Holiday",
+                                                        value: stats.holiday,
+                                                        color: "bg-purple-100 text-purple-700",
+                                                        bgColor: "bg-purple-50",
+                                                    },
                                                 ];
 
                                                 return (
@@ -1607,7 +1623,7 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                                                 const stats = calculateAttendanceStats(monthlyAttendance, currentMonth);
                                                 const monthlyBaseSalary = 30000; // Static monthly salary
                                                 const perDaySalary = monthlyBaseSalary / 30; // Assuming 30 working days per month
-                                                const presentDays = stats.present + stats.gracePresent +(stats.halfDay*0.5)+stats.late; // Count present and grace present as working days
+                                                const presentDays = stats.present + stats.gracePresent +(stats.halfDay*0.5)+stats.late+stats.cl+stats.holiday; // Count present and grace present as working days
                                                 const totalEarned = perDaySalary * presentDays;
 
                                                 return (

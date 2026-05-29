@@ -1,9 +1,14 @@
-const SuperAdminAttendanceCard = () => {
+import { FaUsers, FaCheckCircle, FaTimesCircle, FaClock } from "react-icons/fa";
+
+const SuperAdminAttendanceCard = ({ statsData }) => {
+    const defaultStats = { total: 0, present: 0, absent: 0, late: 0 };
+    const data = statsData || defaultStats;
+    
     const stats = [
-        { value: "450", label: "Total Employees", change: "+4%", trend: "up", icon: "👥" },
-        { value: "380", label: "Present", change: "+12%", trend: "up", icon: "✅" },
-        { value: "40", label: "Absent", change: "+2%", trend: "up", icon: "❌" },
-        { value: "30", label: "Late Check-ins", change: "-1%", trend: "down", icon: "🕒" },
+        { value: data.total, label: "Total Employees", change: "+0%", trend: "up", icon: <FaUsers className="w-8 h-8 text-indigo-600" /> },
+        { value: data.present, label: "Present", change: "+0%", trend: "up", icon: <FaCheckCircle className="w-8 h-8 text-emerald-600" /> },
+        { value: data.absent, label: "Absent", change: "+0%", trend: "up", icon: <FaTimesCircle className="w-8 h-8 text-rose-600" /> },
+        { value: data.late, label: "Late Check-ins", change: "+0%", trend: "down", icon: <FaClock className="w-8 h-8 text-amber-600" /> },
     ];
 
     return (

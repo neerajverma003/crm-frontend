@@ -182,7 +182,7 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { MdAdd, MdGridView, MdList } from "react-icons/md";
+import { MdAdd, MdGridView, MdList, MdBusiness, MdCheckCircle, MdHourglassEmpty } from "react-icons/md";
 import MyCards from "../UserManagement/MyCards.jsx";
 import SearchCompanies from "./SearchCompanies.jsx";
 import SearchCompanyByStatus from "./SearchCompanyByStatus.jsx";
@@ -269,10 +269,6 @@ const MainAllCompanies = () => {
         </div>
       </div>
 
-      {/* Dashboard Summary Cards */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-8">
-        <MyCards />
-      </div>
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -282,8 +278,8 @@ const MainAllCompanies = () => {
               <p className="text-gray-600 text-sm font-medium">Total Companies</p>
               <p className="text-3xl font-bold text-gray-900 mt-2">{companies.length}</p>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <span className="text-xl">🏢</span>
+            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+              <MdBusiness size={24} />
             </div>
           </div>
         </div>
@@ -293,8 +289,8 @@ const MainAllCompanies = () => {
               <p className="text-gray-600 text-sm font-medium">Active</p>
               <p className="text-3xl font-bold text-green-600 mt-2">{activeCount}</p>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <span className="text-xl">✓</span>
+            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center text-green-600">
+              <MdCheckCircle size={24} />
             </div>
           </div>
         </div>
@@ -304,8 +300,8 @@ const MainAllCompanies = () => {
               <p className="text-gray-600 text-sm font-medium">Pending</p>
               <p className="text-3xl font-bold text-amber-600 mt-2">{pendingCount}</p>
             </div>
-            <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
-              <span className="text-xl">⏳</span>
+            <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600">
+              <MdHourglassEmpty size={24} />
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FiLock, FiBriefcase, FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { FaLock, FaBriefcase, FaChevronDown, FaChevronUp, FaThLarge, FaChartLine, FaBookOpen, FaClock, FaCheckSquare } from "react-icons/fa";
 
 function EmployeeSidebar() {
     const location = useLocation();
@@ -222,57 +222,74 @@ function EmployeeSidebar() {
                 }`}
             >
                 {/* Header */}
-                <div className="flex items-center gap-3 border-b border-gray-200 bg-black p-6 text-white">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-xl font-bold text-black">
+                <div className="flex items-center gap-4 border-b border-gray-100 bg-white p-6">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-xl font-black text-white shadow-md shadow-indigo-200">
                         {selectedEmployee?.name?.[0]?.toUpperCase() || selectedEmployee?.id?.[0] || "E"}
                     </div>
-                    <div>
-                        <h2 className="text-lg font-semibold">{selectedEmployee?.name || "Employee Dashboard"}</h2>
-                        <p className="mt-1 text-xs text-gray-300">Employee Panel</p>
+                    <div className="min-w-0">
+                        <h2 className="text-sm font-bold text-gray-900 truncate" title={selectedEmployee?.name || "Employee Dashboard"}>
+                            {selectedEmployee?.name || "Employee Dashboard"}
+                        </h2>
+                        <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-indigo-500">Employee Panel</p>
                     </div>
                 </div>
 
                 {/* Content */}
                 <div className="p-4">
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                         <Link
                             to="/dashboard"
-                            className={`block rounded-lg px-4 py-2 font-medium ${
-                                location.pathname === "/dashboard" ? "bg-black text-white" : "text-gray-800 hover:bg-gray-100"
+                            className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                                location.pathname === "/dashboard" 
+                                ? "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-lg shadow-indigo-200/50" 
+                                : "text-gray-600 hover:bg-indigo-50 hover:text-indigo-600"
                             }`}
                         >
+                            <FaThLarge className={location.pathname === "/dashboard" ? "text-white" : "text-gray-400"} size={16} />
                             Dashboard
                         </Link>
                         <Link
                             to="/employee-company-overview"
-                            className={`block rounded-lg px-4 py-2 font-medium ${
-                                location.pathname === "/employee-company-overview" ? "bg-black text-white" : "text-gray-800 hover:bg-gray-100"
+                            className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                                location.pathname === "/employee-company-overview" 
+                                ? "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-lg shadow-indigo-200/50" 
+                                : "text-gray-600 hover:bg-indigo-50 hover:text-indigo-600"
                             }`}
                         >
+                            <FaChartLine className={location.pathname === "/employee-company-overview" ? "text-white" : "text-gray-400"} size={16} />
                             Company Overview
                         </Link>
                         <Link
                             to="/employee-training-material"
-                            className={`block rounded-lg px-4 py-2 font-medium ${
-                                location.pathname === "/employee-training-material" ? "bg-black text-white" : "text-gray-800 hover:bg-gray-100"
+                            className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                                location.pathname === "/employee-training-material" 
+                                ? "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-lg shadow-indigo-200/50" 
+                                : "text-gray-600 hover:bg-indigo-50 hover:text-indigo-600"
                             }`}
                         >
+                            <FaBookOpen className={location.pathname === "/employee-training-material" ? "text-white" : "text-gray-400"} size={16} />
                             Training Materials
                         </Link>
                         <Link
                             to="/attendance"
-                            className={`block rounded-lg px-4 py-2 font-medium ${
-                                location.pathname === "/attendance" ? "bg-black text-white" : "text-gray-800 hover:bg-gray-100"
+                            className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                                location.pathname === "/attendance" 
+                                ? "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-lg shadow-indigo-200/50" 
+                                : "text-gray-600 hover:bg-indigo-50 hover:text-indigo-600"
                             }`}
                         >
+                            <FaClock className={location.pathname === "/attendance" ? "text-white" : "text-gray-400"} size={16} />
                             Attendance
                         </Link>
                         <Link
                             to="/employee-tasks"
-                            className={`block rounded-lg px-4 py-2 font-medium ${
-                                location.pathname === "/employee-tasks" ? "bg-black text-white" : "text-gray-800 hover:bg-gray-100"
+                            className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                                location.pathname === "/employee-tasks" 
+                                ? "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-lg shadow-indigo-200/50" 
+                                : "text-gray-600 hover:bg-indigo-50 hover:text-indigo-600"
                             }`}
                         >
+                            <FaCheckSquare className={location.pathname === "/employee-tasks" ? "text-white" : "text-gray-400"} size={16} />
                             My Tasks
                         </Link>
 
@@ -290,22 +307,24 @@ function EmployeeSidebar() {
                                             {/* Role Button */}
                                             <button
                                                 onClick={() => toggleDropdown(roleKey)}
-                                                className={`flex w-full items-center justify-between rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors ${
+                                                className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-bold transition-all ${
                                                     isRoleOpen
-                                                        ? "border-black bg-black text-white"
-                                                        : "border-gray-300 bg-white text-gray-800 hover:bg-gray-100"
+                                                        ? "bg-indigo-50 text-indigo-700"
+                                                        : "bg-white text-gray-600 hover:bg-indigo-50 hover:text-indigo-600"
                                                 }`}
                                             >
-                                                <div className="flex items-center gap-2">
-                                                    <FiBriefcase size={16} />
+                                                <div className="flex items-center gap-3">
+                                                    <FaBriefcase size={16} className={isRoleOpen ? "text-indigo-600" : "text-gray-400"} />
                                                     {roleLabel}
                                                 </div>
-                                                <span>{isRoleOpen ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}</span>
+                                                <span className={`transition-transform duration-300 ${isRoleOpen ? "rotate-180" : ""}`}>
+                                                    <FaChevronDown size={14} />
+                                                </span>
                                             </button>
 
                                             {/* SubRoles Container */}
                                             {isRoleOpen && role.subRoles && role.subRoles.length > 0 && (
-                                                <div className="ml-2 mt-2 space-y-1 border-l border-gray-300 pl-2">
+                                                <div className="ml-5 mt-1 space-y-1 border-l-2 border-indigo-100 pl-3">
                                                     {role.subRoles.map((sub, subIndex) => {
                                                         const subKey = `sub-${roleIndex}-${subIndex}`;
                                                         const isSubOpen = openDropdowns[subKey];
@@ -317,37 +336,43 @@ function EmployeeSidebar() {
                                                         const hasPoints = filteredPoints && filteredPoints.length > 0;
 
                                                         return (
-                                                            <div key={subIndex}>
+                                                            <div key={subIndex} className="py-0.5">
                                                                 {/* SubRole Button/Link */}
                                                                 {hasPoints ? (
                                                                     <button
                                                                         onClick={() => toggleDropdown(subKey)}
-                                                                        className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-xs font-medium transition ${
+                                                                        className={`flex w-full items-center justify-between rounded-lg px-4 py-2.5 text-[13px] font-bold transition-all ${
                                                                             isSubOpen
-                                                                                ? "bg-gray-200 text-gray-900"
-                                                                                : "text-gray-700 hover:bg-gray-100"
+                                                                                ? "bg-indigo-50 text-indigo-700"
+                                                                                : "text-gray-600 hover:text-indigo-600 hover:bg-gray-50"
                                                                         }`}
                                                                     >
-                                                                        <span>• {sub.subRoleName || "Unknown Sub-role"}</span>
-                                                                        <span>{isSubOpen ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}</span>
+                                                                        <div className="flex items-center gap-2.5">
+                                                                            <div className={`h-1.5 w-1.5 rounded-full ${isSubOpen ? 'bg-indigo-600' : 'bg-gray-300'}`}></div>
+                                                                            <span>{sub.subRoleName || "Unknown Sub-role"}</span>
+                                                                        </div>
+                                                                        <span className={`transition-transform duration-300 ${isSubOpen ? "rotate-180" : ""}`}>
+                                                                            <FaChevronDown size={12} />
+                                                                        </span>
                                                                     </button>
                                                                 ) : (
                                                                     <Link
                                                                         to={getSubRoleRoute(sub.subRoleName)}
                                                                         onClick={() => setIsMobileMenuOpen(false)}
-                                                                        className={`block rounded-md px-3 py-2 text-xs font-medium transition ${
+                                                                        className={`flex items-center gap-2.5 w-full rounded-lg px-4 py-2.5 text-[13px] font-bold transition-all ${
                                                                             location.pathname === getSubRoleRoute(sub.subRoleName)
-                                                                                ? "bg-gray-900 text-white"
-                                                                                : "text-gray-700 hover:bg-gray-100"
+                                                                                ? "bg-indigo-50 text-indigo-700"
+                                                                                : "text-gray-600 hover:text-indigo-600 hover:bg-gray-50"
                                                                         }`}
                                                                     >
-                                                                        • {sub.subRoleName || "Unknown Sub-role"}
+                                                                        <div className={`h-1.5 w-1.5 rounded-full ${location.pathname === getSubRoleRoute(sub.subRoleName) ? 'bg-indigo-600' : 'bg-gray-300'}`}></div>
+                                                                        {sub.subRoleName || "Unknown Sub-role"}
                                                                     </Link>
                                                                 )}
 
                                                                 {/* Points Container */}
                                                                 {isSubOpen && hasPoints && (
-                                                                    <div className="ml-2 mt-1 space-y-1 border-l border-gray-300 pl-2">
+                                                                    <div className="ml-5 mt-1 space-y-1 border-l-2 border-indigo-50 pl-3">
                                                                         {(() => {
                                                                             return filteredPoints.map((point, pointIndex) => {
                                                                                 const pointRoute = getPointRoute(point);
@@ -357,13 +382,13 @@ function EmployeeSidebar() {
                                                                                         key={pointIndex}
                                                                                         to={pointRoute}
                                                                                         onClick={() => setIsMobileMenuOpen(false)}
-                                                                                        className={`block rounded-md px-2 py-1.5 text-xs font-medium transition ${
+                                                                                        className={`block rounded-lg px-4 py-2 text-xs font-bold transition-all ${
                                                                                             active
-                                                                                                ? "bg-gray-900 text-white"
-                                                                                                : "text-gray-700 hover:bg-gray-100"
+                                                                                                ? "text-indigo-600 bg-indigo-50/50"
+                                                                                                : "text-gray-500 hover:text-indigo-600 hover:bg-gray-50"
                                                                                         }`}
                                                                                     >
-                                                                                        ◆ {point}
+                                                                                        {point}
                                                                                     </Link>
                                                                                 );
                                                                             });
@@ -384,16 +409,18 @@ function EmployeeSidebar() {
                         )}
                     </div>
 
-                    <div className="mt-8 border-t border-gray-200 pt-4">
-                        <p className="mb-2 text-xs font-semibold uppercase text-gray-500">Account</p>
+                    <div className="mt-8 border-t border-gray-100 pt-6">
+                        <p className="mb-3 px-4 text-[10px] font-bold uppercase tracking-widest text-gray-400">Account settings</p>
                         <Link
                             to="/change-password"
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className={`flex items-center gap-2 rounded-lg px-4 py-2 font-medium ${
-                                location.pathname === "/change-password" ? "bg-black text-white" : "text-gray-800 hover:bg-gray-100"
+                            className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                                location.pathname === "/change-password" 
+                                ? "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-lg shadow-indigo-200/50" 
+                                : "text-gray-600 hover:bg-indigo-50 hover:text-indigo-600"
                             }`}
                         >
-                            <FiLock className="text-lg" />
+                            <FaLock size={16} className={location.pathname === "/change-password" ? "text-white" : "text-gray-400"} />
                             Change Password
                         </Link>
                     </div>

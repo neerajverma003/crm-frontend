@@ -333,7 +333,36 @@ const B2bAddCompany = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
+          {/* Mobile View: Select Dropdown instead of tabs */}
+          <div className="block sm:hidden">
+            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Company Name</label>
+            <div className="relative">
+              <select
+                value={activeTab}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setActiveTab(val);
+                  setFormData({ ...formData, company: val === "All" ? null : val });
+                }}
+                className="w-full appearance-none bg-white border border-slate-200 text-slate-700 py-3 px-4 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold"
+              >
+                {role !== "employee" && <option value="All">All Companies</option>}
+                {company.length > 0 && company.map((comp) => (
+                  <option key={comp._id} value={comp.companyName}>
+                    {comp.companyName}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop View: Horizontal Tabs */}
+          <div className="hidden sm:flex items-center gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
             {role !== "employee" && (
               <button
                 onClick={() => {
@@ -475,7 +504,42 @@ const B2bAddCompany = () => {
 
       {/* TABLE LISTING COMPANIES */}
       <div className="bg-white/90 rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
-        <div className="overflow-x-auto">
+        
+        {/* MOBILE VIEW */}
+        <div className="block sm:hidden divide-y divide-slate-100">
+          {companies.length === 0 ? (
+            <div className="p-6 text-center text-sm text-slate-500 font-medium bg-slate-50/30">
+              No companies added yet.
+            </div>
+          ) : (
+            companies.map((company, index) => (
+              <div key={company._id || index} className="p-4 space-y-3 hover:bg-slate-50/50 transition-colors">
+                <div className="flex justify-between items-start">
+                  <span className="font-bold text-slate-800 text-lg">{company.companyName}</span>
+                </div>
+                <div className="text-sm text-slate-600 space-y-1">
+                  <p><span className="font-medium text-slate-500">WhatsApp:</span> {company.whatsapp || "—"}</p>
+                  <p><span className="font-medium text-slate-500">Phone:</span> {company.contactPersonNumber || "—"}</p>
+                  <p><span className="font-medium text-slate-500">Email:</span> {company.email || "—"}</p>
+                </div>
+                <div className="flex items-center gap-2 pt-2">
+                  <button onClick={() => setViewData(company)} className="flex-1 inline-flex items-center justify-center py-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors text-sm font-semibold">
+                    <FaEye className="mr-2" /> View
+                  </button>
+                  <button onClick={() => handleEdit(company, index)} className="flex-1 inline-flex items-center justify-center py-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors text-sm font-semibold">
+                    <FaEdit className="mr-2" /> Edit
+                  </button>
+                  <button onClick={() => handleDelete(index, company._id)} className="flex-1 inline-flex items-center justify-center py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors text-sm font-semibold">
+                    <FaTrash className="mr-2" /> Delete
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* DESKTOP VIEW */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-100">
             <thead className="bg-slate-50/80">
               <tr>

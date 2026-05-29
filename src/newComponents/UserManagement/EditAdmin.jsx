@@ -15,6 +15,7 @@ const EditAdmin = ({ user, isOpen, onClose, onSave }) => {
     isActive: true,
     showPassword: false,
     role: "Admin",
+    department: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,6 +33,7 @@ const EditAdmin = ({ user, isOpen, onClose, onSave }) => {
         salary: user.salary || "",
         isActive: user.accountActive ?? true,
         role: user.role || "Admin",
+        department: user.department || "",
       }));
     }
   }, [user]);
@@ -60,6 +62,7 @@ const EditAdmin = ({ user, isOpen, onClose, onSave }) => {
         salary: formData.salary,
         accountActive: formData.isActive,
         role: formData.role,
+        department: formData.department,
       };
 
       if (formData.password) payload.password = formData.password;
@@ -79,7 +82,7 @@ const EditAdmin = ({ user, isOpen, onClose, onSave }) => {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="max-w-2xl">
-      <div className="p-6">
+      <div className="p-6 max-h-[85vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300">
         <h2 className="mb-4 text-xl font-semibold">Edit Admin</h2>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -129,6 +132,25 @@ const EditAdmin = ({ user, isOpen, onClose, onSave }) => {
             <label className="mb-1 block text-sm font-medium text-gray-700">Password (leave blank to keep)</label>
             <input type={formData.showPassword ? "text" : "password"} value={formData.password} onChange={(e) => handleChange("password", e.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2" placeholder="New password (optional)" />
             <button type="button" onClick={() => handleChange("showPassword", !formData.showPassword)} className="absolute right-3 top-9 text-gray-500">{formData.showPassword ? "Hide" : "Show"}</button>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Department</label>
+            <select value={formData.department} onChange={(e) => handleChange("department", e.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2">
+              <option value="">Select Department</option>
+              {["Sales", "Marketing", "IT", "HR", "Admin", "Legal", "Accounts"].map(dep => (
+                <option key={dep} value={dep}>{dep}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Role</label>
+            <select value={formData.role} onChange={(e) => handleChange("role", e.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2" required>
+              <option value="Admin">Admin</option>
+              <option value="Super Admin">Super Admin</option>
+              <option value="Employee">Employee</option>
+            </select>
           </div>
 
           <div className="flex items-center gap-2 md:col-span-2">

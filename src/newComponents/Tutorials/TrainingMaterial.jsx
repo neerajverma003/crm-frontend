@@ -265,10 +265,10 @@ const TrainingMaterial = () => {
 
   // small components
   const Filters = () => (
-    <div className="md:col-span-1 space-y-5 bg-white/90 p-5 rounded-2xl shadow-xl border border-slate-100 h-fit sticky top-4">
+    <div className="md:col-span-1 space-y-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-200/60 h-fit sticky top-4">
       <div>
         <label className="block text-sm font-semibold text-slate-700 mb-2">Company</label>
-        <select className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none" value={selectedCompany} onChange={(e) => { setSelectedCompany(e.target.value); setSelectedDepartment(''); }} aria-label="Filter by company">
+        <select className="w-full border border-slate-300 bg-slate-50/30 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none" value={selectedCompany} onChange={(e) => { setSelectedCompany(e.target.value); setSelectedDepartment(''); }} aria-label="Filter by company">
           <option value="">All Companies</option>
           {companies.map((c) => (<option key={c._id} value={c._id}>{c.companyName}</option>))}
         </select>
@@ -276,7 +276,7 @@ const TrainingMaterial = () => {
 
       <div>
         <label className="block text-sm font-semibold text-slate-700 mb-2">Department</label>
-        <select className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none" value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)} aria-label="Filter by department">
+        <select className="w-full border border-slate-300 bg-slate-50/30 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none" value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)} aria-label="Filter by department">
           <option value="">All Departments</option>
           {departments.map((d) => <option key={d._id} value={d._id}>{d.dep}</option>)}
         </select>
@@ -302,8 +302,8 @@ const TrainingMaterial = () => {
   const MaterialCard = ({ tut }) => {
     const url = tut.fileUrl || tut.cloudinaryUrl;
     return (
-      <article className="bg-white/90 border border-slate-100 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all overflow-hidden flex flex-col h-full" role="article" aria-labelledby={`title-${tut._id}`}>
-        <div className="relative h-48 bg-slate-50 flex-shrink-0">
+      <article className="bg-white border border-slate-200/60 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 transition-all overflow-hidden flex flex-col h-full" role="article" aria-labelledby={`title-${tut._id}`}>
+        <div className="relative h-48 bg-slate-50 flex-shrink-0 border-b border-slate-100">
           {tut.fileType === 'image' ? (
             <img src={`${import.meta.env.VITE_API_URL}/api/media/preview?key=${tut.key}`} alt={tut.originalName || tut.title} className="w-full h-full object-cover" loading="lazy" />
           ) : tut.fileType === 'video' ? (
@@ -422,18 +422,23 @@ const TrainingMaterial = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f6f8fa] to-[#e9ecef] p-4 sm:p-8">
-      <div className="w-full max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-slate-50/50 p-4 sm:p-6 md:p-8 font-sans">
+      <div className="max-w-7xl mx-auto space-y-6">
         
         {/* Header section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="mb-8 border-b border-slate-200/60 pb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-black text-slate-900 tracking-tight leading-tight drop-shadow-sm">Training Materials</h2>
-            <p className="mt-1 text-sm font-medium text-slate-600">Access and review all training resources across departments.</p>
+            <h1 className="text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
+              <span className="p-2.5 bg-indigo-100 text-indigo-700 rounded-xl shadow-sm">
+                <FileText className="w-6 h-6" />
+              </span>
+              Training Materials
+            </h1>
+            <p className="text-slate-500 mt-2 text-base">Access and review all training resources across departments.</p>
           </div>
-          <div className="relative w-full md:w-auto">
-             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-400 w-5 h-5" />
-             <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by title..." className="w-full md:w-72 pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white shadow-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder-slate-400 font-medium" aria-label="Search training materials" />
+          <div className="relative w-full md:w-auto mt-2 md:mt-0">
+             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+             <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by title..." className="w-full md:w-80 pl-12 pr-4 py-3 rounded-xl border border-slate-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder-slate-400 font-medium" aria-label="Search training materials" />
           </div>
         </div>
 

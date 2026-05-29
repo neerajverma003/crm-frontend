@@ -1,10 +1,75 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Save, Edit2, Trash2, Search, User, MapPin, Building, Briefcase, FileText, Upload, Calendar } from 'lucide-react';
+import { Plus, Save, Edit2, Trash2, Search, User, MapPin, Building, Briefcase, FileText, Upload, ChevronDown, X, Menu } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || `${import.meta.env.VITE_API_URL}`;
 
-const AddCandidate = () => {
-  // Form state
+/* ─── Responsive hook ─── */
+const useBreakpoint = () => {
+  const [width, setWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
+  useEffect(() => {
+    const fn = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', fn);
+    return () => window.removeEventListener('resize', fn);
+  }, []);
+  return { isMobile: width < 640, isTablet: width >= 640 && width < 1024, isDesktop: width >= 1024 };
+};
+
+/* ─── Shared input style helper ─── */
+const inputStyle = (focus, accentColor = '#6366f1') => ({
+  width: '100%',
+  boxSizing: 'border-box',
+  padding: '10px 12px 10px 36px',
+  border: `1.5px solid ${focus ? accentColor : '#e5e7eb'}`,
+  borderRadius: '8px',
+  fontSize: '14px',
+  color: '#111827',
+  outline: 'none',
+  backgroundColor: '#fafafa',
+  transition: 'border-color 0.15s',
+});
+
+const labelStyle = {
+  display: 'block',
+  fontSize: '11px',
+  fontWeight: 600,
+  color: '#6b7280',
+  marginBottom: '5px',
+  textTransform: 'uppercase',
+  letterSpacing: '0.06em',
+};
+
+/* ─── Field component ─── */
+const Field = ({ label, required, icon: Icon, children }) => (
+  <div>
+    <label style={labelStyle}>{label}{required && <span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span>}</label>
+    <div style={{ position: 'relative' }}>
+      {Icon && <Icon size={14} color="#9ca3af" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', zIndex: 1 }} />}
+      {children}
+    </div>
+  </div>
+);
+
+/* ─── Input with focus state ─── */
+const TextInput = ({ icon: Icon, ...props }) => {
+  const [focused, setFocused] = useState(false);
+  return (
+    <Field label={props.label} required={props.required} icon={Icon}>
+      <input
+        {...props}
+        label={undefined}
+        required={undefined}
+        style={inputStyle(focused)}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+      />
+    </Field>
+  );
+};
+
+export default function AddCandidate() {
+  const { isMobile, isTablet, isDesktop } = useBreakpoint();
+
+  /* form state */
   const [candidateName, setCandidateName] = useState('');
   const [state, setState] = useState('');
   const [city, setCity] = useState('');
@@ -13,143 +78,67 @@ const AddCandidate = () => {
   const [resume, setResume] = useState(null);
   const [resumePreview, setResumePreview] = useState('');
 
-  // Data state
+  /* data state */
   const [candidates, setCandidates] = useState([]);
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
-  // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [editingId, setEditingId] = useState(null);
+  const [dragOver, setDragOver] = useState(false);
 
-  // Get user ID from localStorage
+  /* mobile: toggle between form / list */
+  const [mobileView, setMobileView] = useState('list'); // 'form' | 'list'
+
+  /* focus states */
+  const [focusedField, setFocusedField] = useState(null);
+
   const userId = localStorage.getItem('userId');
 
-  // Fetch all candidates
   const fetchCandidates = async () => {
-    if (!userId) {
-      setError('User not authenticated');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-
+    if (!userId) { setError('User not authenticated'); return; }
+    setLoading(true); setError('');
     try {
-      const response = await fetch(`${API_BASE_URL}/candidates`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        }
+      const res = await fetch(`${API_BASE_URL}/candidates`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}`, 'Content-Type': 'application/json' },
       });
-
-      const data = await response.json();
-      console.log(data);
-      
-      if (data.success) {
-        setCandidates(data.data || []);
-      } else {
-        setError(data.message || 'Failed to fetch candidates');
-      }
-    } catch (err) {
-      console.error('Error fetching candidates:', err);
-      setError('Failed to load candidates. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+      const data = await res.json();
+      if (data.success) setCandidates(data.data || []);
+      else setError(data.message || 'Failed to fetch candidates');
+    } catch { setError('Failed to load candidates.'); }
+    finally { setLoading(false); }
   };
 
-  // Fetch all profiles
   const fetchProfiles = async () => {
-    if (!userId) {
-      setError('User not authenticated');
-      return;
-    }
-
+    if (!userId) return;
     try {
-      const response = await fetch(`${API_BASE_URL}/profiles`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        }
+      const res = await fetch(`${API_BASE_URL}/profiles`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}`, 'Content-Type': 'application/json' },
       });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setProfiles(data.data || []);
-      } else {
-        setError(data.message || 'Failed to fetch profiles');
-      }
-    } catch (err) {
-      console.error('Error fetching profiles:', err);
-      setError('Failed to load profiles. Please try again.');
-    }
+      const data = await res.json();
+      if (data.success) setProfiles(data.data || []);
+    } catch { setError('Failed to load profiles.'); }
   };
 
-  // Handle file upload
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Validate file type
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-      if (!allowedTypes.includes(file.type)) {
-        setError('Please upload a valid file (JPG, PDF, or DOC/DOCX)');
-        return;
-      }
-
-      // Validate file size (5MB max)
-      if (file.size > 5 * 1024 * 1024) {
-        setError('File size should not exceed 5MB');
-        return;
-      }
-
-      setResume(file);
-      setResumePreview(file.name);
-      setError('');
-    }
+  const handleFileChange = (file) => {
+    if (!file) return;
+    const allowed = ['image/jpeg', 'image/jpg', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!allowed.includes(file.type)) { setError('Please upload JPG, PDF, or DOC/DOCX'); return; }
+    if (file.size > 5 * 1024 * 1024) { setError('File size max 5MB'); return; }
+    setResume(file); setResumePreview(file.name); setError('');
   };
 
-  // Create or update candidate
   const handleSave = async () => {
-    if (!candidateName.trim()) {
-      setError('Candidate name is required');
-      return;
-    }
+    if (!candidateName.trim()) return setError('Candidate name is required');
+    if (!state.trim()) return setError('State is required');
+    if (!city.trim()) return setError('City is required');
+    if (!experience.trim()) return setError('Experience is required');
+    if (!profile.trim()) return setError('Profile is required');
+    if (!userId) return setError('User not authenticated');
 
-    if (!state.trim()) {
-      setError('State is required');
-      return;
-    }
-
-    if (!city.trim()) {
-      setError('City is required');
-      return;
-    }
-
-    if (!experience.trim()) {
-      setError('Experience is required');
-      return;
-    }
-
-    if (!profile.trim()) {
-      setError('Profile is required');
-      return;
-    }
-
-    if (!userId) {
-      setError('User not authenticated');
-      return;
-    }
-
-    setSaving(true);
-    setError('');
-    setSuccess('');
-
-
+    setSaving(true); setError(''); setSuccess('');
     try {
       const formData = new FormData();
       formData.append('name', candidateName.trim());
@@ -158,630 +147,553 @@ const AddCandidate = () => {
       formData.append('experience', experience.trim());
       formData.append('profile', profile.trim());
       formData.append('createdBy', userId);
-      // Add profileName for Cloudinary folder structure
-      const selectedProfile = profiles.find((p) => p._id === profile);
-      formData.append('profileName', selectedProfile ? selectedProfile.name : 'unknown-profile');
+      const sel = profiles.find(p => p._id === profile);
+      formData.append('profileName', sel ? sel.name : 'unknown-profile');
       formData.append('candidateName', candidateName.trim());
+      if (resume) formData.append('resume', resume);
 
-      if (resume) {
-        formData.append('resume', resume);
-      }
-
-      const url = editingId
-        ? `${API_BASE_URL}/candidates/${editingId}`
-        : `${API_BASE_URL}/candidates`;
-
-      const method = editingId ? 'PUT' : 'POST';
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-          // Don't set Content-Type for FormData
-        },
-        body: formData
+      const url = editingId ? `${API_BASE_URL}/candidates/${editingId}` : `${API_BASE_URL}/candidates`;
+      const res = await fetch(url, {
+        method: editingId ? 'PUT' : 'POST',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+        body: formData,
       });
-
-      const data = await response.json();
-
+      const data = await res.json();
       if (data.success) {
-        setSuccess(editingId ? 'Candidate updated successfully!' : 'Candidate created successfully!');
-        setCandidateName('');
-        setState('');
-        setCity('');
-        setExperience('');
-        setProfile('');
-        setResume(null);
-        setResumePreview('');
-        setEditingId(null);
-        fetchCandidates(); // Refresh the list
-      } else {
-        setError(data.message || 'Failed to save candidate');
-      }
-    } catch (err) {
-      console.error('Error saving candidate:', err);
-      setError('Failed to save candidate. Please try again.');
-    } finally {
-      setSaving(false);
-    }
+        setSuccess(editingId ? 'Candidate updated!' : 'Candidate added successfully!');
+        setCandidateName(''); setState(''); setCity(''); setExperience('');
+        setProfile(''); setResume(null); setResumePreview(''); setEditingId(null);
+        fetchCandidates();
+        if (isMobile) setMobileView('list');
+      } else setError(data.message || 'Failed to save candidate');
+    } catch { setError('Failed to save candidate.'); }
+    finally { setSaving(false); }
   };
 
-  // Edit candidate
-  const handleEdit = (candidate) => {
-    setCandidateName(candidate.name);
-    setState(candidate.state);
-    setCity(candidate.city);
-    setExperience(candidate.experience);
-    setProfile(candidate.profile?._id || candidate.profile);
-    setResumePreview(candidate.resume ? candidate.resume.split('/').pop() : '');
-    setEditingId(candidate._id);
-    setError('');
-    setSuccess('');
+  const handleEdit = (c) => {
+    setCandidateName(c.name); setState(c.state); setCity(c.city);
+    setExperience(c.experience); setProfile(c.profile?._id || c.profile);
+    setResumePreview(c.resume ? c.resume.split('/').pop() : '');
+    setEditingId(c._id); setError(''); setSuccess('');
+    if (isMobile) setMobileView('form');
+    else window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Delete candidate
-  const handleDelete = async (candidateId) => {
-    if (!window.confirm('Are you sure you want to delete this candidate?')) {
-      return;
-    }
-
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this candidate?')) return;
     try {
-      const response = await fetch(`${API_BASE_URL}/candidates/${candidateId}`, {
+      const res = await fetch(`${API_BASE_URL}/candidates/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}`, 'Content-Type': 'application/json' },
       });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setSuccess('Candidate deleted successfully!');
-        fetchCandidates(); // Refresh the list
-      } else {
-        setError(data.message || 'Failed to delete candidate');
-      }
-    } catch (err) {
-      console.error('Error deleting candidate:', err);
-      setError('Failed to delete candidate. Please try again.');
-    }
+      const data = await res.json();
+      if (data.success) { setSuccess('Candidate deleted.'); fetchCandidates(); }
+      else setError(data.message || 'Failed to delete');
+    } catch { setError('Failed to delete candidate.'); }
   };
 
-  // Cancel editing
   const handleCancel = () => {
-    setCandidateName('');
-    setState('');
-    setCity('');
-    setExperience('');
-    setProfile('');
-    setResume(null);
-    setResumePreview('');
-    setEditingId(null);
-    setError('');
-    setSuccess('');
+    setCandidateName(''); setState(''); setCity(''); setExperience('');
+    setProfile(''); setResume(null); setResumePreview(''); setEditingId(null);
+    setError(''); setSuccess('');
+    if (isMobile) setMobileView('list');
   };
 
-  // Filter candidates based on search
-  const filteredCandidates = candidates.filter(candidate =>
-    candidate.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    candidate.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    candidate.city.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredCandidates = candidates.filter(c =>
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.city.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Format date
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  const isFormValid = candidateName.trim() && state.trim() && city.trim() && experience.trim() && profile.trim();
+
+  useEffect(() => { fetchCandidates(); fetchProfiles(); }, []);
+
+  /* avatar color */
+  const avatarColor = (name) => {
+    const colors = ['#6366f1','#0891b2','#059669','#d97706','#dc2626','#7c3aed','#db2777'];
+    return colors[name.charCodeAt(0) % colors.length];
   };
 
-  // Load candidates on component mount
-  useEffect(() => {
-    fetchCandidates();
-    fetchProfiles();
-  }, []);
+  /* ── Layout config ── */
+  const sidebarWidth = isDesktop ? '380px' : '340px';
+  const useStackedLayout = isMobile || isTablet;
 
-  return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <div className="p-4 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl shadow-lg">
-              <User className="w-10 h-10 text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900">Candidate Management System</h1>
-              <p className="text-gray-600 mt-2 text-lg">Manage and organize candidate information</p>
-            </div>
+  /* ── FORM ── */
+  const FormPanel = () => (
+    <div style={{
+      backgroundColor: '#fff',
+      borderRadius: isMobile ? '0' : '14px',
+      border: isMobile ? 'none' : '1px solid #e5e7eb',
+      overflow: 'hidden',
+    }}>
+      {/* Form header */}
+      <div style={{ padding: '16px 20px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{
+            width: '34px', height: '34px', borderRadius: '9px', flexShrink: 0,
+            backgroundColor: editingId ? '#fef3c7' : '#eef2ff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            {editingId ? <Edit2 size={15} color="#d97706" /> : <Plus size={15} color="#4f46e5" />}
           </div>
-          <div className="text-right">
-            <p className="text-sm text-gray-500">Total Candidates</p>
-            <p className="text-3xl font-bold text-blue-600">{candidates.length}</p>
-          </div>
-        </div>
-
-        {/* Success/Error Messages */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg text-red-700 shadow-sm">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm">{error}</p>
-              </div>
+          <div>
+            <div style={{ fontWeight: 600, fontSize: '15px', color: '#111827', lineHeight: 1.3 }}>
+              {editingId ? 'Edit Candidate' : 'Add New Candidate'}
             </div>
-          </div>
-        )}
-
-        {success && (
-          <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 rounded-r-lg text-green-700 shadow-sm">
-            <div className="flex items-center">
-              <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <div className="ml-3">
-                <p className="text-sm font-medium">{success}</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="space-y-8">
-          {/* Add/Edit Candidate Form */}
-          <div className="w-full">
-            <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-              {/* Header */}
-              <div className="bg-gradient-to-br from-indigo-600 via-blue-600 to-purple-600 p-8 relative overflow-hidden">
-                <div className="absolute inset-0 bg-black/10"></div>
-                <div className="relative z-10 flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30">
-                      {editingId ? <Edit2 className="w-8 h-8 text-white" /> : <Plus className="w-8 h-8 text-white" />}
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-white">
-                        {editingId ? 'Edit Candidate' : 'Add New Candidate'}
-                      </h2>
-                      <p className="text-indigo-100 mt-1">
-                        {editingId ? 'Update candidate information' : 'Enter candidate details to get started'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="hidden md:flex items-center gap-2 text-white/80">
-                    <div className="w-2 h-2 bg-white/60 rounded-full"></div>
-                    <div className="w-2 h-2 bg-white/40 rounded-full"></div>
-                    <div className="w-2 h-2 bg-white/20 rounded-full"></div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-8">
-                {/* Progress Indicator */}
-                <div className="flex items-center justify-center mb-8">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
-                        <span className="text-white font-semibold text-sm">1</span>
-                      </div>
-                      <span className="ml-2 text-sm font-medium text-gray-700">Personal Info</span>
-                    </div>
-                    <div className="w-8 h-px bg-gray-300"></div>
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
-                        <span className="text-white font-semibold text-sm">2</span>
-                      </div>
-                      <span className="ml-2 text-sm font-medium text-gray-700">Location</span>
-                    </div>
-                    <div className="w-8 h-px bg-gray-300"></div>
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
-                        <span className="text-white font-semibold text-sm">3</span>
-                      </div>
-                      <span className="ml-2 text-sm font-medium text-gray-700">Professional</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-8">
-                  {/* Personal Information Section */}
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <User className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-gray-900">Personal Information</h3>
-                    </div>
-
-                    <div className="grid md:grid-cols-1 gap-6">
-                      {/* Candidate Name */}
-                      <div className="space-y-2">
-                        <label className="block text-sm font-semibold text-gray-800">
-                          Full Name <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative group">
-                          <input
-                            type="text"
-                            value={candidateName}
-                            onChange={(e) => setCandidateName(e.target.value)}
-                            placeholder="Enter candidate's full name"
-                            className="w-full px-5 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-300 text-gray-900 placeholder-gray-400 bg-white hover:border-gray-300"
-                            maxLength={100}
-                          />
-                          <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 w-5 h-5 transition-colors duration-300" />
-                        </div>
-                        <p className="text-xs text-gray-500 flex items-center gap-1">
-                          <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                          Maximum 100 characters
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Location Information Section */}
-                  <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-100">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="p-2 bg-emerald-100 rounded-lg">
-                        <MapPin className="w-5 h-5 text-emerald-600" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-gray-900">Location Details</h3>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-6">
-                      {/* State */}
-                      <div className="space-y-2">
-                        <label className="block text-sm font-semibold text-gray-800">
-                          State <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative group">
-                          <input
-                            type="text"
-                            value={state}
-                            onChange={(e) => setState(e.target.value)}
-                            placeholder="e.g., California"
-                            className="w-full px-5 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all duration-300 text-gray-900 placeholder-gray-400 bg-white hover:border-gray-300"
-                            maxLength={50}
-                          />
-                          <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500 w-5 h-5 transition-colors duration-300" />
-                        </div>
-                      </div>
-
-                      {/* City */}
-                      <div className="space-y-2">
-                        <label className="block text-sm font-semibold text-gray-800">
-                          City <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative group">
-                          <input
-                            type="text"
-                            value={city}
-                            onChange={(e) => setCity(e.target.value)}
-                            placeholder="e.g., San Francisco"
-                            className="w-full px-5 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all duration-300 text-gray-900 placeholder-gray-400 bg-white hover:border-gray-300"
-                            maxLength={50}
-                          />
-                          <Building className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500 w-5 h-5 transition-colors duration-300" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Professional Information Section */}
-                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="p-2 bg-purple-100 rounded-lg">
-                        <Briefcase className="w-5 h-5 text-purple-600" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-gray-900">Professional Details</h3>
-                    </div>
-
-                    <div className="space-y-6">
-                      {/* Experience */}
-                      <div className="space-y-2">
-                        <label className="block text-sm font-semibold text-gray-800">
-                          Experience <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative group">
-                          <input
-                            type="text"
-                            value={experience}
-                            onChange={(e) => setExperience(e.target.value)}
-                            placeholder="e.g., 3 years, 2-5 years, Fresher"
-                            className="w-full px-5 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all duration-300 text-gray-900 placeholder-gray-400 bg-white hover:border-gray-300"
-                            maxLength={50}
-                          />
-                          <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-purple-500 w-5 h-5 transition-colors duration-300" />
-                        </div>
-                        <p className="text-xs text-gray-500 flex items-center gap-1">
-                          <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                          Specify years of experience or level
-                        </p>
-                      </div>
-
-                      {/* Profile */}
-                      <div className="space-y-2">
-                        <label className="block text-sm font-semibold text-gray-800">
-                          Profile <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative group">
-                          <select
-                            value={profile}
-                            onChange={(e) => setProfile(e.target.value)}
-                            className="w-full px-5 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all duration-300 text-gray-900 bg-white hover:border-gray-300 appearance-none"
-                          >
-                            <option value="">Select a profile</option>
-                            {profiles.map((prof) => (
-                              <option key={prof._id} value={prof._id}>
-                                {prof.name}
-                              </option>
-                            ))}
-                          </select>
-                          <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-purple-500 w-5 h-5 transition-colors duration-300" />
-                          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </div>
-                        </div>
-                        <p className="text-xs text-gray-500 flex items-center gap-1">
-                          <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                          Choose the appropriate profile for this candidate
-                        </p>
-                      </div>
-
-                      {/* Resume Upload */}
-                      <div className="space-y-3">
-                        <label className="block text-sm font-semibold text-gray-800">
-                          Resume/CV Upload
-                        </label>
-                        <div className="relative group">
-                          <input
-                            type="file"
-                            accept=".jpg,.jpeg,.pdf,.doc,.docx"
-                            onChange={handleFileChange}
-                            className="hidden"
-                            id="resume-upload"
-                          />
-                          <label
-                            htmlFor="resume-upload"
-                            className="w-full px-6 py-5 border-2 border-dashed border-gray-300 rounded-xl hover:border-purple-400 focus-within:border-purple-500 focus-within:ring-4 focus-within:ring-purple-100 transition-all duration-300 cursor-pointer bg-gradient-to-r from-gray-50 to-gray-100 hover:from-purple-50 hover:to-pink-50 group"
-                          >
-                            <div className="flex flex-col items-center justify-center space-y-3">
-                              <div className="p-3 bg-white rounded-full shadow-md group-hover:shadow-lg transition-shadow duration-300">
-                                <Upload className="w-6 h-6 text-gray-400 group-hover:text-purple-500 transition-colors duration-300" />
-                              </div>
-                              <div className="text-center">
-                                <p className="text-sm font-medium text-gray-700 group-hover:text-purple-700 transition-colors duration-300">
-                                  {resumePreview ? (
-                                    <span className="flex items-center gap-2">
-                                      <FileText className="w-4 h-4" />
-                                      {resumePreview}
-                                    </span>
-                                  ) : (
-                                    'Click to upload resume'
-                                  )}
-                                </p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                  JPG, PDF, DOC, DOCX (max 5MB)
-                                </p>
-                              </div>
-                            </div>
-                          </label>
-                        </div>
-                        {resumePreview && (
-                          <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            File selected: {resumePreview}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
-                    <button
-                      onClick={handleSave}
-                      disabled={saving || !candidateName.trim() || !state.trim() || !city.trim() || !experience.trim() || !profile.trim()}
-                      className="flex-1 flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl hover:from-indigo-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:transform-none disabled:shadow-none"
-                    >
-                      <Save className="w-5 h-5" />
-                      {saving ? (
-                        <span className="flex items-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                          Saving...
-                        </span>
-                      ) : editingId ? 'Update Candidate' : 'Add Candidate'}
-                    </button>
-
-                    {editingId && (
-                      <button
-                        onClick={handleCancel}
-                        className="px-8 py-4 bg-white border-2 border-gray-300 text-gray-700 rounded-2xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 font-semibold shadow-sm hover:shadow-md"
-                      >
-                        Cancel
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Candidates List */}
-          <div className="w-full">
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-              {/* Header with Search */}
-              <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 bg-blue-100 rounded-xl">
-                      <FileText className="w-6 h-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-semibold text-gray-900">Candidate Directory</h2>
-                      <p className="text-sm text-gray-600">Manage all your candidates</p>
-                    </div>
-                  </div>
-
-                  {/* Search */}
-                  <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search candidates..."
-                      className="pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 w-80 transition-all duration-200"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Loading State */}
-              {loading && (
-                <div className="p-16 text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600 mx-auto mb-6"></div>
-                  <p className="text-gray-600 text-lg">Loading your candidates...</p>
-                </div>
-              )}
-
-              {/* Empty State */}
-              {!loading && filteredCandidates.length === 0 && (
-                <div className="p-16 text-center">
-                  <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <User className="w-12 h-12 text-gray-400" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                    {searchQuery ? 'No matching candidates found' : 'Start building your candidate database'}
-                  </h3>
-                  <p className="text-gray-600 text-lg max-w-md mx-auto">
-                    {searchQuery
-                      ? 'Try adjusting your search terms or add a new candidate'
-                      : 'Add your first candidate using the form on the left to get started'
-                    }
-                  </p>
-                </div>
-              )}
-
-              {/* Candidates Table */}
-              {!loading && filteredCandidates.length > 0 && (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
-                      <tr>
-                        <th className="px-6 py-5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                          Candidate Details
-                        </th>
-                        <th className="px-6 py-5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                          Location
-                        </th>
-                        <th className="px-6 py-5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                          Profile
-                        </th>
-                        <th className="px-6 py-5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                          Experience
-                        </th>
-                        <th className="px-6 py-5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                          Resume
-                        </th>
-                        <th className="px-6 py-5 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {filteredCandidates.map((candidate) => (
-                        <tr key={candidate._id} className="hover:bg-blue-50 transition-colors duration-150">
-                          <td className="px-6 py-5 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md">
-                                <User className="w-6 h-6 text-white" />
-                              </div>
-                              <div className="ml-4">
-                                <div className="text-sm font-semibold text-gray-900">
-                                  {candidate.name}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  ID: {candidate._id.slice(-8)}
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-5 whitespace-nowrap">
-                            <div className="flex items-center text-sm text-gray-600">
-                              <MapPin className="w-4 h-4 mr-2 text-gray-400" />
-                              <div>
-                                <div className="font-medium">{candidate.city}</div>
-                                <div className="text-gray-500">{candidate.state}</div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-5 whitespace-nowrap">
-                            <div className="flex items-center text-sm text-gray-600">
-                              <User className="w-4 h-4 mr-2 text-gray-400" />
-                              {candidate.profile?.name || 'N/A'}
-                            </div>
-                          </td>
-                          <td className="px-6 py-5 whitespace-nowrap">
-                            <div className="flex items-center text-sm text-gray-600">
-                              <Briefcase className="w-4 h-4 mr-2 text-gray-400" />
-                              {candidate.experience}
-                            </div>
-                          </td>
-                          <td className="px-6 py-5 whitespace-nowrap">
-                            {candidate.resume ? (
-                              <a
-                                href={candidate.key ? `${API_BASE_URL}/api/media/preview?key=${candidate.key}` : (candidate.resume.startsWith('http') ? candidate.resume : `${API_BASE_URL}/${candidate.resume}`)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 transition-colors"
-                              >
-                                <FileText className="w-3 h-3 mr-1" />
-                                View Resume
-                              </a>
-                            ) : (
-                              <span className="text-gray-400 text-sm">No resume</span>
-                            )}
-                          </td>
-                          <td className="px-6 py-5 whitespace-nowrap text-right text-sm font-medium">
-                            <div className="flex items-center justify-end gap-3">
-                              <button
-                                onClick={() => handleEdit(candidate)}
-                                className="p-3 text-blue-600 hover:text-white hover:bg-blue-600 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
-                                title="Edit candidate"
-                              >
-                                <Edit2 className="w-5 h-5" />
-                              </button>
-                              <button
-                                onClick={() => handleDelete(candidate._id)}
-                                className="p-3 text-red-600 hover:text-white hover:bg-red-600 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
-                                title="Delete candidate"
-                              >
-                                <Trash2 className="w-5 h-5" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+            <div style={{ fontSize: '12px', color: '#9ca3af' }}>
+              {editingId ? 'Update details below' : 'Fill in candidate information'}
             </div>
           </div>
         </div>
+        {editingId && (
+          <button onClick={handleCancel} style={{ width: '30px', height: '30px', borderRadius: '7px', border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', flexShrink: 0 }}>
+            <X size={14} />
+          </button>
+        )}
+      </div>
+
+      {/* Alerts */}
+      {error && (
+        <div style={{ margin: '14px 20px 0', padding: '10px 14px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', fontSize: '13px', color: '#dc2626', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+          <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#ef4444', flexShrink: 0, marginTop: '5px' }} />
+          {error}
+        </div>
+      )}
+      {success && (
+        <div style={{ margin: '14px 20px 0', padding: '10px 14px', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', fontSize: '13px', color: '#16a34a', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+          <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#22c55e', flexShrink: 0, marginTop: '5px' }} />
+          {success}
+        </div>
+      )}
+
+      <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+
+        {/* Full Name */}
+        <div>
+          <label style={labelStyle}>Full Name <span style={{ color: '#ef4444' }}>*</span></label>
+          <div style={{ position: 'relative' }}>
+            <User size={14} color="#9ca3af" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+            <input
+              type="text" value={candidateName} onChange={e => setCandidateName(e.target.value)}
+              placeholder="e.g. Ravi Sharma" maxLength={100}
+              style={inputStyle(focusedField === 'name')}
+              onFocus={() => setFocusedField('name')} onBlur={() => setFocusedField(null)}
+            />
+          </div>
+        </div>
+
+        {/* State + City */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div>
+            <label style={labelStyle}>State <span style={{ color: '#ef4444' }}>*</span></label>
+            <div style={{ position: 'relative' }}>
+              <MapPin size={14} color="#9ca3af" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+              <input
+                type="text" value={state} onChange={e => setState(e.target.value)}
+                placeholder="Maharashtra" maxLength={50}
+                style={inputStyle(focusedField === 'state')}
+                onFocus={() => setFocusedField('state')} onBlur={() => setFocusedField(null)}
+              />
+            </div>
+          </div>
+          <div>
+            <label style={labelStyle}>City <span style={{ color: '#ef4444' }}>*</span></label>
+            <div style={{ position: 'relative' }}>
+              <Building size={14} color="#9ca3af" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+              <input
+                type="text" value={city} onChange={e => setCity(e.target.value)}
+                placeholder="Mumbai" maxLength={50}
+                style={inputStyle(focusedField === 'city')}
+                onFocus={() => setFocusedField('city')} onBlur={() => setFocusedField(null)}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Experience */}
+        <div>
+          <label style={labelStyle}>Experience <span style={{ color: '#ef4444' }}>*</span></label>
+          <div style={{ position: 'relative' }}>
+            <Briefcase size={14} color="#9ca3af" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+            <input
+              type="text" value={experience} onChange={e => setExperience(e.target.value)}
+              placeholder="e.g. 3 years, Fresher" maxLength={50}
+              style={inputStyle(focusedField === 'exp')}
+              onFocus={() => setFocusedField('exp')} onBlur={() => setFocusedField(null)}
+            />
+          </div>
+        </div>
+
+        {/* Profile */}
+        <div>
+          <label style={labelStyle}>Profile <span style={{ color: '#ef4444' }}>*</span></label>
+          <div style={{ position: 'relative' }}>
+            <select
+              value={profile} onChange={e => setProfile(e.target.value)}
+              style={{
+                ...inputStyle(focusedField === 'profile'),
+                appearance: 'none', cursor: 'pointer',
+                color: profile ? '#111827' : '#9ca3af',
+                paddingRight: '32px',
+              }}
+              onFocus={() => setFocusedField('profile')} onBlur={() => setFocusedField(null)}
+            >
+              <option value="">Select a profile</option>
+              {profiles.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
+            </select>
+            <ChevronDown size={14} color="#9ca3af" style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+          </div>
+        </div>
+
+        {/* Resume Upload */}
+        <div>
+          <label style={labelStyle}>Resume / CV</label>
+          <div
+            onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={e => { e.preventDefault(); setDragOver(false); handleFileChange(e.dataTransfer.files[0]); }}
+            onClick={() => document.getElementById('resume-upload').click()}
+            style={{
+              border: `1.5px dashed ${dragOver ? '#6366f1' : resumePreview ? '#22c55e' : '#d1d5db'}`,
+              borderRadius: '10px', padding: '16px',
+              textAlign: 'center', cursor: 'pointer',
+              backgroundColor: dragOver ? '#eef2ff' : resumePreview ? '#f0fdf4' : '#fafafa',
+              transition: 'all 0.2s',
+            }}
+          >
+            <input id="resume-upload" type="file" accept=".jpg,.jpeg,.pdf,.doc,.docx" style={{ display: 'none' }} onChange={e => handleFileChange(e.target.files[0])} />
+            {resumePreview ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <div style={{ width: '30px', height: '30px', borderRadius: '8px', backgroundColor: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <FileText size={14} color="#16a34a" />
+                </div>
+                <div style={{ textAlign: 'left', overflow: 'hidden' }}>
+                  <div style={{ fontSize: '13px', fontWeight: 500, color: '#16a34a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '200px' }}>{resumePreview}</div>
+                  <div style={{ fontSize: '11px', color: '#6b7280' }}>Click to replace</div>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div style={{ width: '34px', height: '34px', borderRadius: '9px', backgroundColor: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px' }}>
+                  <Upload size={15} color="#6366f1" />
+                </div>
+                <div style={{ fontSize: '13px', fontWeight: 500, color: '#374151' }}>
+                  {isMobile ? 'Tap to upload' : 'Drop file or click to upload'}
+                </div>
+                <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '2px' }}>JPG, PDF, DOC, DOCX — max 5MB</div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Save button */}
+        <button
+          onClick={handleSave}
+          disabled={saving || !isFormValid}
+          style={{
+            width: '100%', padding: '12px',
+            borderRadius: '10px', border: 'none',
+            background: isFormValid && !saving ? 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' : '#e5e7eb',
+            color: isFormValid && !saving ? '#fff' : '#9ca3af',
+            fontSize: '14px', fontWeight: 600,
+            cursor: isFormValid && !saving ? 'pointer' : 'not-allowed',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+            transition: 'opacity 0.15s', marginTop: '4px',
+          }}
+        >
+          {saving ? (
+            <>
+              <div style={{ width: '14px', height: '14px', border: '2px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+              Saving...
+            </>
+          ) : (
+            <><Save size={15} />{editingId ? 'Update Candidate' : 'Add Candidate'}</>
+          )}
+        </button>
       </div>
     </div>
   );
-};
 
-export default AddCandidate;
+  /* ── CANDIDATES LIST / TABLE ── */
+  const CandidatesList = () => (
+    <div style={{ backgroundColor: '#fff', borderRadius: isMobile ? '0' : '14px', border: isMobile ? 'none' : '1px solid #e5e7eb', overflow: 'hidden' }}>
+      {/* List header */}
+      <div style={{
+        padding: '14px 20px', borderBottom: '1px solid #f3f4f6',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        flexWrap: 'wrap', gap: '10px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <FileText size={14} color="#6b7280" />
+          </div>
+          <div>
+            <div style={{ fontWeight: 600, fontSize: '15px', color: '#111827' }}>All Candidates</div>
+            <div style={{ fontSize: '12px', color: '#9ca3af' }}>{filteredCandidates.length} of {candidates.length} shown</div>
+          </div>
+        </div>
+        <div style={{ position: 'relative', width: isMobile ? '100%' : '220px' }}>
+          <Search size={13} color="#9ca3af" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+          <input
+            type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+            placeholder="Search candidates..."
+            style={{ width: '100%', boxSizing: 'border-box', padding: '8px 10px 8px 30px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '13px', outline: 'none', backgroundColor: '#fafafa', color: '#111827' }}
+            onFocus={e => e.target.style.borderColor = '#6366f1'}
+            onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+          />
+        </div>
+      </div>
+
+      {/* Loading */}
+      {loading && (
+        <div style={{ padding: '50px 20px', textAlign: 'center' }}>
+          <div style={{ width: '32px', height: '32px', border: '3px solid #e5e7eb', borderTopColor: '#6366f1', borderRadius: '50%', animation: 'spin 0.7s linear infinite', margin: '0 auto 10px' }} />
+          <div style={{ fontSize: '13px', color: '#9ca3af' }}>Loading...</div>
+        </div>
+      )}
+
+      {/* Empty */}
+      {!loading && filteredCandidates.length === 0 && (
+        <div style={{ padding: '50px 20px', textAlign: 'center' }}>
+          <div style={{ width: '52px', height: '52px', borderRadius: '14px', backgroundColor: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+            <User size={22} color="#d1d5db" />
+          </div>
+          <div style={{ fontSize: '14px', fontWeight: 600, color: '#374151', marginBottom: '4px' }}>
+            {searchQuery ? 'No results found' : 'No candidates yet'}
+          </div>
+          <div style={{ fontSize: '12px', color: '#9ca3af' }}>
+            {searchQuery ? 'Try different keywords' : 'Add your first candidate using the form'}
+          </div>
+        </div>
+      )}
+
+      {/* Mobile: Cards */}
+      {!loading && filteredCandidates.length > 0 && isMobile && (
+        <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {filteredCandidates.map(c => (
+            <div key={c._id} style={{ border: '1px solid #f3f4f6', borderRadius: '12px', padding: '14px', backgroundColor: '#fafafa' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '38px', height: '38px', borderRadius: '10px', backgroundColor: avatarColor(c.name), display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '15px', flexShrink: 0 }}>
+                    {c.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '14px', color: '#111827' }}>{c.name}</div>
+                    <div style={{ fontSize: '11px', color: '#d1d5db', fontFamily: 'monospace' }}>#{c._id.slice(-6)}</div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <button onClick={() => handleEdit(c)} style={{ width: '30px', height: '30px', borderRadius: '7px', border: '1px solid #e5e7eb', backgroundColor: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#6b7280' }}>
+                    <Edit2 size={13} />
+                  </button>
+                  <button onClick={() => handleDelete(c._id)} style={{ width: '30px', height: '30px', borderRadius: '7px', border: '1px solid #e5e7eb', backgroundColor: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#6b7280' }}>
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: '#6b7280' }}>
+                  <MapPin size={12} color="#9ca3af" />
+                  {c.city}, {c.state}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: '#6b7280' }}>
+                  <Briefcase size={12} color="#9ca3af" />
+                  {c.experience}
+                </div>
+              </div>
+              <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 8px', borderRadius: '5px', backgroundColor: '#eef2ff', color: '#4338ca', fontSize: '11px', fontWeight: 500 }}>
+                  {c.profile?.name || 'N/A'}
+                </span>
+                {c.resume ? (
+                  <a
+                    href={c.key ? `${API_BASE_URL}/api/media/preview?key=${c.key}` : (c.resume.startsWith('http') ? c.resume : `${API_BASE_URL}/${c.resume}`)}
+                    target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 8px', borderRadius: '5px', backgroundColor: '#f0fdf4', color: '#16a34a', fontSize: '11px', fontWeight: 500, textDecoration: 'none', border: '1px solid #bbf7d0' }}
+                  >
+                    <FileText size={11} /> View CV
+                  </a>
+                ) : (
+                  <span style={{ fontSize: '11px', color: '#d1d5db' }}>No CV</span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Tablet / Desktop: Table */}
+      {!loading && filteredCandidates.length > 0 && !isMobile && (
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+            <thead>
+              <tr style={{ backgroundColor: '#f9fafb' }}>
+                {['Candidate', 'Location', 'Profile', 'Experience', 'Resume', ''].map((h, i) => (
+                  <th key={i} style={{
+                    padding: '10px 16px', textAlign: i === 5 ? 'right' : 'left',
+                    fontSize: '11px', fontWeight: 600, color: '#9ca3af',
+                    textTransform: 'uppercase', letterSpacing: '0.06em',
+                    borderBottom: '1px solid #f3f4f6', whiteSpace: 'nowrap',
+                  }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filteredCandidates.map((c, idx) => (
+                <tr
+                  key={c._id}
+                  style={{ borderBottom: idx < filteredCandidates.length - 1 ? '1px solid #f9fafb' : 'none' }}
+                  onMouseEnter={e => e.currentTarget.style.backgroundColor = '#fafafa'}
+                  onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <td style={{ padding: '13px 16px', whiteSpace: 'nowrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ width: '34px', height: '34px', borderRadius: '9px', backgroundColor: avatarColor(c.name), display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '13px', flexShrink: 0 }}>
+                        {c.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 600, color: '#111827' }}>{c.name}</div>
+                        <div style={{ fontSize: '11px', color: '#d1d5db', fontFamily: 'monospace' }}>#{c._id.slice(-6)}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ padding: '13px 16px', whiteSpace: 'nowrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#374151' }}>
+                      <MapPin size={12} color="#9ca3af" />
+                      <div>
+                        <div style={{ fontWeight: 500 }}>{c.city}</div>
+                        <div style={{ fontSize: '11px', color: '#9ca3af' }}>{c.state}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ padding: '13px 16px', whiteSpace: 'nowrap' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', padding: '3px 9px', borderRadius: '5px', backgroundColor: '#eef2ff', color: '#4338ca', fontSize: '12px', fontWeight: 500 }}>
+                      {c.profile?.name || 'N/A'}
+                    </span>
+                  </td>
+                  <td style={{ padding: '13px 16px', whiteSpace: 'nowrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#374151', fontWeight: 500 }}>
+                      <Briefcase size={12} color="#9ca3af" />
+                      {c.experience}
+                    </div>
+                  </td>
+                  <td style={{ padding: '13px 16px', whiteSpace: 'nowrap' }}>
+                    {c.resume ? (
+                      <a
+                        href={c.key ? `${API_BASE_URL}/api/media/preview?key=${c.key}` : (c.resume.startsWith('http') ? c.resume : `${API_BASE_URL}/${c.resume}`)}
+                        target="_blank" rel="noopener noreferrer"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 9px', borderRadius: '5px', backgroundColor: '#f0fdf4', color: '#16a34a', fontSize: '12px', fontWeight: 500, textDecoration: 'none', border: '1px solid #bbf7d0' }}
+                      >
+                        <FileText size={11} /> View
+                      </a>
+                    ) : <span style={{ fontSize: '12px', color: '#d1d5db' }}>—</span>}
+                  </td>
+                  <td style={{ padding: '13px 16px', whiteSpace: 'nowrap', textAlign: 'right' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '5px' }}>
+                      {[
+                        { icon: Edit2, onClick: () => handleEdit(c), hoverBg: '#eef2ff', hoverBorder: '#c7d2fe', hoverColor: '#4f46e5' },
+                        { icon: Trash2, onClick: () => handleDelete(c._id), hoverBg: '#fef2f2', hoverBorder: '#fecaca', hoverColor: '#dc2626' },
+                      ].map(({ icon: Icon, onClick, hoverBg, hoverBorder, hoverColor }, bi) => (
+                        <button
+                          key={bi} onClick={onClick}
+                          style={{ width: '30px', height: '30px', borderRadius: '7px', border: '1px solid #e5e7eb', backgroundColor: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#9ca3af', transition: 'all 0.15s' }}
+                          onMouseEnter={e => { e.currentTarget.style.backgroundColor = hoverBg; e.currentTarget.style.borderColor = hoverBorder; e.currentTarget.style.color = hoverColor; }}
+                          onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#fff'; e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.color = '#9ca3af'; }}
+                        >
+                          <Icon size={13} />
+                        </button>
+                      ))}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fc', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
+
+      {/* ── Navbar ── */}
+      <div style={{
+        backgroundColor: '#fff', borderBottom: '1px solid #e5e7eb',
+        padding: `0 ${isMobile ? '16px' : '24px'}`,
+        height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        position: 'sticky', top: 0, zIndex: 100,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ width: '34px', height: '34px', borderRadius: '9px', background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <User size={16} color="#fff" />
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: isMobile ? '14px' : '15px', color: '#111827', lineHeight: 1.2 }}>
+              {isMobile ? 'Candidates' : 'Candidate Management'}
+            </div>
+            {!isMobile && <div style={{ fontSize: '11px', color: '#9ca3af' }}>Recruitment Portal</div>}
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: '10px', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total</div>
+            <div style={{ fontSize: '20px', fontWeight: 700, color: '#4f46e5', lineHeight: 1 }}>{candidates.length}</div>
+          </div>
+          {/* Mobile: toggle tab */}
+          {isMobile && (
+            <button
+              onClick={() => setMobileView(v => v === 'form' ? 'list' : 'form')}
+              style={{ padding: '7px 12px', borderRadius: '8px', border: '1px solid #e5e7eb', backgroundColor: mobileView === 'form' ? '#eef2ff' : '#fff', color: mobileView === 'form' ? '#4f46e5' : '#374151', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
+            >
+              {mobileView === 'form' ? <><FileText size={13} /> List</> : <><Plus size={13} /> Add</>}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ── Main Content ── */}
+      <div style={{
+        maxWidth: '1320px', margin: '0 auto',
+        padding: isMobile ? '0' : isTablet ? '20px 16px' : '28px 24px',
+        display: useStackedLayout ? 'block' : 'grid',
+        gridTemplateColumns: useStackedLayout ? undefined : `${sidebarWidth} 1fr`,
+        gap: '20px', alignItems: 'start',
+      }}>
+
+        {/* Desktop: both columns. Tablet: stacked. Mobile: toggled */}
+
+        {/* Form column */}
+        {(!isMobile || mobileView === 'form') && (
+          <div style={{ position: isDesktop ? 'sticky' : 'static', top: '80px', marginBottom: useStackedLayout ? '16px' : 0 }}>
+            {FormPanel()}
+          </div>
+        )}
+
+        {/* List column */}
+        {(!isMobile || mobileView === 'list') && (
+          <div>
+            {/* On tablet, show form above list (collapsible style) */}
+            {isTablet && (
+              <div style={{ marginBottom: '16px' }}>
+                {FormPanel()}
+              </div>
+            )}
+            {CandidatesList()}
+          </div>
+        )}
+      </div>
+
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        * { box-sizing: border-box; }
+        input::placeholder { color: #c9cdd4; }
+        select option { color: #111827; }
+        @media (max-width: 640px) {
+          table { font-size: 12px; }
+        }
+      `}</style>
+    </div>
+  );
+}

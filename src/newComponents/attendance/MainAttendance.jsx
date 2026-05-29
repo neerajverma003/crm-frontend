@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChartNoAxesCombined, Clock4, UserCheck, Users, LogIn, LogOut, Download, Calendar as CalendarIcon } from "lucide-react";
+import { FaChartLine, FaClock, FaUserCheck, FaUsers, FaSignInAlt, FaSignOutAlt, FaDownload, FaCalendarAlt as CalendarIcon } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Attendance from "../attendance/Attendence.jsx";
@@ -223,10 +223,10 @@ const MainAttendance = () => {
                 {/* Stats Section */}
                 <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {[
-                        { id: 1, title: "Total Employees", value: "89", subtitle: "Active employees", icon: <Users /> },
-                        { id: 2, title: "Open Positions", value: "84", subtitle: "Positions to fill", icon: <UserCheck /> },
-                        { id: 3, title: "On Leave", value: "5", subtitle: "Employees on leave", icon: <Clock4 /> },
-                        { id: 4, title: "New Joins", value: "12", subtitle: "Joined this month", icon: <ChartNoAxesCombined /> },
+                        { id: 1, title: "Total Employees", value: "89", subtitle: "Active employees", icon: <FaUsers /> },
+                        { id: 2, title: "Open Positions", value: "84", subtitle: "Positions to fill", icon: <FaUserCheck /> },
+                        { id: 3, title: "On Leave", value: "5", subtitle: "Employees on leave", icon: <FaClock /> },
+                        { id: 4, title: "New Joins", value: "12", subtitle: "Joined this month", icon: <FaChartLine /> },
                     ].map((item) => (
                         <div
                             key={item.id}
