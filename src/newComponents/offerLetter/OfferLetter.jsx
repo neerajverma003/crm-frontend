@@ -113,6 +113,7 @@ const OfferLetter = () => {
     candidatePhone: "",
     candidateAddress: "",
     candidateGender: "Male",
+    maritalStatus: "Single",
     // Employment Terms
     jobTitle: "",
     joiningDate: new Date().toISOString().split("T")[0],
@@ -235,6 +236,7 @@ const OfferLetter = () => {
         candidatePhone: "",
         candidateAddress: "",
         candidateGender: "Male",
+        maritalStatus: "Single",
         jobTitle: "",
         joiningDate: new Date().toISOString().split("T")[0],
         employmentType: "",
@@ -264,6 +266,7 @@ const OfferLetter = () => {
       candidatePhone: offer.candidatePhone || "",
       candidateAddress: offer.candidateAddress || "",
       candidateGender: offer.candidateGender || "Male",
+      maritalStatus: offer.maritalStatus || "Single",
       jobTitle: offer.jobTitle || "",
       joiningDate: offer.joiningDate ? new Date(offer.joiningDate).toISOString().split("T")[0] : "",
       employmentType: offer.employmentType || "",
@@ -412,7 +415,7 @@ const OfferLetter = () => {
                 />
               </div>
               <div>
-                <label className="mb-2 block text-sm font-semibold">Father's Name</label>
+                <label className="mb-2 block text-sm font-semibold">Father's/Husband's Name</label>
                 <input
                   type="text"
                   name="fatherName"
@@ -433,6 +436,18 @@ const OfferLetter = () => {
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
                   <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-semibold">Marital Status</label>
+                <select
+                  name="maritalStatus"
+                  value={formData.maritalStatus || "Single"}
+                  onChange={handleChange}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2"
+                >
+                  <option value="Single">Single</option>
+                  <option value="Married">Married</option>
                 </select>
               </div>
               <div>
@@ -614,6 +629,7 @@ const OfferLetter = () => {
                     candidatePhone: "",
                     candidateAddress: "",
                     candidateGender: "Male",
+                    maritalStatus: "Single",
                     jobTitle: "",
                     joiningDate: new Date().toISOString().split("T")[0],
                     employmentType: "",

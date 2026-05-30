@@ -14,8 +14,19 @@ const PreviewOfferLetter = ({ formatData, company, onClose }) => {
   // NDA starts right after the letter pages + annexure (if present)
   const ndaStartPage = basePages + annexurePages + 1;
 
-  const getPrefix = () => (formatData.candidateGender === "Female" ? "Ms." : "Mr.");
-  const getRelationPrefix = () => (formatData.candidateGender === "Female" ? "D/o" : "S/o");
+  const getPrefix = () => {
+    if (formatData.candidateGender === "Female") {
+      return formatData.maritalStatus === "Married" ? "Mrs." : "Ms.";
+    }
+    return "Mr.";
+  };
+  
+  const getRelationPrefix = () => {
+    if (formatData.candidateGender === "Female") {
+      return formatData.maritalStatus === "Married" ? "W/o" : "D/o";
+    }
+    return "S/o";
+  };
 
   // ─── Print handler ────────────────────────────────────────────────────────
   const handlePrint = useReactToPrint({
