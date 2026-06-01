@@ -154,7 +154,7 @@ const SuperAdminAttendance = () => {
     };
 
     const EditModal = ({ attendance, onClose, onSave }) => {
-        const statusOptions = ["Present", "Grace Present", "Late", "Half Day", "Absent", "CL"];
+        const statusOptions = ["Present", "Grace Present", "Late", "Half Day", "Absent", "Casual Leave"];
 
         const formatLocalDateTime = (dateString) => {
             if (!dateString) return "";
@@ -323,7 +323,7 @@ const SuperAdminAttendance = () => {
     /* � Date Attendance Edit Modal */
     /* -------------------------------------------------------------------------- */
     const DateAttendanceEditModal = ({ date, dayRecords, onClose, onSave }) => {
-        const statusOptions = ["Present", "Absent", "Late", "Grace Present", "Half Day", "Sunday", "Holiday", "CL"];
+        const statusOptions = ["Present", "Absent", "Late", "Grace Present", "Half Day", "Sunday", "Holiday", "Casual Leave"];
 
         const formatLocalDateTime = (dateString) => {
             if (!dateString) return "";
@@ -762,7 +762,7 @@ const SuperAdminAttendance = () => {
             else if (status === "Absent") stats.absent++;
             else if (status === "Half Day") stats.halfDay++;
             else if (status === "Sunday") stats.sunday++;
-            else if (status === "CL") stats.cl++;
+            else if (status === "CL" || status === "Casual Leave") stats.cl++;
             else if (status === "Holiday" || status === "Holidays") stats.holiday++;
         });
 
@@ -786,7 +786,10 @@ const SuperAdminAttendance = () => {
             setSavingSalary(true);
             const stats = calculateAttendanceStats(monthlyAttendance, currentMonth);
             const baseSalary = selectedUser?.salary || 30000;
-            const perDaySalary = baseSalary / 30;
+            const year = currentMonth.getFullYear();
+            const monthIndex = currentMonth.getMonth();
+            const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+            const perDaySalary = baseSalary / daysInMonth;
             const presentDays = stats.present + stats.gracePresent + stats.late + (stats.halfDay * 0.5) + stats.sunday + stats.cl + stats.holiday;
             const earnedAmount = perDaySalary * presentDays;
             const totalPayable = earnedAmount + (Number(remarkAmount) || 0);
@@ -1034,6 +1037,9 @@ const SuperAdminAttendance = () => {
                     return "bg-gradient-to-br from-pink-50 to-pink-100 border-pink-300 shadow-pink-100";
                 case "absent":
                     return "bg-gradient-to-br from-rose-50 to-rose-100 border-rose-300 shadow-rose-100";
+                case "cl":
+                case "casual leave":
+                    return "bg-gradient-to-br from-gray-200 to-gray-300 border-gray-800 shadow-gray-400";
                 default:
                     return "bg-gradient-to-br from-gray-50 to-gray-100 border-gray-300 shadow-gray-100";
             }
@@ -1057,6 +1063,9 @@ const SuperAdminAttendance = () => {
                     return "bg-pink-500 text-white";
                 case "absent":
                     return "bg-rose-500 text-white";
+                case "cl":
+                case "casual leave":
+                    return "bg-black text-white";
                 default:
                     return "bg-gray-500 text-white";
             }
@@ -1064,6 +1073,14 @@ const SuperAdminAttendance = () => {
 
         // Handle mobile double-tap or desktop double-click
         const handleCardInteraction = (date, dayRecords) => {
+            // Prevent editing future dates
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (date > today) {
+                alert("Cannot edit attendance for future dates.");
+                return;
+            }
+
             const currentTime = new Date().getTime();
             const timeBetweenTaps = currentTime - lastTapRef.current;
 
@@ -1777,10 +1794,11 @@ const SuperAdminAttendance = () => {
                                                         bgColor: "bg-pink-50",
                                                     },
                                                     {
-                                                        label: "CL",
+                                                        label: "Casual Leave",
                                                         value: stats.cl,
-                                                        color: "bg-purple-100 text-purple-700",
-                                                        bgColor: "bg-purple-50",
+                                                        color: "bg-gray-800 text-white",
+                                                        bgColor: "bg-black",
+                                                        textColor: "text-white",
                                                     },
                                                     {
                                                         label: "Holiday",
@@ -1798,7 +1816,7 @@ const SuperAdminAttendance = () => {
                                                                 className={`${item.bgColor} rounded-lg border-l-4 border-current p-3 text-sm`}
                                                             >
                                                                 <div className="flex items-center justify-between">
-                                                                    <span className="font-semibold text-gray-700">{item.label}</span>
+                                                                    <span className={`font-semibold ${item.textColor || 'text-gray-700'}`}>{item.label}</span>
                                                                     <span className={`text-xl font-bold ${item.color.split(" ")[1]}`}>
                                                                         {item.value}
                                                                     </span>
@@ -1813,7 +1831,9 @@ const SuperAdminAttendance = () => {
                                                         <div className="mt-4 border-t border-blue-200 pt-3">
                                                             <div className="flex items-center justify-between">
                                                                 <span className="text-sm font-bold text-gray-800">Total Days</span>
-                                                                <span className="text-xl font-bold text-blue-700">{stats.total}</span>
+                                                                <span className="text-xl font-bold text-blue-700">
+                                                                    {stats.present + stats.gracePresent + stats.late + (stats.halfDay * 0.5) + stats.sunday + stats.cl + stats.holiday}
+                                                                </span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1831,7 +1851,12 @@ const SuperAdminAttendance = () => {
                                             {(() => {
                                                 const stats = calculateAttendanceStats(monthlyAttendance, currentMonth);
                                                 const monthlyBaseSalary = selectedUser?.salary || 30000; // Fetch from user management, fallback to 30000
-                                                const perDaySalary = monthlyBaseSalary / 30; // Assuming 30 working days per month
+                                                
+                                                const year = currentMonth.getFullYear();
+                                                const monthIndex = currentMonth.getMonth();
+                                                const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+                                                
+                                                const perDaySalary = monthlyBaseSalary / daysInMonth;
                                                 const presentDays = stats.present + stats.gracePresent + stats.late + (stats.halfDay * 0.5) + stats.sunday + stats.cl + stats.holiday; // Count present and grace present as working days
                                                 const totalEarned = perDaySalary * presentDays;
                                                 const finalPayable = totalEarned + (Number(remarkAmount) || 0);

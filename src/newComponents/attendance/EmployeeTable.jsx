@@ -446,7 +446,8 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
             else if (status === "Late") stats.late++;
             else if (status === "Absent") stats.absent++;
             else if (status === "Half Day") stats.halfDay++;
-            else if (status === "CL") stats.cl++;
+            else if (status === "Sunday") stats.sunday++;
+            else if (status === "CL" || status === "Casual Leave") stats.cl++;
             else if (status === "Holiday" || status === "Holidays") stats.holiday++;
 
             stats.total++;
@@ -469,7 +470,7 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
     /*  Date Attendance Edit Modal Component */
     /* -------------------------------------------------------------------------- */
     const DateAttendanceEditModal = ({ date, dayRecords, onClose, onSave }) => {
-        const statusOptions = ["Present", "Absent", "Late", "Grace Present", "Half Day","Sunday","Holidays", "CL"];
+        const statusOptions = ["Present", "Absent", "Late", "Grace Present", "Half Day","Sunday","Holiday", "Casual Leave"];
 
         const formatLocalDateTime = (dateString) => {
             if (!dateString) return "";
@@ -793,6 +794,9 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                     return "bg-gradient-to-br from-pink-50 to-pink-100 border-pink-300 shadow-pink-100";
                 case "absent":
                     return "bg-gradient-to-br from-rose-50 to-rose-100 border-rose-300 shadow-rose-100";
+                case "cl":
+                case "casual leave":
+                    return "bg-gradient-to-br from-gray-200 to-gray-300 border-gray-800 shadow-gray-400";
                 default:
                     return "bg-gradient-to-br from-gray-50 to-gray-100 border-gray-300 shadow-gray-100";
             }
@@ -816,6 +820,9 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                     return "bg-pink-500 text-white";
                 case "absent":
                     return "bg-rose-500 text-white";
+                case "cl":
+                case "casual leave":
+                    return "bg-black text-white";
                 default:
                     return "bg-gray-500 text-white";
             }
@@ -834,8 +841,25 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                 <div
                     key={i}
                     className={`cursor-pointer rounded-lg border-2 p-6 text-lg transition-transform hover:shadow-lg active:scale-95 ${getStatusColor(status)}`}
-                    onDoubleClick={() => handleDateCardInteraction(date, dayRecords)}
-                    onClick={() => handleDateCardInteraction(date, dayRecords)}
+                    onDoubleClick={() => {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        if (date > today) {
+                            alert("Cannot edit attendance for future dates.");
+                            return;
+                        }
+                        handleDateCardInteraction(date, dayRecords);
+                    }}
+                    onClick={() => {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        if (date > today) {
+                            // Single clicks typically shouldn't trigger an alert to avoid annoyance, 
+                            // but if onClick is the primary mobile action, we need it.
+                            return; 
+                        }
+                        handleDateCardInteraction(date, dayRecords);
+                    }}
                     title="Double-click or double-tap to edit"
                 >
                     <div className="space-y-4">
@@ -1560,10 +1584,11 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                                                         bgColor: "bg-rose-50",
                                                     },
                                                     {
-                                                        label: "CL",
+                                                        label: "Casual Leave",
                                                         value: stats.cl,
-                                                        color: "bg-purple-100 text-purple-700",
-                                                        bgColor: "bg-purple-50",
+                                                        color: "bg-gray-800 text-white",
+                                                        bgColor: "bg-black",
+                                                        textColor: "text-white",
                                                     },
                                                     {
                                                         label: "Holiday",
@@ -1581,7 +1606,7 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                                                                 className={`${item.bgColor} rounded-lg border-l-4 border-current p-2 text-sm sm:p-2.5 sm:text-xs md:p-3 md:text-sm`}
                                                             >
                                                                 <div className="flex items-center justify-between gap-2 sm:gap-2 md:gap-2">
-                                                                    <span className="text-sm font-semibold text-gray-700 sm:text-xs md:text-sm">
+                                                                    <span className={`text-sm font-semibold sm:text-xs md:text-sm ${item.textColor || 'text-gray-700'}`}>
                                                                         {item.label}
                                                                     </span>
                                                                     <span
@@ -1603,7 +1628,7 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                                                                     Total Days
                                                                 </span>
                                                                 <span className="text-xl font-bold text-blue-700 sm:text-lg md:text-xl">
-                                                                    {stats.total}
+                                                                    {stats.present + stats.gracePresent + stats.late + (stats.halfDay * 0.5) + stats.sunday + stats.cl + stats.holiday}
                                                                 </span>
                                                             </div>
                                                         </div>
@@ -1621,9 +1646,15 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
 
                                             {(() => {
                                                 const stats = calculateAttendanceStats(monthlyAttendance, currentMonth);
-                                                const monthlyBaseSalary = 30000; // Static monthly salary
-                                                const perDaySalary = monthlyBaseSalary / 30; // Assuming 30 working days per month
-                                                const presentDays = stats.present + stats.gracePresent +(stats.halfDay*0.5)+stats.late+stats.cl+stats.holiday; // Count present and grace present as working days
+                                                const monthlyBaseSalary = selectedUser?.salary || 30000; // Get from user or default
+                                                
+                                                // Get the actual number of days in the current month
+                                                const year = currentMonth.getFullYear();
+                                                const monthIndex = currentMonth.getMonth();
+                                                const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+                                                
+                                                const perDaySalary = monthlyBaseSalary / daysInMonth;
+                                                const presentDays = stats.present + stats.gracePresent +(stats.halfDay*0.5)+stats.late+stats.sunday+stats.cl+stats.holiday; // Count present and grace present as working days
                                                 const totalEarned = perDaySalary * presentDays;
 
                                                 return (
