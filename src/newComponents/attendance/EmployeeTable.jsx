@@ -422,6 +422,7 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
             absent: 0,
             total: 0,
             halfDay: 0,
+            sunday: 0,
             cl: 0,
             holiday: 0,
         };
@@ -438,7 +439,18 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
             return recordDate.getMonth() === monthNum && recordDate.getFullYear() === yearNum;
         });
 
+        const uniqueDaysMap = {};
         monthData.forEach((record) => {
+            if (record?.date) {
+                const dateObj = new Date(record.date);
+                const dateKey = `${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
+                if (!uniqueDaysMap[dateKey]) {
+                    uniqueDaysMap[dateKey] = record;
+                }
+            }
+        });
+
+        Object.values(uniqueDaysMap).forEach((record) => {
             const status = record?.status || "Absent";
 
             if (status === "Present") stats.present++;
@@ -1582,6 +1594,12 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                                                         value: stats.absent,
                                                         color: "bg-rose-100 text-rose-700",
                                                         bgColor: "bg-rose-50",
+                                                    },
+                                                    {
+                                                        label: "Sunday",
+                                                        value: stats.sunday,
+                                                        color: "bg-pink-100 text-pink-700",
+                                                        bgColor: "bg-pink-50",
                                                     },
                                                     {
                                                         label: "Casual Leave",
