@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import axios from "axios";
 
 export default function Security() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -12,18 +13,47 @@ export default function Security() {
   const [emailAuth, setEmailAuth] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handlePasswordUpdate = (e) => {
+  const handlePasswordUpdate = async (e) => {
     e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      alert("New passwords do not match!");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      alert("New password must be at least 8 characters long.");
+      return;
+    }
+
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      alert("Password updated!");
+    try {
+      const userId = localStorage.getItem("userId");
+      const role = localStorage.getItem("role") || "superadmin";
+
+      if (!userId) {
+        alert("User not logged in or missing userId");
+        setIsSubmitting(false);
+        return;
+      }
+
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/login/change-password`, {
+        userId,
+        role,
+        currentPassword,
+        newPassword
+      });
+
+      alert(response.data.message || "Password updated successfully!");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-    }, 1000);
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Failed to update password.";
+      alert(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Mail, CheckCircle } from 'lucide-react';
+import { Search, Mail, CheckCircle, Eye, EyeOff } from 'lucide-react';
 
 export default function AdminProfile() {
 
@@ -17,6 +17,8 @@ export default function AdminProfile() {
     const [otpVerified, setOtpVerified] = useState(false);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const role=localStorage.getItem("role");
     const user=localStorage.getItem("user");
@@ -48,12 +50,21 @@ export default function AdminProfile() {
         
         setLoading(true);
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/send-otp`, {
+            const baseUrl = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+            const url = `${baseUrl}/send-otp`;
+            const res = await fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, userId })
             });
-            const data = await res.json();
+            
+            let data;
+            try {
+                data = await res.json();
+            } catch (parseError) {
+                const text = await res.text();
+                throw new Error(`Parse Error on URL: ${url}. Status: ${res.status}. Response starting with: ${text.substring(0, 30)}`);
+            }
             
             if (res.ok) {
                 setOtpSent(true);
@@ -77,7 +88,8 @@ export default function AdminProfile() {
         
         setLoading(true);
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/verify-otp`, {
+            const baseUrl = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+            const res = await fetch(`${baseUrl}/verify-otp`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, otp, userId })
@@ -111,7 +123,8 @@ export default function AdminProfile() {
         
         setLoading(true);
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/reset-password`, {
+            const baseUrl = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+            const res = await fetch(`${baseUrl}/reset-password`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, newPassword, userId })
@@ -331,23 +344,41 @@ export default function AdminProfile() {
                   </div>
                   <div>
                     <label className="block text-gray-700 text-sm font-medium mb-2">New Password</label>
-                    <input
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="Enter new password"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showNewPassword ? "text" : "password"}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="Enter new password"
+                        className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      >
+                        {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-gray-700 text-sm font-medium mb-2">Confirm Password</label>
-                    <input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Confirm new password"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Confirm new password"
+                        className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      >
+                        {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
                   </div>
                   <button
                     onClick={handleResetPassword}
