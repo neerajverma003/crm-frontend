@@ -67,6 +67,7 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [attendanceMap, setAttendanceMap] = useState({});
     const [monthlyAttendance, setMonthlyAttendance] = useState([]);
+    const [savedSalarySummary, setSavedSalarySummary] = useState(null);
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const printRef = useRef(null);
     const [selectedDateForEdit, setSelectedDateForEdit] = useState(null);
@@ -321,6 +322,22 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
             }
 
             setMonthlyAttendance(attendanceData);
+
+            // Fetch saved salary summary if exists
+            try {
+                const salaryRes = await axios.get(
+                    `${import.meta.env.VITE_API_URL}/salary?employeeId=${user._id}&month=${monthNum}&year=${year}`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                if (salaryRes.data && salaryRes.data.success && salaryRes.data.data) {
+                    setSavedSalarySummary(salaryRes.data.data);
+                } else {
+                    setSavedSalarySummary(null);
+                }
+            } catch (err) {
+                setSavedSalarySummary(null);
+            }
+
         } catch (error) {
             console.error("⚠️ Error fetching monthly attendance:", error);
             setMonthlyAttendance([]);
@@ -423,6 +440,7 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
             total: 0,
             halfDay: 0,
             sunday: 0,
+            sundayWorking: 0,
             cl: 0,
             holiday: 0,
         };
@@ -459,6 +477,7 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
             else if (status === "Absent") stats.absent++;
             else if (status === "Half Day") stats.halfDay++;
             else if (status === "Sunday") stats.sunday++;
+            else if (status === "Sunday Working") stats.sundayWorking++;
             else if (status === "CL" || status === "Casual Leave") stats.cl++;
             else if (status === "Holiday" || status === "Holidays") stats.holiday++;
 
@@ -482,7 +501,7 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
     /*  Date Attendance Edit Modal Component */
     /* -------------------------------------------------------------------------- */
     const DateAttendanceEditModal = ({ date, dayRecords, onClose, onSave }) => {
-        const statusOptions = ["Present", "Absent", "Late", "Grace Present", "Half Day","Sunday","Holiday", "Casual Leave"];
+        const statusOptions = ["Present", "Absent", "Late", "Grace Present", "Half Day","Sunday","Holiday", "Casual Leave", "Sunday Working"];
 
         const formatLocalDateTime = (dateString) => {
             if (!dateString) return "";
@@ -804,6 +823,8 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                     return "bg-gradient-to-br from-purple-50 to-purple-100 border-purple-300 shadow-purple-100";
                 case "sunday":
                     return "bg-gradient-to-br from-pink-50 to-pink-100 border-pink-300 shadow-pink-100";
+                case "sunday working":
+                    return "bg-gradient-to-br from-red-50 to-red-100 border-red-400 shadow-red-200";
                 case "absent":
                     return "bg-gradient-to-br from-rose-50 to-rose-100 border-rose-300 shadow-rose-100";
                 case "cl":
@@ -830,6 +851,8 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                     return "bg-purple-500 text-white";
                 case "sunday":
                     return "bg-pink-500 text-white";
+                case "sunday working":
+                    return "bg-red-800 text-white";
                 case "absent":
                     return "bg-rose-500 text-white";
                 case "cl":
@@ -1602,6 +1625,12 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                                                         bgColor: "bg-pink-50",
                                                     },
                                                     {
+                                                        label: "Sunday Working",
+                                                        value: stats.sundayWorking,
+                                                        color: "bg-fuchsia-100 text-fuchsia-700",
+                                                        bgColor: "bg-fuchsia-50",
+                                                    },
+                                                    {
                                                         label: "Casual Leave",
                                                         value: stats.cl,
                                                         color: "bg-gray-800 text-white",
@@ -1646,7 +1675,7 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                                                                     Total Days
                                                                 </span>
                                                                 <span className="text-xl font-bold text-blue-700 sm:text-lg md:text-xl">
-                                                                    {stats.present + stats.gracePresent + stats.late + (stats.halfDay * 0.5) + stats.sunday + stats.cl + stats.holiday}
+                                                                    {stats.present + stats.gracePresent + stats.late + (stats.halfDay * 0.5) + stats.sunday + stats.sundayWorking + stats.cl + stats.holiday}
                                                                 </span>
                                                             </div>
                                                         </div>
@@ -1672,8 +1701,20 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                                                 const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
                                                 
                                                 const perDaySalary = monthlyBaseSalary / daysInMonth;
-                                                const presentDays = stats.present + stats.gracePresent +(stats.halfDay*0.5)+stats.late+stats.sunday+stats.cl+stats.holiday; // Count present and grace present as working days
+                                                const presentDays = stats.present + stats.gracePresent +(stats.halfDay*0.5)+stats.late+stats.sunday+(stats.sundayWorking*2)+stats.cl+stats.holiday; // Count present and grace present as working days
                                                 const totalEarned = perDaySalary * presentDays;
+
+                                                let remarksList = [];
+                                                if (savedSalarySummary?.notes) {
+                                                    try {
+                                                        remarksList = JSON.parse(savedSalarySummary.notes);
+                                                    } catch (e) {
+                                                        console.error("Error parsing remarks:", e);
+                                                    }
+                                                }
+                                                
+                                                const totalRemarkAmount = remarksList.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+                                                const finalPayable = savedSalarySummary ? savedSalarySummary.totalPayable : totalEarned;
 
                                                 return (
                                                     <div className="space-y-2 text-sm sm:space-y-2.5 md:space-y-3">
@@ -1723,12 +1764,30 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                                                             </div>
                                                         </div>
 
+                                                        {/* Remarks List (If any) */}
+                                                        {remarksList.length > 0 && (
+                                                            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
+                                                                <h4 className="mb-2 text-xs font-semibold text-gray-700 uppercase tracking-wider">Adjustments</h4>
+                                                                <div className="space-y-1">
+                                                                    {remarksList.map((remark, idx) => (
+                                                                        <div key={idx} className="flex items-center justify-between text-sm">
+                                                                            <span className="text-gray-700 font-medium">{remark.title || "Adjustment"}</span>
+                                                                            <span className="font-bold text-gray-900">₹{remark.amount}</span>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                                <div className="mt-2 text-right border-t border-amber-200 pt-1 text-xs font-bold text-amber-800">
+                                                                    Total Adjustments: ₹{totalRemarkAmount.toLocaleString()}
+                                                                </div>
+                                                            </div>
+                                                        )}
+
                                                         {/* Final Payable */}
                                                         <div className="rounded-lg border-2 border-emerald-700 bg-gradient-to-r from-emerald-500 to-green-600 p-2 text-white sm:p-2.5 md:p-3">
                                                             <div className="flex items-center justify-between gap-2">
                                                                 <span className="text-sm font-bold sm:text-sm md:text-sm">Payable</span>
                                                                 <span className="text-lg font-bold sm:text-base md:text-lg">
-                                                                    ₹{totalEarned.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                                                                    ₹{finalPayable.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                                                                 </span>
                                                             </div>
                                                         </div>

@@ -21,7 +21,7 @@ const tripDurations = [
 const pageSize = 100;
 
 // 🧩 Input Field Component
-const InputField = ({ name, type = "text", placeholder, required, value, error, onChange, disabled = false }) => (
+export const InputField = ({ name, type = "text", placeholder, required, value, error, onChange, disabled = false }) => (
   <div className="h-[4.5rem]">
     <label className="block text-xs font-medium text-gray-700 mb-0.5">
       {name.charAt(0).toUpperCase() + name.slice(1)} {required && <span className="text-red-500">*</span>}
@@ -47,7 +47,7 @@ const InputField = ({ name, type = "text", placeholder, required, value, error, 
 );
 
 // 🧩 Select Field Component
-const SelectField = ({ name, options, required, value, error, onChange }) => (
+export const SelectField = ({ name, options, required, value, error, onChange }) => (
   <div className="h-[4.5rem]">
     <label className="block text-xs font-medium text-gray-700 mb-0.5">
       {name.charAt(0).toUpperCase() + name.slice(1)} {required && <span className="text-red-500">*</span>}
@@ -181,7 +181,7 @@ const MobileLeadCard = ({
 };
 
 // 🧩 Modal Component
-const Modal = ({ isOpen, onClose, size = "large", children }) => {
+export const Modal = ({ isOpen, onClose, size = "large", children }) => {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={onClose}>
@@ -196,7 +196,7 @@ const Modal = ({ isOpen, onClose, size = "large", children }) => {
 };
 
 // 🧩 Add/Edit Lead Form Component
-const LeadForm = ({ initialData, onSubmit, onClose, isEditing = false }) => {
+export const LeadForm = ({ initialData, onSubmit, onClose, isEditing = false, readOnlyPhone = false }) => {
   useEffect(() => {
     console.log("LeadForm mounted/initialData:", initialData);
   }, [initialData]);
@@ -374,7 +374,7 @@ const LeadForm = ({ initialData, onSubmit, onClose, isEditing = false }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <InputField name="name" value={formData.name} onChange={handleChange} />
         <InputField name="email" type="email" value={formData.email} onChange={handleChange} />
-        <InputField name="phone" value={formData.phone} onChange={handleChange} required error={errors.phone} disabled={isEditing} />
+        <InputField name="phone" value={formData.phone} onChange={handleChange} required error={errors.phone} disabled={isEditing || readOnlyPhone} />
         <InputField name="whatsAppNo" value={formData.whatsAppNo} onChange={handleChange} />
         <InputField name="departureCity" value={formData.departureCity} onChange={handleChange} />
         <DestinationSearchBox

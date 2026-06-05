@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Modal, LeadForm } from "../leadManagement/AddMyLead";
+import { FiX } from "react-icons/fi";
 
 const EmployeeTasks = () => {
     const navigate = useNavigate();
@@ -17,6 +19,8 @@ const EmployeeTasks = () => {
     const [expandedTaskId, setExpandedTaskId] = useState(null);
     const [taskNumberEdits, setTaskNumberEdits] = useState({});
     const [savingTaskId, setSavingTaskId] = useState(null);
+    const [showEnquiryModal, setShowEnquiryModal] = useState(false);
+    const [enquiryModalData, setEnquiryModalData] = useState(null);
 
     const id = localStorage.getItem("userId");
     const role = localStorage.getItem("role");
@@ -100,7 +104,7 @@ const EmployeeTasks = () => {
     const getTaskNumberRows = (task) => {
         const baseRows = task.numberData && task.numberData.length > 0
             ? task.numberData
-            : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "" }));
+            : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "", callStatus: "" }));
         return taskNumberEdits[task._id] || baseRows;
     };
 
@@ -111,7 +115,7 @@ const EmployeeTasks = () => {
         if (task.numberData && task.numberData.length > 0) {
             return task.numberData;
         }
-        return Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "" }));
+        return Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "", callStatus: "" }));
     };
 
     const isCellOriginallyPrefilled = (task, rowIndex, col) => {
@@ -119,6 +123,25 @@ const EmployeeTasks = () => {
     };
 
     const handleNumberCellChange = (taskId, rowIndex, column, value) => {
+        if (column === "callStatus" && value === "Enquiry") {
+            const existing = taskNumberEdits[taskId] ? [...taskNumberEdits[taskId]] : [];
+            let taskRows = existing.length > 0 ? existing : [];
+            if (taskRows.length === 0) {
+                const foundTask = todayTasks.find((t) => t._id === taskId) || last7Tasks.find((t) => t._id === taskId);
+                taskRows = foundTask && foundTask.numberData && foundTask.numberData.length > 0
+                    ? foundTask.numberData.map((row) => ({ ...row }))
+                    : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "", callStatus: "" }));
+            }
+            const phone = taskRows[rowIndex]?.col1 || "";
+            setEnquiryModalData({
+                taskId,
+                rowIndex,
+                phone,
+            });
+            setShowEnquiryModal(true);
+            return; // Don't update state yet
+        }
+
         setTaskNumberEdits((prev) => {
             const existing = prev[taskId] ? [...prev[taskId]] : [];
             let taskRows = existing.length > 0 ? existing : [];
@@ -127,10 +150,10 @@ const EmployeeTasks = () => {
                 const foundTask = todayTasks.find((t) => t._id === taskId) || last7Tasks.find((t) => t._id === taskId);
                 taskRows = foundTask && foundTask.numberData && foundTask.numberData.length > 0
                     ? foundTask.numberData.map((row) => ({ ...row }))
-                    : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "" }));
+                    : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "", callStatus: "" }));
             }
 
-            const row = taskRows[rowIndex] ? { ...taskRows[rowIndex] } : { row: rowIndex + 1, col1: "", col2: "", col3: "", col4: "" };
+            const row = taskRows[rowIndex] ? { ...taskRows[rowIndex] } : { row: rowIndex + 1, col1: "", col2: "", col3: "", col4: "", callStatus: "" };
             row[column] = value;
 
             const nextRows = [...taskRows];
@@ -151,6 +174,7 @@ const EmployeeTasks = () => {
             col2: row.col2 || "",
             col3: row.col3 || "",
             col4: row.col4 || "",
+            callStatus: row.callStatus || "",
         }));
 
         setSavingTaskId(task._id);
@@ -175,6 +199,67 @@ const EmployeeTasks = () => {
             toast.error("Failed to save task data");
         } finally {
             setSavingTaskId(null);
+        }
+    };
+
+    const handleEnquirySubmit = async (data) => {
+        try {
+            const companyId = localStorage.getItem("companyId");
+            const payload = { ...data };
+            payload.employee = id;
+            payload.employeeId = id;
+            payload.companyId = companyId;
+
+            // Submit employee lead
+            await axios.post(`${import.meta.env.VITE_API_URL}/employeelead`, payload);
+
+            // Update task status to "Enquiry"
+            const { taskId, rowIndex } = enquiryModalData;
+            const task = todayTasks.find((t) => t._id === taskId) || last7Tasks.find((t) => t._id === taskId);
+            
+            if (task) {
+                // Determine the correct rows to update
+                const existingEdits = taskNumberEdits[taskId];
+                let taskRows = existingEdits && existingEdits.length > 0 
+                    ? [...existingEdits] 
+                    : (task.numberData && task.numberData.length > 0 ? [...task.numberData] : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "", callStatus: "" })));
+                
+                if (taskRows[rowIndex]) {
+                    taskRows[rowIndex].callStatus = "Enquiry";
+                }
+
+                // Call backend to update the task number data right away
+                const payloadRows = taskRows.map((row, index) => ({
+                    row: row.row || index + 1,
+                    col1: row.col1 || "",
+                    col2: row.col2 || "",
+                    col3: row.col3 || "",
+                    col4: row.col4 || "",
+                    callStatus: row.callStatus || "",
+                }));
+
+                const res = await axios.put(`${import.meta.env.VITE_API_URL}/tasks/task/${task._id}`, {
+                    numberData: payloadRows,
+                });
+
+                const updatedTask = res.data?.data;
+                if (updatedTask) {
+                    setTodayTasks((prev) => prev.map((t) => (t._id === task._id ? updatedTask : t)));
+                    setLast7Tasks((prev) => prev.map((t) => (t._id === task._id ? updatedTask : t)));
+                    setTaskNumberEdits((prev) => {
+                        const next = { ...prev };
+                        delete next[task._id];
+                        return next;
+                    });
+                }
+            }
+
+            setShowEnquiryModal(false);
+            setEnquiryModalData(null);
+            toast.success("Lead moved to My Leads and status updated to Enquiry!");
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to save lead: " + (err.response?.data?.message || err.message));
         }
     };
 
@@ -377,6 +462,7 @@ const EmployeeTasks = () => {
                                                                                         <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 2</th>
                                                                                         <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 3</th>
                                                                                         <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 4</th>
+                                                                                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600 min-w-[150px]">Call Status</th>
                                                                                     </tr>
                                                                                 </thead>
                                                                                 <tbody>
@@ -402,6 +488,30 @@ const EmployeeTasks = () => {
                                                                                                     </td>
                                                                                                 );
                                                                                             })}
+                                                                                            <td className="border border-gray-200 px-3 py-2 text-sm">
+                                                                                                <select
+                                                                                                    value={row.callStatus || ""}
+                                                                                                    onChange={(e) => handleNumberCellChange(t._id, rowIndex, "callStatus", e.target.value)}
+                                                                                                    disabled={row.callStatus === "Enquiry"}
+                                                                                                    className={`w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                                                                                                        row.callStatus === "Enquiry" ? "bg-amber-100 text-amber-800 font-semibold cursor-not-allowed" : "bg-white text-gray-900"
+                                                                                                    }`}
+                                                                                                    onClick={(e) => e.stopPropagation()}
+                                                                                                >
+                                                                                                    <option value="">Select Status</option>
+                                                                                                    <option value="Connected">Connected</option>
+                                                                                                    <option value="Not Connected">Not Connected</option>
+                                                                                                    <option value="Interested">Interested</option>
+                                                                                                    <option value="Not Interested">Not Interested</option>
+                                                                                                    <option value="Busy">Busy</option>
+                                                                                                    <option value="Call Cut">Call Cut</option>
+                                                                                                    <option value="Call Back Later">Call Back Later</option>
+                                                                                                    <option value="Invalid Number">Invalid Number</option>
+                                                                                                    <option value="Language Issues">Language Issues</option>
+                                                                                                    <option value="Enquiry">Enquiry</option>
+                                                                                                    <option value="Connected on WhatsApp">Connected on WhatsApp</option>
+                                                                                                </select>
+                                                                                            </td>
                                                                                         </tr>
                                                                                     ))}
                                                                                 </tbody>
@@ -702,6 +812,26 @@ const EmployeeTasks = () => {
                     </div>
                 </div>
             )}
+
+            {/* Enquiry Modal */}
+            <Modal isOpen={showEnquiryModal} onClose={() => setShowEnquiryModal(false)} size="large">
+                <div className="p-4 border-b flex justify-between items-center bg-gray-50 rounded-t-lg">
+                    <h2 className="text-lg font-bold text-gray-900">Add New Lead (Enquiry)</h2>
+                    <button onClick={() => setShowEnquiryModal(false)} className="text-gray-500 hover:text-gray-700">
+                        <FiX className="w-5 h-5" />
+                    </button>
+                </div>
+                <div className="p-4 overflow-y-auto max-h-[80vh]">
+                    {showEnquiryModal && (
+                        <LeadForm 
+                            initialData={{ phone: enquiryModalData?.phone || "" }} 
+                            onSubmit={handleEnquirySubmit} 
+                            onClose={() => setShowEnquiryModal(false)} 
+                            readOnlyPhone={true}
+                        />
+                    )}
+                </div>
+            </Modal>
         </div>
     );
 };

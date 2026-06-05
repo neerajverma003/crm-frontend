@@ -19,7 +19,7 @@ const SuperAdminAttendance = () => {
     const [editingAttendance, setEditingAttendance] = useState(null);
     const [selectedDateForEdit, setSelectedDateForEdit] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [remarkAmount, setRemarkAmount] = useState(0);
+    const [remarksList, setRemarksList] = useState([{ title: "", amount: "" }]);
     const [savingSalary, setSavingSalary] = useState(false);
     const [salaryStatus, setSalaryStatus] = useState("Pending");
     const token = localStorage.getItem("token");
@@ -154,7 +154,7 @@ const SuperAdminAttendance = () => {
     };
 
     const EditModal = ({ attendance, onClose, onSave }) => {
-        const statusOptions = ["Present", "Grace Present", "Late", "Half Day", "Absent", "Casual Leave"];
+        const statusOptions = ["Present", "Grace Present", "Late", "Half Day", "Absent", "Casual Leave", "Sunday Working"];
 
         const formatLocalDateTime = (dateString) => {
             if (!dateString) return "";
@@ -323,7 +323,7 @@ const SuperAdminAttendance = () => {
     /* � Date Attendance Edit Modal */
     /* -------------------------------------------------------------------------- */
     const DateAttendanceEditModal = ({ date, dayRecords, onClose, onSave }) => {
-        const statusOptions = ["Present", "Absent", "Late", "Grace Present", "Half Day", "Sunday", "Holiday", "Casual Leave"];
+        const statusOptions = ["Present", "Absent", "Late", "Grace Present", "Half Day", "Sunday", "Holiday", "Casual Leave", "Sunday Working"];
 
         const formatLocalDateTime = (dateString) => {
             if (!dateString) return "";
@@ -691,9 +691,45 @@ const SuperAdminAttendance = () => {
             }
 
             setMonthlyAttendance(attendanceData);
+
+            // Fetch saved salary summary to pre-fill remarks and status
+            try {
+                const salaryRes = await axios.get(
+                    `${import.meta.env.VITE_API_URL}/salary?employeeId=${user._id}&month=${month}&year=${year}`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                if (salaryRes.data && salaryRes.data.success && salaryRes.data.data) {
+                    const savedSalary = salaryRes.data.data;
+                    setSalaryStatus(savedSalary.status || "Pending");
+                    if (savedSalary.notes) {
+                        try {
+                            const parsedRemarks = JSON.parse(savedSalary.notes);
+                            if (parsedRemarks && parsedRemarks.length > 0) {
+                                // Assume they are saved if they are coming from the DB
+                                setRemarksList(parsedRemarks.map(r => ({ ...r, isSaved: true })));
+                            } else {
+                                setRemarksList([{ title: "", amount: "", isSaved: false }]);
+                            }
+                        } catch (e) {
+                            setRemarksList([{ title: "", amount: "", isSaved: false }]);
+                        }
+                    } else {
+                        setRemarksList([{ title: "", amount: "", isSaved: false }]);
+                    }
+                } else {
+                    setSalaryStatus("Pending");
+                    setRemarksList([{ title: "", amount: "", isSaved: false }]);
+                }
+            } catch (error) {
+                setSalaryStatus("Pending");
+                setRemarksList([{ title: "", amount: "", isSaved: false }]);
+            }
+
         } catch (error) {
             console.error("⚠️ Error fetching monthly attendance:", error);
             setMonthlyAttendance([]);
+            setSalaryStatus("Pending");
+            setRemarksList([{ title: "", amount: "", isSaved: false }]);
         }
     };
 
@@ -722,6 +758,7 @@ const SuperAdminAttendance = () => {
             absent: 0,
             halfDay: 0,
             sunday: 0,
+            sundayWorking: 0,
             cl: 0,
             holiday: 0,
             total: 0
@@ -762,13 +799,14 @@ const SuperAdminAttendance = () => {
             else if (status === "Absent") stats.absent++;
             else if (status === "Half Day") stats.halfDay++;
             else if (status === "Sunday") stats.sunday++;
+            else if (status === "Sunday Working") stats.sundayWorking++;
             else if (status === "CL" || status === "Casual Leave") stats.cl++;
             else if (status === "Holiday" || status === "Holidays") stats.holiday++;
         });
 
         // Total days considered as working/present-type days per requirement:
         // Present + Grace Present + Late + CL + Holiday should equal Total Days for the selected month
-        stats.total = stats.present + stats.gracePresent + stats.late + stats.halfDay + stats.sunday + stats.cl + stats.holiday;
+        stats.total = stats.present + stats.gracePresent + stats.late + stats.halfDay + stats.sunday + stats.sundayWorking + stats.cl + stats.holiday;
 
         return stats;
     };
@@ -790,9 +828,10 @@ const SuperAdminAttendance = () => {
             const monthIndex = currentMonth.getMonth();
             const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
             const perDaySalary = baseSalary / daysInMonth;
-            const presentDays = stats.present + stats.gracePresent + stats.late + (stats.halfDay * 0.5) + stats.sunday + stats.cl + stats.holiday;
+            const presentDays = stats.present + stats.gracePresent + stats.late + (stats.halfDay * 0.5) + stats.sunday + (stats.sundayWorking * 2) + stats.cl + stats.holiday;
             const earnedAmount = perDaySalary * presentDays;
-            const totalPayable = earnedAmount + (Number(remarkAmount) || 0);
+            const totalRemarkAmount = remarksList.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+            const totalPayable = earnedAmount + totalRemarkAmount;
             const attendancePercentage = stats.total > 0 ? (presentDays / stats.total) * 100 : 0;
 
             // Attendance Summary Object
@@ -803,6 +842,7 @@ const SuperAdminAttendance = () => {
                 halfDay: stats.halfDay || 0,
                 gracePresent: stats.gracePresent,
                 sunday: stats.sunday || 0,
+                sundayWorking: stats.sundayWorking || 0,
                 holiday: stats.holiday || 0,
                 total: stats.total,
             };
@@ -814,7 +854,7 @@ const SuperAdminAttendance = () => {
                 workingDaysAllowed: stats.total,
                 workingDaysPresent: presentDays,
                 totalEarned: parseFloat(earnedAmount.toFixed(2)),
-                deductions: Number(remarkAmount) || 0,
+                deductions: totalRemarkAmount,
                 netPayable: parseFloat(totalPayable.toFixed(2)),
                 attendancePercentage: parseFloat(attendancePercentage.toFixed(2)),
             };
@@ -829,10 +869,10 @@ const SuperAdminAttendance = () => {
                 presentDays: stats.present,
                 gracePresentDays: stats.gracePresent,
                 earnedAmount: parseFloat(earnedAmount.toFixed(2)),
-                remarkAmount: Number(remarkAmount) || 0,
+                remarkAmount: totalRemarkAmount,
                 totalPayable: parseFloat(totalPayable.toFixed(2)),
                 status: salaryStatus,
-                notes: "",
+                notes: JSON.stringify(remarksList.filter(r => r.title || r.amount)),
                 attendanceSummary,
                 salarySummary,
             };
@@ -841,7 +881,12 @@ const SuperAdminAttendance = () => {
 
             if (response.data.success) {
                 alert("Salary summary saved successfully!");
-                setRemarkAmount(0); // Reset remark after saving
+                // Keep the remarks but mark them as saved
+                setRemarksList(prev => {
+                    const valid = prev.filter(r => r.title || r.amount);
+                    if (valid.length === 0) return [{ title: "", amount: "", isSaved: false }];
+                    return valid.map(r => ({ ...r, isSaved: true }));
+                });
             } else {
                 alert("Failed to save salary summary");
             }
@@ -1035,6 +1080,8 @@ const SuperAdminAttendance = () => {
                     return "bg-gradient-to-br from-purple-50 to-purple-100 border-purple-300 shadow-purple-100";
                 case "sunday":
                     return "bg-gradient-to-br from-pink-50 to-pink-100 border-pink-300 shadow-pink-100";
+                case "sunday working":
+                    return "bg-gradient-to-br from-red-50 to-red-100 border-red-400 shadow-red-200";
                 case "absent":
                     return "bg-gradient-to-br from-rose-50 to-rose-100 border-rose-300 shadow-rose-100";
                 case "cl":
@@ -1061,6 +1108,8 @@ const SuperAdminAttendance = () => {
                     return "bg-purple-500 text-white";
                 case "sunday":
                     return "bg-pink-500 text-white";
+                case "sunday working":
+                    return "bg-red-800 text-white";
                 case "absent":
                     return "bg-rose-500 text-white";
                 case "cl":
@@ -1794,6 +1843,12 @@ const SuperAdminAttendance = () => {
                                                         bgColor: "bg-pink-50",
                                                     },
                                                     {
+                                                        label: "Sunday Working",
+                                                        value: stats.sundayWorking,
+                                                        color: "bg-fuchsia-100 text-fuchsia-700",
+                                                        bgColor: "bg-fuchsia-50",
+                                                    },
+                                                    {
                                                         label: "Casual Leave",
                                                         value: stats.cl,
                                                         color: "bg-gray-800 text-white",
@@ -1832,7 +1887,7 @@ const SuperAdminAttendance = () => {
                                                             <div className="flex items-center justify-between">
                                                                 <span className="text-sm font-bold text-gray-800">Total Days</span>
                                                                 <span className="text-xl font-bold text-blue-700">
-                                                                    {stats.present + stats.gracePresent + stats.late + (stats.halfDay * 0.5) + stats.sunday + stats.cl + stats.holiday}
+                                                                    {stats.present + stats.gracePresent + stats.late + (stats.halfDay * 0.5) + stats.sunday + stats.sundayWorking + stats.cl + stats.holiday}
                                                                 </span>
                                                             </div>
                                                         </div>
@@ -1857,9 +1912,10 @@ const SuperAdminAttendance = () => {
                                                 const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
                                                 
                                                 const perDaySalary = monthlyBaseSalary / daysInMonth;
-                                                const presentDays = stats.present + stats.gracePresent + stats.late + (stats.halfDay * 0.5) + stats.sunday + stats.cl + stats.holiday; // Count present and grace present as working days
+                                                const presentDays = stats.present + stats.gracePresent + stats.late + (stats.halfDay * 0.5) + stats.sunday + (stats.sundayWorking * 2) + stats.cl + stats.holiday; // Count present and grace present as working days
                                                 const totalEarned = perDaySalary * presentDays;
-                                                const finalPayable = totalEarned + (Number(remarkAmount) || 0);
+                                                const totalRemarkAmount = remarksList.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+                                                const finalPayable = totalEarned + totalRemarkAmount;
 
                                                 return (
                                                     <div className="space-y-3 text-sm">
@@ -1899,18 +1955,105 @@ const SuperAdminAttendance = () => {
                                                             </div>
                                                         </div>
 
-                                                        {/* Remark Amount (Optional) */}
+                                                        {/* Remarks List */}
                                                         <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
-                                                            <label className="mb-2 block text-xs font-medium text-gray-700">
-                                                                Remark Amount (Optional)
-                                                            </label>
-                                                            <input
-                                                                type="number"
-                                                                placeholder="Enter additional amount"
-                                                                value={remarkAmount}
-                                                                onChange={(e) => setRemarkAmount(e.target.value)}
-                                                                className="w-full rounded border border-amber-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-                                                            />
+                                                            <div className="mb-2 flex items-center justify-between">
+                                                                <label className="text-xs font-medium text-gray-700">
+                                                                    Remarks / Adjustments
+                                                                </label>
+                                                                <button
+                                                                    onClick={() => setRemarksList([...remarksList, { title: "", amount: "" }])}
+                                                                    className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-200 text-amber-800 hover:bg-amber-300 font-bold"
+                                                                    title="Add Remark"
+                                                                >
+                                                                    +
+                                                                </button>
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                {remarksList.map((remark, idx) => (
+                                                                    <div key={idx} className="flex items-center gap-2">
+                                                                        {remark.isSaved ? (
+                                                                            <>
+                                                                                <div className="flex-1 rounded bg-amber-100 px-2 py-1 text-sm font-semibold text-amber-900 border border-amber-200">
+                                                                                    {remark.title}
+                                                                                </div>
+                                                                                <div className="w-24 rounded bg-amber-100 px-2 py-1 text-sm font-bold text-amber-900 border border-amber-200">
+                                                                                    ₹{remark.amount}
+                                                                                </div>
+                                                                                <button
+                                                                                    onClick={() => {
+                                                                                        const newRemarks = [...remarksList];
+                                                                                        newRemarks[idx].isSaved = false;
+                                                                                        setRemarksList(newRemarks);
+                                                                                    }}
+                                                                                    className="text-blue-500 hover:text-blue-700 p-1"
+                                                                                    title="Edit"
+                                                                                >
+                                                                                    <Edit2 size={16} />
+                                                                                </button>
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <input
+                                                                                    type="text"
+                                                                                    placeholder="Title (e.g. Bonus, Late fee)"
+                                                                                    value={remark.title}
+                                                                                    onChange={(e) => {
+                                                                                        const newRemarks = [...remarksList];
+                                                                                        newRemarks[idx].title = e.target.value;
+                                                                                        setRemarksList(newRemarks);
+                                                                                    }}
+                                                                                    className="w-full flex-1 rounded border border-amber-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                                                                />
+                                                                                <input
+                                                                                    type="number"
+                                                                                    placeholder="Amount"
+                                                                                    value={remark.amount}
+                                                                                    onChange={(e) => {
+                                                                                        const newRemarks = [...remarksList];
+                                                                                        newRemarks[idx].amount = e.target.value;
+                                                                                        setRemarksList(newRemarks);
+                                                                                    }}
+                                                                                    className="w-24 rounded border border-amber-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                                                                />
+                                                                                <button
+                                                                                    onClick={() => {
+                                                                                        if(remark.title && remark.amount) {
+                                                                                            const newRemarks = [...remarksList];
+                                                                                            newRemarks[idx].isSaved = true;
+                                                                                            setRemarksList(newRemarks);
+                                                                                        }
+                                                                                    }}
+                                                                                    className={`p-1 ${remark.title && remark.amount ? "text-emerald-600 hover:text-emerald-800" : "text-emerald-300 cursor-not-allowed"}`}
+                                                                                    title="Save"
+                                                                                >
+                                                                                    <CheckCircle size={16} />
+                                                                                </button>
+                                                                            </>
+                                                                        )}
+                                                                        
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                const newRemarks = [...remarksList];
+                                                                                newRemarks.splice(idx, 1);
+                                                                                if (newRemarks.length === 0) {
+                                                                                    newRemarks.push({ title: "", amount: "", isSaved: false });
+                                                                                }
+                                                                                setRemarksList(newRemarks);
+                                                                            }}
+                                                                            className="text-red-500 hover:text-red-700 p-1"
+                                                                            title="Delete"
+                                                                        >
+                                                                            <Trash2 size={16} />
+                                                                        </button>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                            {totalRemarkAmount !== 0 && (
+                                                                <div className="mt-2 text-right text-xs font-semibold text-amber-800">
+                                                                    Total Adjustments: ₹{totalRemarkAmount.toLocaleString()}
+                                                                </div>
+                                                            )}
                                                         </div>
 
                                                         {/* Final Payable */}

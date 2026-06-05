@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { FiPlus, FiEdit2, FiTrash2, FiX, FiSearch, FiFilter, FiChevronDown } from "react-icons/fi";
 import * as XLSX from "xlsx";
+import { Modal, LeadForm } from "../leadManagement/AddMyLead";
 
 const TaskAssign = () => {
   const fileInputRef = useRef(null);
@@ -33,13 +34,17 @@ const TaskAssign = () => {
 
   const [contentType, setContentType] = useState("description");
   const [numberData, setNumberData] = useState([
-    { row: 1, col1: "", col2: "", col3: "", col4: "" },
-    { row: 2, col1: "", col2: "", col3: "", col4: "" },
-    { row: 3, col1: "", col2: "", col3: "", col4: "" },
-    { row: 4, col1: "", col2: "", col3: "", col4: "" },
-    { row: 5, col1: "", col2: "", col3: "", col4: "" },
+    { row: 1, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+    { row: 2, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+    { row: 3, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+    { row: 4, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+    { row: 5, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
   ]);
   const [expandedTaskId, setExpandedTaskId] = useState(null);
+
+  // Enquiry Modal States
+  const [showEnquiryModal, setShowEnquiryModal] = useState(false);
+  const [enquiryModalData, setEnquiryModalData] = useState(null);
 
   // Upload progress states
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -156,7 +161,7 @@ const TaskAssign = () => {
   const addNumberRow = () => {
     setNumberData((prev) => [
       ...prev,
-      { row: prev.length + 1, col1: "", col2: "", col3: "", col4: "" },
+      { row: prev.length + 1, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
     ]);
   };
 
@@ -211,6 +216,7 @@ const TaskAssign = () => {
               col2: row[1] ? String(row[1]) : "",
               col3: row[2] ? String(row[2]) : "",
               col4: row[3] ? String(row[3]) : "",
+              callStatus: row[4] ? String(row[4]) : "",
             });
 
             processedCount++;
@@ -298,11 +304,11 @@ const TaskAssign = () => {
       });
       setContentType("description");
       setNumberData([
-        { row: 1, col1: "", col2: "", col3: "", col4: "" },
-        { row: 2, col1: "", col2: "", col3: "", col4: "" },
-        { row: 3, col1: "", col2: "", col3: "", col4: "" },
-        { row: 4, col1: "", col2: "", col3: "", col4: "" },
-        { row: 5, col1: "", col2: "", col3: "", col4: "" },
+        { row: 1, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+        { row: 2, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+        { row: 3, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+        { row: 4, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+        { row: 5, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
       ]);
       setShowForm(false);
 
@@ -330,11 +336,11 @@ const TaskAssign = () => {
       setNumberData(task.numberData);
     } else {
       setNumberData([
-        { row: 1, col1: "", col2: "", col3: "", col4: "" },
-        { row: 2, col1: "", col2: "", col3: "", col4: "" },
-        { row: 3, col1: "", col2: "", col3: "", col4: "" },
-        { row: 4, col1: "", col2: "", col3: "", col4: "" },
-        { row: 5, col1: "", col2: "", col3: "", col4: "" },
+        { row: 1, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+        { row: 2, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+        { row: 3, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+        { row: 4, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+        { row: 5, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
       ]);
     }
     setShowForm(true);
@@ -365,6 +371,129 @@ const TaskAssign = () => {
     } catch (error) {
       console.error("Error updating status:", error);
       alert("Error updating status");
+    }
+  };
+
+  // Handle number data status change
+  const handleNumberDataStatusChange = async (taskId, rowIndex, newStatus) => {
+    try {
+      const task = tasks.find((t) => t._id === taskId);
+      if (!task) return;
+
+      let updatedNumberData = task.numberData && task.numberData.length > 0 
+        ? [...task.numberData] 
+        : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "", callStatus: "" }));
+      
+      if (!updatedNumberData[rowIndex]) return;
+      
+      if (newStatus === "Enquiry") {
+        setEnquiryModalData({
+          taskId,
+          rowIndex,
+          phone: updatedNumberData[rowIndex].col1 || "",
+        });
+        setShowEnquiryModal(true);
+        return; // Don't update backend yet
+      }
+
+      // Optimistic UI Update
+      setTasks(prevTasks => prevTasks.map(t => {
+        if (t._id === taskId) {
+          let newData = t.numberData && t.numberData.length > 0 
+            ? [...t.numberData] 
+            : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "", callStatus: "" }));
+          if (newData[rowIndex]) {
+            newData[rowIndex] = { ...newData[rowIndex], callStatus: newStatus };
+          }
+          return { ...t, numberData: newData };
+        }
+        return t;
+      }));
+
+      updatedNumberData[rowIndex].callStatus = newStatus;
+
+      const payload = {
+        company: task.company?._id || task.company,
+        assignedTo: task.assignedTo?._id || task.assignedTo,
+        priority: task.priority,
+        dueDate: task.dueDate,
+        taskTitle: task.taskTitle,
+        description: task.description,
+        assignedBy: superAdminId,
+        contentType: task.contentType,
+        numberData: updatedNumberData,
+      };
+
+      await axios.put(`${API_BASE_URL}/tasks/task/${taskId}`, payload);
+      fetchTasks();
+    } catch (error) {
+      console.error("Error updating row status:", error);
+      alert("Error updating row status");
+    }
+  };
+
+  const handleEnquirySubmit = async (data) => {
+    try {
+      const userRole = localStorage.getItem("role");
+      const userId = localStorage.getItem("userId");
+      const companyId = localStorage.getItem("companyId");
+      
+      const payload = { ...data };
+      
+      if (userRole && userRole.toLowerCase() === "superadmin") {
+        await axios.post(`${API_BASE_URL}/superadminmylead/${userId}`, payload);
+      } else {
+        payload.employee = userId;
+        payload.employeeId = userId;
+        payload.companyId = companyId;
+        await axios.post(`${API_BASE_URL}/employeelead`, payload);
+      }
+      
+      // Update task status to "Enquiry"
+      const { taskId, rowIndex } = enquiryModalData;
+      const task = tasks.find((t) => t._id === taskId);
+      if (task) {
+        // Optimistic UI Update
+        setTasks(prevTasks => prevTasks.map(t => {
+          if (t._id === taskId) {
+            let newData = t.numberData && t.numberData.length > 0 
+              ? [...t.numberData] 
+              : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "", callStatus: "" }));
+            if (newData[rowIndex]) {
+              newData[rowIndex] = { ...newData[rowIndex], callStatus: "Enquiry" };
+            }
+            return { ...t, numberData: newData };
+          }
+          return t;
+        }));
+
+        let updatedNumberData = task.numberData && task.numberData.length > 0 
+          ? [...task.numberData] 
+          : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "", callStatus: "" }));
+        if (updatedNumberData[rowIndex]) {
+          updatedNumberData[rowIndex].callStatus = "Enquiry";
+          const taskPayload = {
+            company: task.company?._id || task.company,
+            assignedTo: task.assignedTo?._id || task.assignedTo,
+            priority: task.priority,
+            dueDate: task.dueDate,
+            taskTitle: task.taskTitle,
+            description: task.description,
+            assignedBy: superAdminId,
+            contentType: task.contentType,
+            numberData: updatedNumberData,
+          };
+          await axios.put(`${API_BASE_URL}/tasks/task/${taskId}`, taskPayload);
+          fetchTasks();
+        }
+      }
+      
+      setShowEnquiryModal(false);
+      setEnquiryModalData(null);
+      alert("Lead moved to My Leads and status updated to Enquiry!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save lead: " + (err.response?.data?.message || err.message));
     }
   };
 
@@ -431,11 +560,11 @@ const TaskAssign = () => {
                   });
                   setContentType("description");
                   setNumberData([
-                    { row: 1, col1: "", col2: "", col3: "", col4: "" },
-                    { row: 2, col1: "", col2: "", col3: "", col4: "" },
-                    { row: 3, col1: "", col2: "", col3: "", col4: "" },
-                    { row: 4, col1: "", col2: "", col3: "", col4: "" },
-                    { row: 5, col1: "", col2: "", col3: "", col4: "" },
+                    { row: 1, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+                    { row: 2, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+                    { row: 3, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+                    { row: 4, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+                    { row: 5, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
                   ]);
                 }
               }}
@@ -609,6 +738,9 @@ const TaskAssign = () => {
                             <th className="border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 min-w-32">
                               Column 4
                             </th>
+                            <th className="border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 min-w-40">
+                              Call Status
+                            </th>
                             <th className="border border-gray-300 px-3 py-2 text-center text-sm font-semibold text-gray-700 w-16">
                               Action
                             </th>
@@ -664,6 +796,29 @@ const TaskAssign = () => {
                                   placeholder="Enter value"
                                 />
                               </td>
+                              <td className="border border-gray-300 px-3 py-2">
+                                <select
+                                  value={row.callStatus || ""}
+                                  onChange={(e) => handleNumberCellChange(rowIndex, "callStatus", e.target.value)}
+                                  disabled={row.callStatus === "Enquiry"}
+                                  className={`w-full px-2 py-1 border-0 focus:ring-2 focus:ring-indigo-500 rounded ${
+                                    row.callStatus === "Enquiry" ? "bg-amber-100 text-amber-800 font-semibold cursor-not-allowed" : "bg-transparent"
+                                  }`}
+                                >
+                                  <option value="">Select Status</option>
+                                  <option value="Connected">Connected</option>
+                                  <option value="Not Connected">Not Connected</option>
+                                  <option value="Interested">Interested</option>
+                                  <option value="Not Interested">Not Interested</option>
+                                  <option value="Busy">Busy</option>
+                                  <option value="Call Cut">Call Cut</option>
+                                  <option value="Call Back Later">Call Back Later</option>
+                                  <option value="Invalid Number">Invalid Number</option>
+                                  <option value="Language Issues">Language Issues</option>
+                                  <option value="Enquiry">Enquiry</option>
+                                  <option value="Connected on WhatsApp">Connected on WhatsApp</option>
+                                </select>
+                              </td>
                               <td className="border border-gray-300 px-3 py-2 text-center">
                                 <button
                                   type="button"
@@ -714,11 +869,11 @@ const TaskAssign = () => {
                     setShowForm(false);
                     setContentType("description");
                     setNumberData([
-                      { row: 1, col1: "", col2: "", col3: "", col4: "" },
-                      { row: 2, col1: "", col2: "", col3: "", col4: "" },
-                      { row: 3, col1: "", col2: "", col3: "", col4: "" },
-                      { row: 4, col1: "", col2: "", col3: "", col4: "" },
-                      { row: 5, col1: "", col2: "", col3: "", col4: "" },
+                      { row: 1, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+                      { row: 2, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+                      { row: 3, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+                      { row: 4, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
+                      { row: 5, col1: "", col2: "", col3: "", col4: "", callStatus: "" },
                     ]);
                   }}
                   className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
@@ -915,13 +1070,14 @@ const TaskAssign = () => {
                                         <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 2</th>
                                         <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 3</th>
                                         <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 4</th>
+                                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600 min-w-40">Call Status</th>
                                       </tr>
                                     </thead>
                                     <tbody>
                                       {(
                                         task.numberData && task.numberData.length > 0
                                           ? task.numberData
-                                          : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "" }))
+                                          : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "", callStatus: "" }))
                                       ).map((row, index) => (
                                         <tr key={`${task._id}-detail-${index}`} className="odd:bg-white even:bg-slate-50">
                                           <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700 font-semibold">{row.row || index + 1}</td>
@@ -929,6 +1085,30 @@ const TaskAssign = () => {
                                           <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700">{row.col2 || ""}</td>
                                           <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700">{row.col3 || ""}</td>
                                           <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700">{row.col4 || ""}</td>
+                                          <td className="border border-gray-200 px-3 py-2 text-sm text-gray-700">
+                                            <select
+                                              value={row.callStatus || ""}
+                                              onChange={(e) => handleNumberDataStatusChange(task._id, index, e.target.value)}
+                                              disabled={row.callStatus === "Enquiry"}
+                                              className={`px-2 py-1 text-xs border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 w-full ${
+                                                row.callStatus === "Enquiry" ? "bg-amber-100 text-amber-800 font-semibold cursor-not-allowed" : "bg-white"
+                                              }`}
+                                              onClick={(e) => e.stopPropagation()}
+                                            >
+                                              <option value="">Select Status</option>
+                                              <option value="Connected">Connected</option>
+                                              <option value="Not Connected">Not Connected</option>
+                                              <option value="Interested">Interested</option>
+                                              <option value="Not Interested">Not Interested</option>
+                                              <option value="Busy">Busy</option>
+                                              <option value="Call Cut">Call Cut</option>
+                                              <option value="Call Back Later">Call Back Later</option>
+                                              <option value="Invalid Number">Invalid Number</option>
+                                              <option value="Language Issues">Language Issues</option>
+                                  <option value="Enquiry">Enquiry</option>
+                                              <option value="Connected on WhatsApp">Connected on WhatsApp</option>
+                                            </select>
+                                          </td>
                                         </tr>
                                       ))}
                                     </tbody>
@@ -1047,13 +1227,14 @@ const TaskAssign = () => {
                                   <th className="border border-gray-200 px-2 py-1 text-left text-[10px] font-semibold uppercase text-gray-600">Col 2</th>
                                   <th className="border border-gray-200 px-2 py-1 text-left text-[10px] font-semibold uppercase text-gray-600">Col 3</th>
                                   <th className="border border-gray-200 px-2 py-1 text-left text-[10px] font-semibold uppercase text-gray-600">Col 4</th>
+                                  <th className="border border-gray-200 px-2 py-1 text-left text-[10px] font-semibold uppercase text-gray-600">Status</th>
                                 </tr>
                               </thead>
                               <tbody>
                                 {(
                                   task.numberData && task.numberData.length > 0
                                     ? task.numberData
-                                    : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "" }))
+                                    : Array.from({ length: 5 }, (_, idx) => ({ row: idx + 1, col1: "", col2: "", col3: "", col4: "", callStatus: "" }))
                                 ).map((row, index) => (
                                   <tr key={`${task._id}-detail-${index}`} className="bg-white odd:bg-gray-50">
                                     <td className="border border-gray-200 px-2 py-1 text-[10px] text-gray-700 font-semibold">{row.row || index + 1}</td>
@@ -1061,6 +1242,30 @@ const TaskAssign = () => {
                                     <td className="border border-gray-200 px-2 py-1 text-[10px] text-gray-700">{row.col2 || ""}</td>
                                     <td className="border border-gray-200 px-2 py-1 text-[10px] text-gray-700">{row.col3 || ""}</td>
                                     <td className="border border-gray-200 px-2 py-1 text-[10px] text-gray-700">{row.col4 || ""}</td>
+                                    <td className="border border-gray-200 px-2 py-1 text-[10px] text-gray-700">
+                                      <select
+                                        value={row.callStatus || ""}
+                                        onChange={(e) => handleNumberDataStatusChange(task._id, index, e.target.value)}
+                                        disabled={row.callStatus === "Enquiry"}
+                                        className={`px-1 py-0.5 text-[10px] border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 ${
+                                          row.callStatus === "Enquiry" ? "bg-amber-100 text-amber-800 font-semibold cursor-not-allowed" : "bg-white"
+                                        }`}
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        <option value="">Select</option>
+                                        <option value="Connected">Connected</option>
+                                        <option value="Not Connected">Not Connected</option>
+                                        <option value="Interested">Interested</option>
+                                        <option value="Not Interested">Not Interested</option>
+                                        <option value="Busy">Busy</option>
+                                        <option value="Call Cut">Call Cut</option>
+                                        <option value="Call Back Later">Call Back Later</option>
+                                        <option value="Invalid Number">Invalid Number</option>
+                                        <option value="Language Issues">Language Issues</option>
+                                  <option value="Enquiry">Enquiry</option>
+                                        <option value="Connected on WhatsApp">WhatsApp</option>
+                                      </select>
+                                    </td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -1253,6 +1458,25 @@ const TaskAssign = () => {
           </div>
         )}
       </div>
+
+      <Modal isOpen={showEnquiryModal} onClose={() => setShowEnquiryModal(false)} size="large">
+        <div className="p-4 border-b flex justify-between items-center bg-gray-50 rounded-t-lg">
+          <h2 className="text-lg font-bold">Add New Lead (Enquiry)</h2>
+          <button onClick={() => setShowEnquiryModal(false)} className="text-gray-500 hover:text-gray-700">
+            <FiX className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="p-4 overflow-y-auto max-h-[80vh]">
+          {showEnquiryModal && (
+            <LeadForm 
+              initialData={{ phone: enquiryModalData?.phone || "" }} 
+              onSubmit={handleEnquirySubmit} 
+              onClose={() => setShowEnquiryModal(false)} 
+              readOnlyPhone={true}
+            />
+          )}
+        </div>
+      </Modal>
     </div>
   );
 };
