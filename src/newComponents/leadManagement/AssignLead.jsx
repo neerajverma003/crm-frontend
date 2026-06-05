@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 export default function AssignLeads() {
   const [employees, setEmployees] = useState([]);
   const [leads, setLeads] = useState([]);
+  const [totalUnassignedLeads, setTotalUnassignedLeads] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 100; // number of leads per page
   const [selectedEmployee, setSelectedEmployee] = useState("");
@@ -16,6 +17,8 @@ export default function AssignLeads() {
   const [loadingAssigned, setLoadingAssigned] = useState(false);
   const [assignedIds, setAssignedIds] = useState([]); // ids already assigned to selected employee
   const [assignedCurrentPage, setAssignedCurrentPage] = useState(1);
+  const [employeeFilter, setEmployeeFilter] = useState("active"); // "active", "inactive", "all"
+  const [employeeFilterTarget, setEmployeeFilterTarget] = useState("active"); // "active", "inactive", "all" for target dropdown
   const selectAllRef = useRef(null);
   const selectAllAssignedRef = useRef(null);
 
@@ -41,35 +44,36 @@ export default function AssignLeads() {
     fetchEmployees();
   }, []);
 
-  // Fetch all leads
-  useEffect(() => {
-    const fetchLeads = async () => {
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/leads/`);
-        const data = await res.json();
-        if (data.data) {
-          setLeads(data.data);
-          // reset to first page when leads change
-          setCurrentPage(1);
+  // Fetch all leads for current page
+  const fetchLeads = async (page = currentPage) => {
+    setLoadingLeads(true);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/leads/?page=${page}&limit=${pageSize}`);
+      const data = await res.json();
+      if (data.data) {
+        setLeads(data.data);
+        if (data.pagination) {
+          setTotalUnassignedLeads(data.pagination.totalRecords || 0);
         } else {
-          setLeads([]);
-          console.error("Failed to fetch leads:", data.message);
+          setTotalUnassignedLeads(data.data.length);
         }
-      } catch (err) {
-        console.error("Error fetching leads:", err);
+      } else {
         setLeads([]);
-      } finally {
-        setLoadingLeads(false);
+        setTotalUnassignedLeads(0);
+        console.error("Failed to fetch leads:", data.message);
       }
-    };
-    fetchLeads();
-  }, []);
+    } catch (err) {
+      console.error("Error fetching leads:", err);
+      setLeads([]);
+      setTotalUnassignedLeads(0);
+    } finally {
+      setLoadingLeads(false);
+    }
+  };
 
-  // adjust current page if leads length changes and current page becomes out of range
   useEffect(() => {
-    const totalPages = Math.max(1, Math.ceil((leads && leads.length) / pageSize));
-    if (currentPage > totalPages) setCurrentPage(totalPages);
-  }, [leads, currentPage]);
+    fetchLeads(currentPage);
+  }, [currentPage]);
 
   // Handle lead checkbox toggle
   const handleLeadCheck = (leadId) => {
@@ -108,8 +112,8 @@ export default function AssignLeads() {
         // switch to Assigned tab and refresh assigned leads for the selected employee
         setActiveTab("assigned");
         fetchAssignedLeads(selectedEmployee);
-        // remove assigned leads from the local leads list to show only unassigned data
-        setLeads((prev) => prev.filter((l) => !selectedLeads.includes(String(l._id))));
+        // refresh leads to fill up the pagination holes
+        fetchLeads(currentPage);
         // update assignedIds cache so UI reflects assignment immediately (normalize to strings)
         setAssignedIds((prev) => Array.from(new Set([...(prev || []).map(String), ...selectedLeads.map(String)])));
       } else {
@@ -158,8 +162,7 @@ export default function AssignLeads() {
 
   // compute visible items for current pages
   const visibleLeads = (leads || [])
-    .filter((l) => !assignedIds.includes(String(l._id)))
-    .slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    .filter((l) => !assignedIds.includes(String(l._id)));
 
   const visibleAssignedLeads = (assignedLeads || []).slice((assignedCurrentPage - 1) * pageSize, assignedCurrentPage * pageSize);
 
@@ -233,6 +236,10 @@ export default function AssignLeads() {
       return;
     }
 
+    const leadIdsToReassign = assignedLeads
+      .filter((l) => selectedAssignedLeads.includes(l.assignmentId))
+      .map((l) => l._id);
+
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/assignlead/reassign`, {
         method: "POST",
@@ -240,7 +247,7 @@ export default function AssignLeads() {
         body: JSON.stringify({
           fromEmployeeId: selectedEmployee,
           toEmployeeId: selectedTargetEmployee,
-          leadIds: selectedAssignedLeads,
+          leadIds: leadIdsToReassign,
         }),
       });
       const data = await res.json();
@@ -329,6 +336,18 @@ export default function AssignLeads() {
     }
   };
 
+  const filteredEmployees = employees?.filter(emp => {
+    if (employeeFilter === "active") return emp.accountActive !== false;
+    if (employeeFilter === "inactive") return emp.accountActive === false;
+    return true;
+  });
+
+  const filteredEmployeesTarget = employees?.filter(emp => {
+    if (employeeFilterTarget === "active") return emp.accountActive !== false;
+    if (employeeFilterTarget === "inactive") return emp.accountActive === false;
+    return true;
+  });
+
   return (
     <div className="max-w-8xl mx-auto p-6 bg-white shadow-md rounded-lg">
       {/* Top nav: Assigned Lead first as requested */}
@@ -351,7 +370,29 @@ export default function AssignLeads() {
         <div>
           <h2 className="text-2xl font-semibold mb-4">Assign Leads to Employee</h2>
 
-          <label className="block mb-2 font-medium">Select Employee</label>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
+            <label className="block font-medium text-gray-700">Select Employee</label>
+            <div className="inline-flex rounded-md shadow-sm" role="group">
+              <button
+                onClick={() => setEmployeeFilter("active")}
+                className={`px-4 py-1.5 text-xs font-medium border border-gray-300 rounded-s-lg focus:z-10 focus:ring-2 focus:ring-blue-500 transition-colors ${employeeFilter === "active" ? "bg-blue-50 text-blue-700 border-blue-300 z-10" : "bg-white text-gray-700 hover:bg-gray-50"}`}
+              >
+                Active
+              </button>
+              <button
+                onClick={() => setEmployeeFilter("inactive")}
+                className={`px-4 py-1.5 text-xs font-medium border-t border-b border-gray-300 focus:z-10 focus:ring-2 focus:ring-blue-500 transition-colors ${employeeFilter === "inactive" ? "bg-blue-50 text-blue-700 border-blue-300 z-10" : "bg-white text-gray-700 hover:bg-gray-50"}`}
+              >
+                Inactive
+              </button>
+              <button
+                onClick={() => setEmployeeFilter("all")}
+                className={`px-4 py-1.5 text-xs font-medium border border-gray-300 rounded-e-lg focus:z-10 focus:ring-2 focus:ring-blue-500 transition-colors ${employeeFilter === "all" ? "bg-blue-50 text-blue-700 border-blue-300 z-10" : "bg-white text-gray-700 hover:bg-gray-50"}`}
+              >
+                All
+              </button>
+            </div>
+          </div>
           {loadingEmployees ? (
             <p>Loading employees...</p>
           ) : (
@@ -366,9 +407,9 @@ export default function AssignLeads() {
               }}
             >
               <option value="">-- Select an Employee --</option>
-              {employees?.map((emp) => (
+              {filteredEmployees?.map((emp) => (
                 <option key={emp._id} value={emp._id}>
-                  {emp.fullName}
+                  {emp.fullName} {emp.accountActive === false ? "(Inactive)" : ""}
                 </option>
               ))}
             </select>
@@ -411,11 +452,7 @@ export default function AssignLeads() {
                     </tr>
                   </thead>
                   <tbody>
-                    {(
-                      // client-side pagination: show only current page items and exclude already-assigned leads
-                      (leads || []).filter((l) => !assignedIds.includes(String(l._id)))
-                    )
-                      .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+                    {(leads || [])
                       .map((lead) => (
                         <tr key={lead._id}>
                           <td className="border px-3 py-2 text-center">
@@ -439,7 +476,7 @@ export default function AssignLeads() {
               {/* Pagination controls */}
               <div className="flex items-center justify-between mt-3">
                 <div className="text-sm text-gray-600">
-                  Showing {Math.min((currentPage - 1) * pageSize + 1, leads.length || 0)} to {Math.min(currentPage * pageSize, leads.length || 0)} of {leads.length || 0} leads
+                  Showing {Math.min((currentPage - 1) * pageSize + 1, totalUnassignedLeads || 0)} to {Math.min(currentPage * pageSize, totalUnassignedLeads || 0)} of {totalUnassignedLeads || 0} leads
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -449,11 +486,11 @@ export default function AssignLeads() {
                   >
                     Previous
                   </button>
-                  <div className="text-sm">Page {currentPage} of {Math.max(1, Math.ceil((leads.length || 0) / pageSize))}</div>
+                  <div className="text-sm">Page {currentPage} of {Math.max(1, Math.ceil((totalUnassignedLeads || 0) / pageSize))}</div>
                   <button
-                    onClick={() => setCurrentPage((p) => Math.min(Math.max(1, Math.ceil((leads.length || 0) / pageSize)), p + 1))}
-                    disabled={currentPage >= Math.ceil((leads.length || 0) / pageSize)}
-                    className={`px-3 py-1 rounded ${currentPage >= Math.ceil((leads.length || 0) / pageSize) ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-white border'}`}
+                    onClick={() => setCurrentPage((p) => Math.min(Math.max(1, Math.ceil((totalUnassignedLeads || 0) / pageSize)), p + 1))}
+                    disabled={currentPage >= Math.ceil((totalUnassignedLeads || 0) / pageSize)}
+                    className={`px-3 py-1 rounded ${currentPage >= Math.ceil((totalUnassignedLeads || 0) / pageSize) ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-white border'}`}
                   >
                     Next
                   </button>
@@ -475,7 +512,29 @@ export default function AssignLeads() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
             <div>
-              <label className="block mb-2 font-medium">Select Employee</label>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
+                <label className="block font-medium text-gray-700">Select Employee</label>
+                <div className="inline-flex rounded-md shadow-sm" role="group">
+                  <button
+                    onClick={() => setEmployeeFilter("active")}
+                    className={`px-3 py-1 text-[11px] font-medium border border-gray-300 rounded-s-lg focus:z-10 focus:ring-2 focus:ring-blue-500 transition-colors ${employeeFilter === "active" ? "bg-blue-50 text-blue-700 border-blue-300 z-10" : "bg-white text-gray-700 hover:bg-gray-50"}`}
+                  >
+                    Active
+                  </button>
+                  <button
+                    onClick={() => setEmployeeFilter("inactive")}
+                    className={`px-3 py-1 text-[11px] font-medium border-t border-b border-gray-300 focus:z-10 focus:ring-2 focus:ring-blue-500 transition-colors ${employeeFilter === "inactive" ? "bg-blue-50 text-blue-700 border-blue-300 z-10" : "bg-white text-gray-700 hover:bg-gray-50"}`}
+                  >
+                    Inactive
+                  </button>
+                  <button
+                    onClick={() => setEmployeeFilter("all")}
+                    className={`px-3 py-1 text-[11px] font-medium border border-gray-300 rounded-e-lg focus:z-10 focus:ring-2 focus:ring-blue-500 transition-colors ${employeeFilter === "all" ? "bg-blue-50 text-blue-700 border-blue-300 z-10" : "bg-white text-gray-700 hover:bg-gray-50"}`}
+                  >
+                    All
+                  </button>
+                </div>
+              </div>
               {loadingEmployees ? (
                 <p>Loading employees...</p>
               ) : (
@@ -492,9 +551,9 @@ export default function AssignLeads() {
                   }}
                 >
                   <option value="">-- Select an Employee --</option>
-                  {employees?.map((emp) => (
+                  {filteredEmployees?.map((emp) => (
                     <option key={emp._id} value={emp._id}>
-                      {emp.fullName}
+                      {emp.fullName} {emp.accountActive === false ? "(Inactive)" : ""}
                     </option>
                   ))}
                 </select>
@@ -502,7 +561,29 @@ export default function AssignLeads() {
             </div>
 
             <div>
-              <label className="block mb-2 font-medium">To this Employee</label>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
+                <label className="block font-medium text-gray-700">To this Employee</label>
+                <div className="inline-flex rounded-md shadow-sm" role="group">
+                  <button
+                    onClick={() => setEmployeeFilterTarget("active")}
+                    className={`px-3 py-1 text-[11px] font-medium border border-gray-300 rounded-s-lg focus:z-10 focus:ring-2 focus:ring-blue-500 transition-colors ${employeeFilterTarget === "active" ? "bg-blue-50 text-blue-700 border-blue-300 z-10" : "bg-white text-gray-700 hover:bg-gray-50"}`}
+                  >
+                    Active
+                  </button>
+                  <button
+                    onClick={() => setEmployeeFilterTarget("inactive")}
+                    className={`px-3 py-1 text-[11px] font-medium border-t border-b border-gray-300 focus:z-10 focus:ring-2 focus:ring-blue-500 transition-colors ${employeeFilterTarget === "inactive" ? "bg-blue-50 text-blue-700 border-blue-300 z-10" : "bg-white text-gray-700 hover:bg-gray-50"}`}
+                  >
+                    Inactive
+                  </button>
+                  <button
+                    onClick={() => setEmployeeFilterTarget("all")}
+                    className={`px-3 py-1 text-[11px] font-medium border border-gray-300 rounded-e-lg focus:z-10 focus:ring-2 focus:ring-blue-500 transition-colors ${employeeFilterTarget === "all" ? "bg-blue-50 text-blue-700 border-blue-300 z-10" : "bg-white text-gray-700 hover:bg-gray-50"}`}
+                  >
+                    All
+                  </button>
+                </div>
+              </div>
               {loadingEmployees ? (
                 <p>Loading employees...</p>
               ) : (
@@ -512,11 +593,11 @@ export default function AssignLeads() {
                   onChange={(e) => setSelectedTargetEmployee(e.target.value)}
                 >
                   <option value="">-- Select Target Employee --</option>
-                  {employees
+                  {filteredEmployeesTarget
                     ?.filter((emp) => String(emp._id) !== String(selectedEmployee))
                     .map((emp) => (
                       <option key={emp._id} value={emp._id}>
-                        {emp.fullName}
+                        {emp.fullName} {emp.accountActive === false ? "(Inactive)" : ""}
                       </option>
                     ))}
                 </select>
