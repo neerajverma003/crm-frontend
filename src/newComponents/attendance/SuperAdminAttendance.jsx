@@ -695,7 +695,7 @@ const SuperAdminAttendance = () => {
             // Fetch saved salary summary to pre-fill remarks and status
             try {
                 const salaryRes = await axios.get(
-                    `${import.meta.env.VITE_API_URL}/salary?employeeId=${user._id}&month=${month}&year=${year}`,
+                    `${import.meta.env.VITE_API_URL}/salary?employeeId=${user._id}&userType=${user.userType}&month=${month}&year=${year}`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 if (salaryRes.data && salaryRes.data.success && salaryRes.data.data) {
@@ -861,6 +861,7 @@ const SuperAdminAttendance = () => {
 
             const salaryData = {
                 employeeId: selectedUser._id,
+                userType: selectedUser.userType,
                 month: currentMonth.getMonth(),
                 year: currentMonth.getFullYear(),
                 baseSalary,

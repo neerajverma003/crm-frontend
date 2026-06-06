@@ -21,6 +21,7 @@ const SalaryList = () => {
     const [error, setError] = useState(null);
     const [editingSalaryId, setEditingSalaryId] = useState(null);
     const [editingStatus, setEditingStatus] = useState(null);
+    const [expandedSalaryId, setExpandedSalaryId] = useState(null);
     const token = localStorage.getItem("token");
 
     console.log("🔍 SalaryList Component Mounted");
@@ -45,6 +46,30 @@ const SalaryList = () => {
     const formatCurrency = (amount) => {
         if (!amount) return "₹0.00";
         return `₹${Number(amount).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    };
+
+    const renderNotes = (notesStr) => {
+        if (!notesStr) return "N/A";
+        try {
+            const parsed = JSON.parse(notesStr);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                return (
+                    <ul className="list-disc list-inside mt-1 space-y-1">
+                        {parsed.map((n, i) => (
+                            <li key={i}>
+                                <span className="font-semibold text-gray-700">{n.title}:</span>{" "}
+                                <span className={Number(n.amount) >= 0 ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
+                                    {formatCurrency(n.amount)}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+                );
+            }
+            return <p className="mt-1">{notesStr}</p>;
+        } catch {
+            return <p className="mt-1">{notesStr}</p>;
+        }
     };
 
     /* -------------------------------------------------------------------------- */
@@ -108,7 +133,7 @@ const SalaryList = () => {
             // Only fetch working days for active users
             for (const user of activeUsers) {
                 try {
-                    const res = await axios.get(`${import.meta.env.VITE_API_URL}/salary/history?employeeId=${user._id}`);
+                    const res = await axios.get(`${import.meta.env.VITE_API_URL}/salary/history?employeeId=${user._id}&userType=${user.userType}`);
                     const salaryData = res?.data?.data || res?.data || [];
                     
                     if (Array.isArray(salaryData) && salaryData.length > 0) {
@@ -165,7 +190,7 @@ const SalaryList = () => {
             // Fetch salary data for selected month/year
             for (const user of activeUsers) {
                 try {
-                    const res = await axios.get(`${import.meta.env.VITE_API_URL}/salary/history?employeeId=${user._id}`);
+                    const res = await axios.get(`${import.meta.env.VITE_API_URL}/salary/history?employeeId=${user._id}&userType=${user.userType}`);
                     const salaryData = res?.data?.data || res?.data || [];
                     
                     if (Array.isArray(salaryData) && salaryData.length > 0) {
@@ -259,10 +284,11 @@ const SalaryList = () => {
         setSelectedUser(user);
         setMonthlyPaidSalaries([]);
         setUserSalaryData(null);
+        setExpandedSalaryId(null);
         
         try {
             // Fetch all salary history for this user using the correct endpoint
-            const res = await axios.get(`${import.meta.env.VITE_API_URL}/salary/history?employeeId=${user._id}`);
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/salary/history?employeeId=${user._id}&userType=${user.userType}`);
             console.log("📊 Full API Response:", res?.data);
             
             // The API returns { success: true, data: [...] }
@@ -923,62 +949,103 @@ const SalaryList = () => {
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-100">
                                                     {monthlyPaidSalaries.map((salary, idx) => (
-                                                        <tr key={idx} className="transition-colors hover:bg-amber-50">
-                                                            <td className="px-3 py-3 font-medium text-gray-800 sm:px-4">
-                                                                {new Date(salary.year, salary.month, 1).toLocaleDateString("en-IN", { month: "short" })}
-                                                            </td>
-                                                            <td className="px-3 py-3 text-gray-700 font-bold sm:px-4">{salary.year}</td>
-                                                            <td className="px-3 py-3 text-center sm:px-4">
-                                                                <span className="inline-flex items-center justify-center rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">
-                                                                    {salary.workingDays || 0} days
-                                                                </span>
-                                                            </td>
-                                                            <td 
-                                                                className="px-3 py-3 text-center sm:px-4 cursor-pointer relative"
-                                                                onDoubleClick={() => {
-                                                                    setEditingSalaryId(salary._id);
-                                                                    setEditingStatus(salary.status);
+                                                        <React.Fragment key={idx}>
+                                                            <tr 
+                                                                className="transition-colors hover:bg-amber-50 cursor-pointer"
+                                                                onClick={(e) => {
+                                                                    // Don't expand if double clicking to edit
+                                                                    if (e.detail === 2) return;
+                                                                    setExpandedSalaryId(expandedSalaryId === salary._id ? null : salary._id);
                                                                 }}
                                                             >
-                                                                {editingSalaryId === salary._id ? (
-                                                                    <div className="relative inline-block">
-                                                                        <select
-                                                                            value={editingStatus}
-                                                                            onChange={(e) => {
-                                                                                const newStatus = e.target.value;
-                                                                                setEditingStatus(newStatus);
-                                                                                handleStatusChange(salary, newStatus);
-                                                                            }}
-                                                                            onBlur={() => {
-                                                                                setEditingSalaryId(null);
-                                                                                setEditingStatus(null);
-                                                                            }}
-                                                                            className="rounded-lg border-2 border-blue-500 px-2 py-1 text-xs font-bold bg-white cursor-pointer focus:outline-none"
-                                                                            autoFocus
-                                                                        >
-                                                                            <option value="Paid">Paid</option>
-                                                                            <option value="Pending">Pending</option>
-                                                                            <option value="Approved">Approved</option>
-                                                                        </select>
-                                                                    </div>
-                                                                ) : (
-                                                                    <span className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-bold ${
-                                                                        salary.status === "Paid" 
-                                                                            ? "bg-green-100 text-green-700" 
-                                                                            : salary.status === "Pending"
-                                                                            ? "bg-yellow-100 text-yellow-700"
-                                                                            : "bg-blue-100 text-blue-700"
-                                                                    }`}>
-                                                                        {salary.status || "Paid"}
+                                                                <td className="px-3 py-3 font-medium text-gray-800 sm:px-4">
+                                                                    {new Date(salary.year, salary.month, 1).toLocaleDateString("en-IN", { month: "short" })}
+                                                                </td>
+                                                                <td className="px-3 py-3 text-gray-700 font-bold sm:px-4">{salary.year}</td>
+                                                                <td className="px-3 py-3 text-center sm:px-4">
+                                                                    <span className="inline-flex items-center justify-center rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">
+                                                                        {salary.workingDays || 0} days
                                                                     </span>
-                                                                )}
-                                                            </td>
-                                                            <td className="px-3 py-3 text-right sm:px-4">
-                                                                <span className="inline-flex items-center justify-center rounded-lg bg-green-100 px-3 py-1 text-xs font-bold text-green-700">
-                                                                    {formatCurrency(salary.totalPayable)}
-                                                                </span>
-                                                            </td>
-                                                        </tr>
+                                                                </td>
+                                                                <td 
+                                                                    className="px-3 py-3 text-center sm:px-4 cursor-pointer relative"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setEditingSalaryId(salary._id);
+                                                                        setEditingStatus(salary.status);
+                                                                    }}
+                                                                >
+                                                                    {editingSalaryId === salary._id ? (
+                                                                        <div className="relative inline-block">
+                                                                            <select
+                                                                                value={editingStatus}
+                                                                                onClick={(e) => e.stopPropagation()}
+                                                                                onChange={(e) => {
+                                                                                    const newStatus = e.target.value;
+                                                                                    setEditingStatus(newStatus);
+                                                                                    handleStatusChange(salary, newStatus);
+                                                                                }}
+                                                                                onBlur={() => {
+                                                                                    setEditingSalaryId(null);
+                                                                                    setEditingStatus(null);
+                                                                                }}
+                                                                                className="rounded-lg border-2 border-blue-500 px-2 py-1 text-xs font-bold bg-white cursor-pointer focus:outline-none"
+                                                                                autoFocus
+                                                                            >
+                                                                                <option value="Paid">Paid</option>
+                                                                                <option value="Pending">Pending</option>
+                                                                                <option value="Approved">Approved</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <span className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-bold ${
+                                                                            salary.status === "Paid" 
+                                                                                ? "bg-green-100 text-green-700" 
+                                                                                : salary.status === "Pending"
+                                                                                ? "bg-yellow-100 text-yellow-700"
+                                                                                : "bg-blue-100 text-blue-700"
+                                                                        }`}>
+                                                                            {salary.status || "Paid"}
+                                                                        </span>
+                                                                    )}
+                                                                </td>
+                                                                <td className="px-3 py-3 text-right sm:px-4">
+                                                                    <span className="inline-flex items-center justify-center rounded-lg bg-green-100 px-3 py-1 text-xs font-bold text-green-700">
+                                                                        {formatCurrency(salary.totalPayable)}
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                            {expandedSalaryId === salary._id && (
+                                                                <tr className="bg-gradient-to-r from-orange-50 to-amber-50/30">
+                                                                    <td colSpan="5" className="p-0 border-t border-amber-100">
+                                                                        <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                                                            <div>
+                                                                                <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Base Salary</p>
+                                                                                <p className="text-sm font-bold text-gray-800">{formatCurrency(salary.baseSalary)}</p>
+                                                                            </div>
+                                                                            <div>
+                                                                                <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Earned Amount</p>
+                                                                                <p className="text-sm font-bold text-gray-800">{formatCurrency(salary.earnedAmount)}</p>
+                                                                            </div>
+                                                                            <div>
+                                                                                <p className="text-xs text-amber-600 font-bold uppercase tracking-wider mb-1">Incentive/Deduction</p>
+                                                                                <p className="text-sm font-bold text-amber-700">{formatCurrency(salary.remarkAmount)}</p>
+                                                                            </div>
+                                                                            <div>
+                                                                                <p className="text-xs text-green-600 font-bold uppercase tracking-wider mb-1">Net Payable</p>
+                                                                                <p className="text-sm font-bold text-green-700">{formatCurrency(salary.totalPayable)}</p>
+                                                                            </div>
+                                                                            <div className="col-span-2 sm:col-span-4 mt-2 pt-3 border-t border-amber-200/50">
+                                                                                <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Remarks / Notes</p>
+                                                                                <div className="text-sm text-gray-700 bg-white/60 p-2 rounded border border-amber-100/50">
+                                                                                    {renderNotes(salary.notes)}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            )}
+                                                        </React.Fragment>
                                                     ))}
                                                 </tbody>
                                             </table>
