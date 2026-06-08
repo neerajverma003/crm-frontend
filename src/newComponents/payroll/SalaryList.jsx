@@ -17,6 +17,7 @@ const SalaryList = () => {
     const [userSalaryData, setUserSalaryData] = useState(null);
     const [monthlyAttendance, setMonthlyAttendance] = useState({});
     const [monthSalaryData, setMonthSalaryData] = useState({});
+    const [monthSalaryStatusData, setMonthSalaryStatusData] = useState({});
     const [monthlyPaidSalaries, setMonthlyPaidSalaries] = useState([]);
     const [error, setError] = useState(null);
     const [editingSalaryId, setEditingSalaryId] = useState(null);
@@ -133,6 +134,7 @@ const SalaryList = () => {
             
             const workingDaysMap = {};
             const monthSalaryMap = {};
+            const monthSalaryStatusMap = {};
             
             // Only fetch working days for active users
             for (const user of activeUsers) {
@@ -144,9 +146,11 @@ const SalaryList = () => {
                         const currentMonthSalary = salaryData.find(s => s.month === currentMonth && s.year === currentYear);
                         workingDaysMap[user._id] = currentMonthSalary?.workingDays || 0;
                         monthSalaryMap[user._id] = currentMonthSalary?.totalPayable || 0;
+                        monthSalaryStatusMap[user._id] = currentMonthSalary?.status || 'Unknown';
                     } else {
                         workingDaysMap[user._id] = 0;
                         monthSalaryMap[user._id] = 0;
+                        monthSalaryStatusMap[user._id] = 'Unknown';
                     }
                 } catch (err) {
                     console.warn(`Could not fetch working days for user ${user._id}:`, err);
@@ -157,6 +161,7 @@ const SalaryList = () => {
             
             setMonthlyAttendance(workingDaysMap);
             setMonthSalaryData(monthSalaryMap);
+            setMonthSalaryStatusData(monthSalaryStatusMap);
             console.log("✅ Working Days Map:", workingDaysMap);
             console.log("✅ Month Salary Map:", monthSalaryMap);
         } catch (error) {
@@ -190,6 +195,7 @@ const SalaryList = () => {
             
             const workingDaysMap = {};
             const monthSalaryMap = {};
+            const monthSalaryStatusMap = {};
             
             // Fetch salary data for selected month/year
             for (const user of activeUsers) {
@@ -202,9 +208,11 @@ const SalaryList = () => {
                         const selectedMonthSalary = salaryData.find(s => s.month === selectedMonth && s.year === selectedYear);
                         workingDaysMap[user._id] = selectedMonthSalary?.workingDays || 0;
                         monthSalaryMap[user._id] = selectedMonthSalary?.totalPayable || 0;
+                        monthSalaryStatusMap[user._id] = selectedMonthSalary?.status || 'Unknown';
                     } else {
                         workingDaysMap[user._id] = 0;
                         monthSalaryMap[user._id] = 0;
+                        monthSalaryStatusMap[user._id] = 'Unknown';
                     }
                 } catch (err) {
                     console.warn(`Could not fetch data for user ${user._id}:`, err);
@@ -215,6 +223,7 @@ const SalaryList = () => {
             
             setMonthlyAttendance(workingDaysMap);
             setMonthSalaryData(monthSalaryMap);
+            setMonthSalaryStatusData(monthSalaryStatusMap);
             console.log("✅ Updated Working Days Map:", workingDaysMap);
             console.log("✅ Updated Month Salary Map:", monthSalaryMap);
         } catch (error) {
@@ -524,6 +533,14 @@ const SalaryList = () => {
     /* -------------------------------------------------------------------------- */
     /* 🧾 Render */
     /* -------------------------------------------------------------------------- */
+    const adminSalaryTotal = filteredData.filter(u => u.userType === "Admin").reduce((sum, u) => sum + (monthSalaryData[u._id] || 0), 0);
+    const employeeSalaryTotal = filteredData.filter(u => u.userType === "Employee").reduce((sum, u) => sum + (monthSalaryData[u._id] || 0), 0);
+    const combinedSalaryTotal = adminSalaryTotal + employeeSalaryTotal;
+
+    const pendingSalaryTotal = filteredData.filter(u => monthSalaryStatusData[u._id] === "Pending").reduce((sum, u) => sum + (monthSalaryData[u._id] || 0), 0);
+    const approvedSalaryTotal = filteredData.filter(u => monthSalaryStatusData[u._id] === "Approved").reduce((sum, u) => sum + (monthSalaryData[u._id] || 0), 0);
+    const paidSalaryTotal = filteredData.filter(u => monthSalaryStatusData[u._id] === "Paid").reduce((sum, u) => sum + (monthSalaryData[u._id] || 0), 0);
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-6">
             {/* Header Section */}
@@ -536,6 +553,82 @@ const SalaryList = () => {
                     <h1 className="text-3xl font-bold text-gray-900">Salary Management</h1>
                 </div>
                 <p className="text-sm text-gray-600">Manage salaries for employees and administrators</p>
+            </div>
+
+            {/* Statistics Cards */}
+            <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {activeTab === "active" ? (
+                    <div className="rounded-lg border border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 shadow-sm">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-emerald-700">Total Active</p>
+                                <p className="text-3xl font-bold text-emerald-600">{totalActive}</p>
+                            </div>
+                            <CheckCircle size={40} className="text-emerald-600 opacity-20" />
+                        </div>
+                    </div>
+                ) : (
+                    <div className="rounded-lg border border-rose-200 bg-gradient-to-br from-rose-50 to-rose-100 p-4 shadow-sm">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-rose-700">Total Inactive</p>
+                                <p className="text-3xl font-bold text-rose-600">{totalInactive}</p>
+                            </div>
+                            <XCircle size={40} className="text-rose-600 opacity-20" />
+                        </div>
+                    </div>
+                )}
+                
+                {/* Admin Salary Card */}
+                <div className="rounded-lg border border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100 p-4 shadow-sm">
+                    <div className="flex flex-col h-full justify-between">
+                        <p className="text-sm font-medium text-purple-700">Total Admin Salary</p>
+                        <p className="text-2xl font-bold text-purple-600 mt-2 truncate">{formatCurrency(adminSalaryTotal)}</p>
+                    </div>
+                </div>
+
+                {/* Employee Salary Card */}
+                <div className="rounded-lg border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100 p-4 shadow-sm">
+                    <div className="flex flex-col h-full justify-between">
+                        <p className="text-sm font-medium text-blue-700">Total Employee Salary</p>
+                        <p className="text-2xl font-bold text-blue-600 mt-2 truncate">{formatCurrency(employeeSalaryTotal)}</p>
+                    </div>
+                </div>
+
+                {/* Total Salary Card */}
+                <div className="rounded-lg border border-indigo-200 bg-gradient-to-br from-indigo-50 to-indigo-100 p-4 shadow-sm">
+                    <div className="flex flex-col h-full justify-between">
+                        <p className="text-sm font-medium text-indigo-700">Overall Total Salary</p>
+                        <p className="text-2xl font-bold text-indigo-600 mt-2 truncate">{formatCurrency(combinedSalaryTotal)}</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Salary Status Cards */}
+            <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                {/* Pending Salary Card */}
+                <div className="rounded-lg border border-yellow-200 bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 shadow-sm">
+                    <div className="flex flex-col h-full justify-between">
+                        <p className="text-sm font-medium text-yellow-700">Pending Salary</p>
+                        <p className="text-2xl font-bold text-yellow-600 mt-2 truncate">{formatCurrency(pendingSalaryTotal)}</p>
+                    </div>
+                </div>
+
+                {/* Approved Salary Card */}
+                <div className="rounded-lg border border-cyan-200 bg-gradient-to-br from-cyan-50 to-cyan-100 p-4 shadow-sm">
+                    <div className="flex flex-col h-full justify-between">
+                        <p className="text-sm font-medium text-cyan-700">Approved Salary</p>
+                        <p className="text-2xl font-bold text-cyan-600 mt-2 truncate">{formatCurrency(approvedSalaryTotal)}</p>
+                    </div>
+                </div>
+
+                {/* Paid Salary Card */}
+                <div className="rounded-lg border border-green-200 bg-gradient-to-br from-green-50 to-green-100 p-4 shadow-sm">
+                    <div className="flex flex-col h-full justify-between">
+                        <p className="text-sm font-medium text-green-700">Paid Salary</p>
+                        <p className="text-2xl font-bold text-green-600 mt-2 truncate">{formatCurrency(paidSalaryTotal)}</p>
+                    </div>
+                </div>
             </div>
 
             {/* Search & Filter Bar */}
@@ -688,37 +781,6 @@ const SalaryList = () => {
                         Export
                     </button>
                 </div>
-            </div>
-
-            {/* Statistics Card */}
-            <div className="mb-6">
-                {activeTab === "active" ? (
-                    <div className="rounded-lg border border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 shadow-sm">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium text-emerald-700">Total Active</p>
-                                <p className="text-3xl font-bold text-emerald-600">{totalActive}</p>
-                            </div>
-                            <CheckCircle
-                                size={40}
-                                className="text-emerald-600 opacity-20"
-                            />
-                        </div>
-                    </div>
-                ) : (
-                    <div className="rounded-lg border border-rose-200 bg-gradient-to-br from-rose-50 to-rose-100 p-4 shadow-sm">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium text-rose-700">Total Inactive</p>
-                                <p className="text-3xl font-bold text-rose-600">{totalInactive}</p>
-                            </div>
-                            <XCircle
-                                size={40}
-                                className="text-rose-600 opacity-20"
-                            />
-                        </div>
-                    </div>
-                )}
             </div>
 
             {/* Data Table */}
