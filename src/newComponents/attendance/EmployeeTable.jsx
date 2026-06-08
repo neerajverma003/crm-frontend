@@ -1952,20 +1952,22 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                                                                             </>
                                                                         )}
                                                                         
-                                                                        <button
-                                                                            onClick={() => {
-                                                                                const newRemarks = [...remarksList];
-                                                                                newRemarks.splice(idx, 1);
-                                                                                if (newRemarks.length === 0) {
-                                                                                    newRemarks.push({ title: "", amount: "", isSaved: false, type: "Amount" });
-                                                                                }
-                                                                                setRemarksList(newRemarks);
-                                                                            }}
-                                                                            className="text-red-500 hover:text-red-700 p-1"
-                                                                            title="Delete"
-                                                                        >
-                                                                            <Trash2 size={16} />
-                                                                        </button>
+                                                                        {(globalRole === "superadmin" || globalRole === "admin") && (
+                                                                            <button
+                                                                                onClick={() => {
+                                                                                    const newRemarks = [...remarksList];
+                                                                                    newRemarks.splice(idx, 1);
+                                                                                    if (newRemarks.length === 0) {
+                                                                                        newRemarks.push({ title: "", amount: "", isSaved: false, type: "Amount" });
+                                                                                    }
+                                                                                    setRemarksList(newRemarks);
+                                                                                }}
+                                                                                className="text-red-500 hover:text-red-700 p-1"
+                                                                                title="Delete"
+                                                                            >
+                                                                                <Trash2 size={16} />
+                                                                            </button>
+                                                                        )}
                                                                     </div>
                                                                 ))}
                                                             </div>
