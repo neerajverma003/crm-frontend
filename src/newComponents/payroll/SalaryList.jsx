@@ -48,21 +48,25 @@ const SalaryList = () => {
         return `₹${Number(amount).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     };
 
-    const renderNotes = (notesStr) => {
+    const renderNotes = (notesStr, baseSalary) => {
         if (!notesStr) return "N/A";
         try {
             const parsed = JSON.parse(notesStr);
             if (Array.isArray(parsed) && parsed.length > 0) {
                 return (
                     <ul className="list-disc list-inside mt-1 space-y-1">
-                        {parsed.map((n, i) => (
-                            <li key={i}>
-                                <span className="font-semibold text-gray-700">{n.title}:</span>{" "}
-                                <span className={Number(n.amount) >= 0 ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
-                                    {formatCurrency(n.amount)}
-                                </span>
-                            </li>
-                        ))}
+                        {parsed.map((n, i) => {
+                            const isPercentage = n.type === "Percentage";
+                            const effectiveAmount = isPercentage ? (baseSalary * (Number(n.amount) || 0)) / 100 : Number(n.amount);
+                            return (
+                                <li key={i}>
+                                    <span className="font-semibold text-gray-700">{n.title}:</span>{" "}
+                                    <span className={effectiveAmount >= 0 ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
+                                        {isPercentage ? `${n.amount}% (${formatCurrency(effectiveAmount)})` : formatCurrency(effectiveAmount)}
+                                    </span>
+                                </li>
+                            );
+                        })}
                     </ul>
                 );
             }
@@ -1038,7 +1042,7 @@ const SalaryList = () => {
                                                                             <div className="col-span-2 sm:col-span-4 mt-2 pt-3 border-t border-amber-200/50">
                                                                                 <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Remarks / Notes</p>
                                                                                 <div className="text-sm text-gray-700 bg-white/60 p-2 rounded border border-amber-100/50">
-                                                                                    {renderNotes(salary.notes)}
+                                                                                    {renderNotes(salary.notes, salary.baseSalary)}
                                                                                 </div>
                                                                             </div>
                                                                         </div>

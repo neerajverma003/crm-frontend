@@ -1,7 +1,308 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { ChevronDown, Eye, Edit2, MessageSquare } from "lucide-react";
+import { ChevronDown, Eye, Edit2, MessageSquare, X, AlertCircle } from "lucide-react";
 import EmployeeOwnLeadCards from "./EmployeeOwnLeadCards.jsx";
+import DestinationSearchBox from "../../components/DestinationSearchBox";
 
+const tripDurations = [
+  "1n/2d","2n/3d","3n/4d","4n/5d","5n/6d","6n/7d","7n/8d","8n/9d","9n/10d",
+  "10n/11d","11n/12d","12n/13d","13n/14d","14n/15d","Others"
+];
+
+const leadSources = [
+  "Cold Call", "Website", "Referral", "LinkedIn", "Trade Show",
+  "Email Campaign", "Social Media", "Event", "Organic Search", "Paid Ads",
+];
+const leadTypes = ["International", "Domestic"];
+const tripTypes = ["Solo", "Group", "Family", "Couple", "Honeymoon"];
+const leadStatuses = ["Hot", "Warm", "Cold", "Converted", "Lost"];
+
+// Modal Component
+const Modal = ({ isOpen, onClose, size = "large", children }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={onClose}>
+      <div
+        className={`bg-white rounded-lg shadow-lg ${size === "large" ? "w-full max-w-4xl" : "w-full max-w-md"} max-h-[95vh] overflow-hidden`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </div>
+    </div>
+  );
+};
+
+// Input Field Component
+const InputField = ({ name, type = "text", placeholder, required, value, error, onChange }) => (
+  <div className="h-[4.5rem]">
+    <label className="block text-xs font-medium text-gray-700 mb-0.5">
+      {name.charAt(0).toUpperCase() + name.slice(1)} {required && <span className="text-red-500">*</span>}
+    </label>
+    <input
+      type={type}
+      name={name}
+      value={value || ""}
+      onChange={onChange}
+      placeholder={placeholder}
+      className={`w-full px-3 py-1.5 border rounded-lg text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
+        error ? "border-red-300 bg-red-50" : "border-gray-300 hover:border-gray-400"
+      }`}
+      autoComplete="off"
+    />
+    {error && (
+      <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+        <AlertCircle className="w-3 h-3" /> {error}
+      </p>
+    )}
+  </div>
+);
+
+// Select Field Component
+const SelectField = ({ name, options, required, value, error, onChange }) => (
+  <div className="h-[4.5rem]">
+    <label className="block text-xs font-medium text-gray-700 mb-0.5">
+      {name.charAt(0).toUpperCase() + name.slice(1)} {required && <span className="text-red-500">*</span>}
+    </label>
+    <select
+      name={name}
+      value={value || ""}
+      onChange={onChange}
+      className={`w-full px-3 py-1.5 border rounded-lg text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
+        error ? "border-red-300 bg-red-50" : "border-gray-300 hover:border-gray-400"
+      }`}
+    >
+      <option value="">Select {name}</option>
+      {options.map((opt) => (
+        <option key={opt}>{opt}</option>
+      ))}
+    </select>
+    {error && (
+      <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+        <AlertCircle className="w-3 h-3" /> {error}
+      </p>
+    )}
+  </div>
+);
+
+// Edit Lead Form Component
+const EditLeadForm = ({ initialData, onSubmit, onClose }) => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    whatsAppNo: "",
+    departureCity: "",
+    destination: "",
+    expectedTravelDate: "",
+    noOfDays: "",
+    customNoOfDays: "",
+    placesToCover: "",
+    placesToCoverArray: [],
+    noOfPerson: "",
+    noOfChild: "",
+    childAges: [],
+    groupNumber: "",
+    leadSource: "",
+    leadType: "",
+    tripType: "",
+    leadStatus: "Hot",
+    notes: "",
+    ...initialData,
+    placesToCoverArray: initialData?.placesToCoverArray || (initialData?.placesToCover ? initialData.placesToCover.split(", ").map(p => p.trim()) : []),
+  });
+
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiError, setApiError] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  useEffect(() => {
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      whatsAppNo: "",
+      departureCity: "",
+      destination: "",
+      expectedTravelDate: "",
+      noOfDays: "",
+      customNoOfDays: "",
+      placesToCover: "",
+      placesToCoverArray: initialData?.placesToCoverArray || (initialData?.placesToCover ? initialData.placesToCover.split(", ").map(p => p.trim()) : []),
+      noOfPerson: "",
+      noOfChild: "",
+      childAges: [],
+      groupNumber: "",
+      leadSource: "",
+      leadType: "",
+      tripType: "",
+      leadStatus: "Hot",
+      notes: "",
+      ...initialData,
+    });
+  }, [initialData]);
+
+  const validate = (data) => {
+    const newErrors = {};
+    if (!data.phone || data.phone.trim() === "") newErrors.phone = "Phone is required";
+    return newErrors;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleChildAgeChange = (index, value) => {
+    const ages = [...formData.childAges];
+    ages[index] = value;
+    setFormData((prev) => ({ ...prev, childAges: ages }));
+  };
+
+  const addChildAge = () => setFormData((prev) => ({ ...prev, childAges: [...prev.childAges, ""] }));
+
+  const removeChildAge = (index) => {
+    const ages = [...formData.childAges];
+    ages.splice(index, 1);
+    setFormData((prev) => ({ ...prev, childAges: ages }));
+  };
+
+  const handleAddPlace = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const place = e.target.value.trim();
+      if (!place) return;
+
+      const currentPlaces = formData.placesToCoverArray || [];
+      if (!currentPlaces.includes(place)) {
+        setFormData((prev) => ({
+          ...prev,
+          placesToCoverArray: [...currentPlaces, place],
+        }));
+      }
+      e.target.value = "";
+    }
+  };
+
+  const removePlace = (index) => {
+    const updatedPlaces = [...(formData.placesToCoverArray || [])];
+    updatedPlaces.splice(index, 1);
+    setFormData((prev) => ({ ...prev, placesToCoverArray: updatedPlaces }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const newErrors = validate(formData);
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
+
+    const payload = {
+      ...formData,
+      placesToCover: (formData.placesToCoverArray || []).join(", "),
+    };
+
+    setIsSubmitting(true);
+    setApiError("");
+    try {
+      await onSubmit(payload);
+      setSubmitSuccess(true);
+      setTimeout(() => {
+        setSubmitSuccess(false);
+        onClose();
+      }, 1500);
+    } catch (err) {
+      setApiError(err.message || "Failed to save lead");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <InputField name="name" value={formData.name || formData.leadName} onChange={handleChange} />
+        <InputField name="email" type="email" value={formData.email} onChange={handleChange} />
+        <InputField name="phone" value={formData.phone || formData.phoneNumber} onChange={handleChange} required error={errors.phone} />
+        <InputField name="whatsAppNo" value={formData.whatsAppNo} onChange={handleChange} />
+        <InputField name="departureCity" value={formData.departureCity} onChange={handleChange} />
+        <DestinationSearchBox
+          name="destination"
+          value={formData.destination}
+          onChange={handleChange}
+          placeholder="Search destination..."
+          error={errors.destination}
+        />
+        <InputField name="expectedTravelDate" type="date" value={formData.expectedTravelDate ? formData.expectedTravelDate.split('T')[0] : ''} onChange={handleChange} />
+        <SelectField name="noOfDays" options={tripDurations} value={formData.noOfDays} onChange={handleChange} />
+        {formData.noOfDays === "Others" && (
+          <InputField name="customNoOfDays" placeholder="Enter custom duration" value={formData.customNoOfDays || ""} onChange={handleChange} />
+        )}
+
+        {/* Multi-place input */}
+        <div className="col-span-2">
+          <label className="block text-xs font-medium text-gray-700 mb-0.5">Places to Cover</label>
+          <div className="flex flex-wrap gap-1 mb-1">
+            {(formData.placesToCoverArray || []).map((place, idx) => (
+              <span key={idx} className="bg-blue-100 text-blue-700 px-2 py-1 rounded flex items-center gap-1 text-sm">
+                {place}
+                <button type="button" onClick={() => removePlace(idx)}>x</button>
+              </span>
+            ))}
+          </div>
+          <input
+            type="text"
+            placeholder="Type a place and press Enter"
+            onKeyDown={handleAddPlace}
+            className="w-full px-3 py-1.5 border rounded-lg text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        <InputField name="noOfPerson" type="number" value={formData.noOfPerson} onChange={handleChange} />
+        <InputField name="noOfChild" type="number" value={formData.noOfChild} onChange={handleChange} />
+        <InputField name="groupNumber" type="text" value={formData.groupNumber} onChange={handleChange} />
+
+        {/* Child Ages */}
+        <div className="col-span-2">
+          <label className="block text-xs font-medium text-gray-700 mb-0.5">Child Ages</label>
+          {formData.childAges.map((age, idx) => (
+            <div key={idx} className="flex gap-2 mb-1">
+              <input type="number" value={age} onChange={(e) => handleChildAgeChange(idx, e.target.value)} placeholder="Child Age" className="w-full px-3 py-1.5 border rounded-lg text-sm" />
+              <button type="button" onClick={() => removeChildAge(idx)} className="bg-red-100 px-2 rounded hover:bg-red-200">X</button>
+            </div>
+          ))}
+          <button type="button" onClick={addChildAge} className="mt-1 text-blue-600 hover:underline text-sm">+ Add Child Age</button>
+        </div>
+
+        <SelectField name="leadSource" options={leadSources} value={formData.leadSource} onChange={handleChange} />
+        <SelectField name="leadType" options={leadTypes} value={formData.leadType} onChange={handleChange} />
+        <SelectField name="tripType" options={tripTypes} value={formData.tripType} onChange={handleChange} />
+        <SelectField name="leadStatus" options={leadStatuses} value={formData.leadStatus} onChange={handleChange} />
+      </div>
+
+      <div className="mt-2">
+        <label className="block text-xs font-medium text-gray-700 mb-0.5">Notes</label>
+        <textarea
+          name="notes"
+          value={formData.notes}
+          onChange={handleChange}
+          rows="3"
+          placeholder="Add any notes or remarks..."
+          className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm"
+        ></textarea>
+      </div>
+
+      <div className="mt-3 flex gap-2">
+        <button type="submit" disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+          {isSubmitting ? "Saving..." : "Save Lead"}
+        </button>
+        <button type="button" onClick={onClose} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded">
+          Cancel
+        </button>
+      </div>
+      {apiError && <p className="text-red-600 mt-2">{apiError}</p>}
+      {submitSuccess && <p className="text-green-600 mt-2">Lead saved successfully!</p>}
+    </form>
+  );
+};
 const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) => {
   const [employees, setEmployees] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -22,6 +323,7 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [viewLead, setViewLead] = useState(null);
+  const [editLead, setEditLead] = useState(null);
   const [statusSavingId, setStatusSavingId] = useState(null);
   const [pendingStatus, setPendingStatus] = useState(null);
   const [messageModal, setMessageModal] = useState({ isOpen: false, lead: null });
@@ -31,6 +333,23 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
   const [selectedEmployeeForAssign, setSelectedEmployeeForAssign] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [employeeSearchQuery, setEmployeeSearchQuery] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const filteredEmployees = employees.filter(emp =>
+    (emp.fullName || emp.name || "").toLowerCase().includes(employeeSearchQuery.toLowerCase())
+  );
 
   const statuses = ["All", "Follow Up", "Interested", "Connected", "Not Connected"];
 
@@ -274,7 +593,34 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
   };
 
   const handleView = (lead) => setViewLead(lead);
-  const closeModal = () => setViewLead(null);
+  const handleEdit = (lead) => setEditLead(lead);
+  
+  const closeModal = () => {
+    setViewLead(null);
+    setEditLead(null);
+  };
+
+  const handleUpdateLead = async (data) => {
+    if (!editLead) return;
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/employeelead/${editLead._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Failed to update lead");
+      }
+      setLeads((prev) =>
+        prev.map((lead) => (lead._id === editLead._id ? { ...lead, ...data } : lead))
+      );
+      setEditLead(null);
+    } catch (err) {
+      console.error("Error updating lead:", err);
+      throw err;
+    }
+  };
 
   // View Lead Modal
   const ViewLeadModal = ({ lead }) => {
@@ -341,28 +687,43 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
             <p className="text-sm text-gray-600">Choose an employee to view their assigned leads</p>
           </div>
 
-          <div className="w-full sm:w-auto">
+          <div className="w-full sm:w-auto" ref={dropdownRef}>
             <div className="relative inline-block w-full sm:w-80">
-              <select
-                value={selectedEmployee?._id || ""}
-                onChange={handleEmployeeChange}
+              <input
+                type="text"
+                placeholder={employees.length === 0 ? "No active employees" : "Search employee..."}
+                value={employeeSearchQuery}
+                onChange={(e) => {
+                  setEmployeeSearchQuery(e.target.value);
+                  setShowDropdown(true);
+                }}
+                onFocus={() => setShowDropdown(true)}
                 disabled={employees.length === 0}
-                className="w-full px-4 py-3 pr-10 appearance-none border border-gray-300 rounded-lg bg-white text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed transition-all duration-200"
-              >
-                {employees.length === 0 ? (
-                  <option>No active employees</option>
-                ) : (
-                  <>
-                    <option value="">Select an employee...</option>
-                    {employees.map((employee) => (
-                      <option key={employee._id} value={employee._id}>
-                        {employee.fullName}
-                      </option>
-                    ))}
-                  </>
-                )}
-              </select>
+                className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg bg-white text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed transition-all duration-200"
+              />
               <ChevronDown className="absolute right-3 top-3.5 h-5 w-5 text-gray-400 pointer-events-none" />
+              
+              {showDropdown && employees.length > 0 && (
+                <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  {filteredEmployees.length > 0 ? (
+                    filteredEmployees.map((emp) => (
+                      <li
+                        key={emp._id}
+                        onClick={() => {
+                          setEmployeeSearchQuery(emp.fullName || emp.name || "");
+                          handleEmployeeChange({ target: { value: emp._id } });
+                          setShowDropdown(false);
+                        }}
+                        className={`px-4 py-2 cursor-pointer hover:bg-blue-50 ${selectedEmployee?._id === emp._id ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700'}`}
+                      >
+                        {emp.fullName || emp.name}
+                      </li>
+                    ))
+                  ) : (
+                    <li className="px-4 py-2 text-gray-500">No employees found</li>
+                  )}
+                </ul>
+              )}
             </div>
           </div>
         </div>
@@ -491,11 +852,11 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
                         <td className="px-6 py-3 border-b border-gray-100 text-center">
                           <div className="flex justify-center gap-2 flex-col sm:flex-row">
                             <div className="flex flex-col justify-center gap-2">
-                              <div>
-                                <button onClick={() => handleView(lead)} className="p-2 mx-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 shadow-sm transition-all" title="View Lead"><Eye size={16} /></button>
-                                <button className="p-2 mx-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 shadow-sm transition-all" title="Edit Lead"><Edit2 size={16} /></button>
-                                <button onClick={() => handleAddMessage(lead)} className="p-2 mx-2 rounded-full bg-purple-100 text-purple-600 hover:bg-purple-200 shadow-sm transition-all" title="Add Message"><MessageSquare size={16} /></button>
-                              </div>
+                                <div>
+                                  <button onClick={() => handleView(lead)} className="p-2 mx-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 shadow-sm transition-all" title="View Lead"><Eye size={16} /></button>
+                                  <button onClick={() => handleEdit(lead)} className="p-2 mx-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 shadow-sm transition-all" title="Edit Lead"><Edit2 size={16} /></button>
+                                  <button onClick={() => handleAddMessage(lead)} className="p-2 mx-2 rounded-full bg-purple-100 text-purple-600 hover:bg-purple-200 shadow-sm transition-all" title="Add Message"><MessageSquare size={16} /></button>
+                                </div>
                               <div className="flex">
                                 <div className="flex flex-col sm:flex-row gap-2">
                                   <select
@@ -586,6 +947,26 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
 
         {/* Modals */}
         {viewLead && <ViewLeadModal lead={viewLead} />}
+        
+        {/* Edit Lead Modal */}
+        {editLead && (
+          <Modal isOpen={true} onClose={closeModal} size="large">
+            <div className="flex flex-col h-full max-h-[95vh]">
+              <div className="p-4 border-b flex justify-between items-center">
+                <h2 className="text-lg font-bold text-gray-900">Edit Lead</h2>
+                <button onClick={closeModal} className="text-gray-600 hover:text-gray-800"><X size={20} /></button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4">
+                <EditLeadForm
+                  initialData={editLead}
+                  onSubmit={handleUpdateLead}
+                  onClose={closeModal}
+                />
+              </div>
+            </div>
+          </Modal>
+        )}
+
         {messageModal.isOpen && (
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={() => setMessageModal({ isOpen: false, lead: null })}>
             <div className="bg-white rounded-lg shadow-lg w-full max-w-md max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>

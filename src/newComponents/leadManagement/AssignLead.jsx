@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import EmployeeOwnLeads from "./EmployeeOwnLeads";
 
 export default function AssignLeads() {
   const [employees, setEmployees] = useState([]);
@@ -364,6 +365,12 @@ export default function AssignLeads() {
         >
           Assign Leads to Employee
         </button>
+        <button
+          onClick={() => setActiveTab("employeeOwn")}
+          className={`px-4 py-2 rounded ${activeTab === 'employeeOwn' ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}
+        >
+          Employee Own Lead
+        </button>
       </div>
 
       {activeTab === 'assign' ? (
@@ -702,6 +709,12 @@ export default function AssignLeads() {
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {activeTab === 'employeeOwn' && (
+        <div className="mt-4">
+          <EmployeeOwnLeads />
         </div>
       )}
     </div>

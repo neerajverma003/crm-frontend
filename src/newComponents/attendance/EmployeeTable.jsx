@@ -1713,8 +1713,14 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                                                     }
                                                 }
                                                 
-                                                const totalRemarkAmount = remarksList.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
-                                                const finalPayable = savedSalarySummary ? savedSalarySummary.totalPayable : totalEarned;
+                                                const totalRemarkAmount = remarksList.reduce((acc, curr) => {
+                                                    let val = Number(curr.amount) || 0;
+                                                    if (curr.type === "Percentage") {
+                                                        val = (monthlyBaseSalary * val) / 100;
+                                                    }
+                                                    return acc + val;
+                                                }, 0);
+                                                const finalPayable = savedSalarySummary ? savedSalarySummary.totalPayable : (totalEarned + totalRemarkAmount);
 
                                                 return (
                                                     <div className="space-y-2 text-sm sm:space-y-2.5 md:space-y-3">
@@ -1769,12 +1775,18 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                                                             <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
                                                                 <h4 className="mb-2 text-xs font-semibold text-gray-700 uppercase tracking-wider">Adjustments</h4>
                                                                 <div className="space-y-1">
-                                                                    {remarksList.map((remark, idx) => (
-                                                                        <div key={idx} className="flex items-center justify-between text-sm">
-                                                                            <span className="text-gray-700 font-medium">{remark.title || "Adjustment"}</span>
-                                                                            <span className="font-bold text-gray-900">₹{remark.amount}</span>
-                                                                        </div>
-                                                                    ))}
+                                                                    {remarksList.map((remark, idx) => {
+                                                                        const isPercentage = remark.type === "Percentage";
+                                                                        const effectiveAmount = isPercentage ? (monthlyBaseSalary * (Number(remark.amount) || 0)) / 100 : Number(remark.amount);
+                                                                        return (
+                                                                            <div key={idx} className="flex items-center justify-between text-sm">
+                                                                                <span className="text-gray-700 font-medium">{remark.title || "Adjustment"}</span>
+                                                                                <span className="font-bold text-gray-900">
+                                                                                    {isPercentage ? `${remark.amount}% (₹${effectiveAmount.toFixed(0)})` : `₹${effectiveAmount.toFixed(0)}`}
+                                                                                </span>
+                                                                            </div>
+                                                                        );
+                                                                    })}
                                                                 </div>
                                                                 <div className="mt-2 text-right border-t border-amber-200 pt-1 text-xs font-bold text-amber-800">
                                                                     Total Adjustments: ₹{totalRemarkAmount.toLocaleString()}

@@ -19,7 +19,7 @@ const SuperAdminAttendance = () => {
     const [editingAttendance, setEditingAttendance] = useState(null);
     const [selectedDateForEdit, setSelectedDateForEdit] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [remarksList, setRemarksList] = useState([{ title: "", amount: "" }]);
+    const [remarksList, setRemarksList] = useState([{ title: "", amount: "", type: "Amount" }]);
     const [savingSalary, setSavingSalary] = useState(false);
     const [salaryStatus, setSalaryStatus] = useState("Pending");
     const token = localStorage.getItem("token");
@@ -830,7 +830,13 @@ const SuperAdminAttendance = () => {
             const perDaySalary = baseSalary / daysInMonth;
             const presentDays = stats.present + stats.gracePresent + stats.late + (stats.halfDay * 0.5) + stats.sunday + (stats.sundayWorking * 2) + stats.cl + stats.holiday;
             const earnedAmount = perDaySalary * presentDays;
-            const totalRemarkAmount = remarksList.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+            const totalRemarkAmount = remarksList.reduce((acc, curr) => {
+                let val = Number(curr.amount) || 0;
+                if (curr.type === "Percentage") {
+                    val = (baseSalary * val) / 100;
+                }
+                return acc + val;
+            }, 0);
             const totalPayable = earnedAmount + totalRemarkAmount;
             const attendancePercentage = stats.total > 0 ? (presentDays / stats.total) * 100 : 0;
 
@@ -1915,7 +1921,13 @@ const SuperAdminAttendance = () => {
                                                 const perDaySalary = monthlyBaseSalary / daysInMonth;
                                                 const presentDays = stats.present + stats.gracePresent + stats.late + (stats.halfDay * 0.5) + stats.sunday + (stats.sundayWorking * 2) + stats.cl + stats.holiday; // Count present and grace present as working days
                                                 const totalEarned = perDaySalary * presentDays;
-                                                const totalRemarkAmount = remarksList.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+                                                const totalRemarkAmount = remarksList.reduce((acc, curr) => {
+                                                    let val = Number(curr.amount) || 0;
+                                                    if (curr.type === "Percentage") {
+                                                        val = (monthlyBaseSalary * val) / 100;
+                                                    }
+                                                    return acc + val;
+                                                }, 0);
                                                 const finalPayable = totalEarned + totalRemarkAmount;
 
                                                 return (
@@ -1963,7 +1975,7 @@ const SuperAdminAttendance = () => {
                                                                     Remarks / Adjustments
                                                                 </label>
                                                                 <button
-                                                                    onClick={() => setRemarksList([...remarksList, { title: "", amount: "" }])}
+                                                                    onClick={() => setRemarksList([...remarksList, { title: "", amount: "", type: "Amount" }])}
                                                                     className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-200 text-amber-800 hover:bg-amber-300 font-bold"
                                                                     title="Add Remark"
                                                                 >
@@ -1972,14 +1984,16 @@ const SuperAdminAttendance = () => {
                                                             </div>
                                                             <div className="space-y-2">
                                                                 {remarksList.map((remark, idx) => (
-                                                                    <div key={idx} className="flex items-center gap-2">
+                                                                    <div key={idx} className="flex flex-wrap sm:flex-nowrap items-center gap-2">
                                                                         {remark.isSaved ? (
                                                                             <>
                                                                                 <div className="flex-1 rounded bg-amber-100 px-2 py-1 text-sm font-semibold text-amber-900 border border-amber-200">
                                                                                     {remark.title}
                                                                                 </div>
-                                                                                <div className="w-24 rounded bg-amber-100 px-2 py-1 text-sm font-bold text-amber-900 border border-amber-200">
-                                                                                    ₹{remark.amount}
+                                                                                <div className="w-auto min-w-[6rem] rounded bg-amber-100 px-2 py-1 text-sm font-bold text-amber-900 border border-amber-200">
+                                                                                    {remark.type === "Percentage" 
+                                                                                        ? `${remark.amount}% (₹${((monthlyBaseSalary * (Number(remark.amount) || 0)) / 100).toFixed(0)})` 
+                                                                                        : `₹${remark.amount}`}
                                                                                 </div>
                                                                                 <button
                                                                                     onClick={() => {
@@ -1997,18 +2011,30 @@ const SuperAdminAttendance = () => {
                                                                             <>
                                                                                 <input
                                                                                     type="text"
-                                                                                    placeholder="Title (e.g. Bonus, Late fee)"
+                                                                                    placeholder="Title"
                                                                                     value={remark.title}
                                                                                     onChange={(e) => {
                                                                                         const newRemarks = [...remarksList];
                                                                                         newRemarks[idx].title = e.target.value;
                                                                                         setRemarksList(newRemarks);
                                                                                     }}
-                                                                                    className="w-full flex-1 rounded border border-amber-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                                                                    className="flex-1 min-w-[120px] rounded border border-amber-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
                                                                                 />
+                                                                                <select
+                                                                                    value={remark.type || "Amount"}
+                                                                                    onChange={(e) => {
+                                                                                        const newRemarks = [...remarksList];
+                                                                                        newRemarks[idx].type = e.target.value;
+                                                                                        setRemarksList(newRemarks);
+                                                                                    }}
+                                                                                    className="w-28 rounded border border-amber-300 px-2 py-1 text-sm focus:outline-none bg-white focus:ring-2 focus:ring-amber-500"
+                                                                                >
+                                                                                    <option value="Amount">₹ Amount</option>
+                                                                                    <option value="Percentage">% Percent</option>
+                                                                                </select>
                                                                                 <input
                                                                                     type="number"
-                                                                                    placeholder="Amount"
+                                                                                    placeholder={remark.type === 'Percentage' ? '% Value' : 'Amount'}
                                                                                     value={remark.amount}
                                                                                     onChange={(e) => {
                                                                                         const newRemarks = [...remarksList];
@@ -2038,7 +2064,7 @@ const SuperAdminAttendance = () => {
                                                                                 const newRemarks = [...remarksList];
                                                                                 newRemarks.splice(idx, 1);
                                                                                 if (newRemarks.length === 0) {
-                                                                                    newRemarks.push({ title: "", amount: "", isSaved: false });
+                                                                                    newRemarks.push({ title: "", amount: "", isSaved: false, type: "Amount" });
                                                                                 }
                                                                                 setRemarksList(newRemarks);
                                                                             }}
