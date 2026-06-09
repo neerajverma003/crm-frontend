@@ -157,16 +157,14 @@ const MyLeadCard = () => {
 
   return (
     <div 
-      className="flex flex-row overflow-x-auto md:grid md:grid-cols-3 lg:grid-cols-5 gap-3 w-full mb-3 pb-2 snap-x [&::-webkit-scrollbar]:hidden"
-      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 w-full mb-3 pb-2"
     >
       {cards.map((card, index) => {
         const Icon = card.icon;
         return (
           <div
             key={index}
-            className={`flex-none w-[150px] md:w-auto snap-start group relative overflow-hidden rounded-xl p-3 sm:p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 ${card.bgClass} ${card.textClass}`}
-
+            className={`w-full group relative overflow-hidden rounded-xl p-3 sm:p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 ${card.bgClass} ${card.textClass}`}
           >
             <div className="relative z-10 flex flex-col items-start h-full">
               <div className={`rounded-lg sm:rounded-xl ${card.iconBg} p-1.5 sm:p-2 mb-2 sm:mb-4 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shadow-inner`}>

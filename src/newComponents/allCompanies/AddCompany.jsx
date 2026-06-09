@@ -341,12 +341,12 @@ const AddCompany = ({ isOpen: controlledOpen, onClose: controlledOnClose, initia
           aria-haspopup="dialog"
           aria-expanded={open}
           aria-controls="add-company-modal"
-          className="bg-black w-fit px-3 py-2 flex gap-2 rounded-md text-white"
+          className="bg-blue-600 hover:bg-blue-700 w-fit px-3 py-2 flex items-center justify-center gap-2 rounded-md text-white transition-colors"
         >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
+          width="20"
+          height="20"
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
@@ -371,7 +371,7 @@ const AddCompany = ({ isOpen: controlledOpen, onClose: controlledOnClose, initia
 
           <form
             onSubmit={handleSubmit}
-            className="grid grid-cols-2 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 gap-6"
             aria-labelledby="add-company-title"
           >
             {/* Company Name */}
@@ -490,7 +490,7 @@ const AddCompany = ({ isOpen: controlledOpen, onClose: controlledOnClose, initia
             </div>
 
             {/* Website */}
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <label htmlFor="website" className="block text-sm mb-1">
                 Website *
               </label>
@@ -517,7 +517,7 @@ const AddCompany = ({ isOpen: controlledOpen, onClose: controlledOnClose, initia
             </div>
 
             {/* Address */}
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <label htmlFor="address" className="block text-sm mb-1">
                 Address *
               </label>
@@ -624,7 +624,7 @@ const AddCompany = ({ isOpen: controlledOpen, onClose: controlledOnClose, initia
             </div>
 
             {/* Footer Buttons */}
-              <div className="flex justify-start gap-2 mt-6 col-span-2">
+              <div className="flex justify-start gap-2 mt-6 sm:col-span-2">
               <button
                 type="button"
                 onClick={handleClose}
@@ -635,7 +635,7 @@ const AddCompany = ({ isOpen: controlledOpen, onClose: controlledOnClose, initia
               </button>
               <button
                 type="submit"
-                className="bg-black px-3 py-2 rounded-md text-white flex items-center gap-2"
+                className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md text-white flex items-center justify-center gap-2 transition-colors"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (initialData && initialData._id ? "Saving..." : "Adding...") : (initialData && initialData._id ? "Save Changes" : "Add Company")}

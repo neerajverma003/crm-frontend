@@ -92,7 +92,7 @@ const Modal = ({
 
   const modalContent = (
     <div
-      className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 p-4"
+      className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-[10000] p-4"
       onClick={handleBackdropClick}
       aria-labelledby="modal-title"
       role="dialog"

@@ -204,9 +204,9 @@ export default function AdminProfile() {
       <div className="absolute bottom-1/4 left-1/3 w-64 h-64 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full blur-3xl opacity-40 -translate-x-20"></div>
       
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column - My Profile Card */}
-          <div className="bg-white rounded-3xl shadow-xl p-8 h-fit">
+          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl p-6 md:p-8 h-fit border border-white/20">
             {/* Profile Image */}
             <div className="flex justify-center mb-6">
               <img 
@@ -246,11 +246,11 @@ export default function AdminProfile() {
           </div>
 
           {/* Right Column */}
-          <div className="space-y-6">
+          <div className="space-y-6 w-full max-w-full">
             {/* My xPay accounts Card */}
-            <div className="bg-white rounded-3xl shadow-xl p-8">
+            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl p-6 md:p-8 border border-white/20">
               {/* Header */}
-              <div className="flex items-center justify-between mb-8">
+              <div className="flex flex-wrap items-center justify-between mb-8 gap-4">
                 <h2 className="text-gray-800 font-semibold text-lg">Professional data</h2>
                 <div className="flex items-center gap-4">
                   <Search className="w-5 h-5 text-gray-400" />
@@ -278,7 +278,7 @@ export default function AdminProfile() {
             </div>
 
             {/* Forgot Password Card */}
-            <div className="bg-white rounded-3xl shadow-xl p-8">
+            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl p-6 md:p-8 border border-white/20">
               {/* Header */}
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-gray-800 font-semibold text-lg">Forgot Password</h2>
@@ -308,7 +308,7 @@ export default function AdminProfile() {
                   <button
                     onClick={handleSendOTP}
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-orange-400 to-orange-500 text-white py-3 rounded-full font-semibold hover:shadow-lg transition disabled:opacity-50"
+                    className="w-full bg-gradient-to-r from-orange-400 to-orange-500 text-white py-3 px-2 sm:px-4 rounded-full font-semibold hover:shadow-lg transition disabled:opacity-50 text-sm sm:text-base whitespace-nowrap"
                   >
                     {loading ? "Sending OTP..." : "Send OTP to Email"}
                   </button>

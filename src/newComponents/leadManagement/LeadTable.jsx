@@ -309,71 +309,114 @@ const LeadTable = ({ searchText = "", searchType = "name", selectedStatus = "All
       </div>
 
       {/* Table */}
-      <div className="flex flex-col gap-4 mt-6">
-        {/* Table Header */}
-        <div className="hidden md:grid grid-cols-6 gap-4 px-6 py-3 bg-gradient-to-r from-blue-50/60 to-slate-50/60 rounded-xl">
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-600">Contact Information</div>
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-600">Group</div>
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-600">Destination</div>
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-600">Source</div>
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-600">Employee</div>
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-600 text-center">Actions</div>
+      <div className="mt-4 md:mt-6 bg-transparent md:bg-white md:rounded-xl md:shadow-sm md:border md:border-slate-200 overflow-hidden mx-0 md:mx-6 mb-4">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="min-w-full text-sm text-left">
+            <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+              <tr>
+                <th className="p-4">Contact Information</th>
+                <th className="p-4">Group</th>
+                <th className="p-4">Destination</th>
+                <th className="p-4">Source</th>
+                <th className="p-4">Employee</th>
+                <th className="p-4 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {filteredLeads.map((lead) => (
+                <tr key={lead._id} className="hover:bg-slate-50 transition-colors">
+                  <td className="p-4">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-semibold text-slate-900 text-base leading-tight">{lead.name || "—"}</span>
+                      <span className="text-sm text-slate-600">{lead.email || "—"}</span>
+                      <span className="text-xs text-slate-400">{lead.phone || "—"}</span>
+                    </div>
+                  </td>
+                  <td className="p-4">
+                    <span className="text-sm font-medium text-slate-800 bg-slate-100 px-2.5 py-1 rounded-md">{lead.groupNumber || "—"}</span>
+                  </td>
+                  <td className="p-4">
+                    <span className="text-sm text-slate-700">{lead.destination || "—"}</span>
+                  </td>
+                  <td className="p-4">
+                    <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider ${getSourceBadgeColor(lead.leadSource)}`}>{lead.leadSource || "—"}</span>
+                  </td>
+                  <td className="p-4">
+                    {lead.type === "employee" && lead.employee?.fullName ? (
+                      <span className={`inline-flex rounded-md px-2.5 py-1.5 text-xs font-semibold border border-white/50 shadow-sm ${getEmployeeBadgeColor(lead.employee.fullName)}`}>{lead.employee.fullName}</span>
+                    ) : (
+                      <span className="text-sm text-slate-400">—</span>
+                    )}
+                  </td>
+                  <td className="p-4 text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      <button onClick={() => handleView(lead)} className="bg-slate-100 text-slate-600 p-1.5 rounded-md hover:bg-slate-200 transition" title="View">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => handleEdit(lead)} className="bg-green-50 text-green-600 p-1.5 rounded-md hover:bg-green-100 border border-green-100 transition" title="Edit">
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => handleDelete(lead)} className="bg-red-50 text-red-600 p-1.5 rounded-md hover:bg-red-100 border border-red-100 transition" title="Delete">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        {/* Table Rows as Cards */}
-        {filteredLeads.map((lead) => (
-          <div key={lead._id} className="grid grid-cols-1 w-[98%] mx-auto md:grid-cols-6 gap-4 items-center bg-white rounded-2xl shadow border border-slate-100 px-6 py-4 hover:shadow-lg transition-all">
-            {/* Contact Info */}
-            <div className="flex flex-col gap-0.5">
-              <span className="font-semibold text-slate-900 text-base leading-tight">{lead.name || "—"}</span>
-              <span className="text-sm text-slate-600">{lead.email || "—"}</span>
-              <span className="text-xs text-slate-400">{lead.phone || "—"}</span>
+
+        {/* Mobile Card View */}
+        <div className="block md:hidden px-4 pb-4 space-y-4">
+          {filteredLeads.map((lead) => (
+            <div key={lead._id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-3">
+              <div className="flex justify-between items-start mb-1">
+                <div className="flex flex-col gap-0.5">
+                  <span className="font-bold text-slate-900 text-base leading-tight">{lead.name || "—"}</span>
+                  <span className="text-xs text-slate-500 font-medium">{lead.email || "—"}</span>
+                  <span className="text-xs text-slate-400">{lead.phone || "—"}</span>
+                </div>
+                <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${getSourceBadgeColor(lead.leadSource)}`}>
+                  {lead.leadSource || "—"}
+                </span>
+              </div>
+
+              <div className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100 grid grid-cols-2 gap-2">
+                <div>
+                  <span className="text-slate-400 block mb-0.5">Destination</span>
+                  <span className="font-medium text-slate-700">{lead.destination || "—"}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block mb-0.5">Group</span>
+                  <span className="font-medium text-slate-800 bg-white px-2 py-0.5 rounded border border-slate-200">{lead.groupNumber || "—"}</span>
+                </div>
+              </div>
+              
+              <div>
+                <span className="text-xs text-slate-400 block mb-1">Assigned Employee</span>
+                {lead.type === "employee" && lead.employee?.fullName ? (
+                  <span className={`inline-flex rounded-md px-2.5 py-1 text-xs font-semibold ${getEmployeeBadgeColor(lead.employee.fullName)}`}>{lead.employee.fullName}</span>
+                ) : (
+                  <span className="text-xs text-slate-400">—</span>
+                )}
+              </div>
+
+              <div className="flex gap-2 mt-2 pt-3 border-t border-slate-100">
+                <button onClick={() => handleView(lead)} className="flex-1 flex items-center justify-center gap-2 bg-slate-100 text-slate-700 py-2 rounded-lg font-medium text-xs hover:bg-slate-200 transition">
+                  <Eye className="w-3.5 h-3.5" /> View
+                </button>
+                <button onClick={() => handleEdit(lead)} className="flex-1 flex items-center justify-center gap-2 bg-green-50 text-green-700 border border-green-200 py-2 rounded-lg font-medium text-xs hover:bg-green-100 transition">
+                  <Edit2 className="w-3.5 h-3.5" /> Edit
+                </button>
+                <button onClick={() => handleDelete(lead)} className="flex-1 flex items-center justify-center gap-2 bg-red-50 text-red-700 border border-red-200 py-2 rounded-lg font-medium text-xs hover:bg-red-100 transition">
+                  <Trash2 className="w-3.5 h-3.5" /> Delete
+                </button>
+              </div>
             </div>
-            {/* Group */}
-            <div>
-              <span className="text-sm font-medium text-slate-800">{lead.groupNumber || "—"}</span>
-            </div>
-            {/* Destination */}
-            <div>
-              <span className="text-sm text-slate-700">{lead.destination || "—"}</span>
-            </div>
-            {/* Source */}
-            <div>
-              <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getSourceBadgeColor(lead.leadSource)}`}>{lead.leadSource || "—"}</span>
-            </div>
-            {/* Employee */}
-            <div>
-              {lead.type === "employee" && lead.employee?.fullName ? (
-                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getEmployeeBadgeColor(lead.employee.fullName)}`}>{lead.employee.fullName}</span>
-              ) : (
-                <span className="text-sm text-slate-400">—</span>
-              )}
-            </div>
-            {/* Actions */}
-            <div className="flex items-center justify-center gap-2">
-              <button
-                onClick={() => handleView(lead)}
-                className="rounded-lg p-2 text-blue-600 transition-colors hover:bg-slate-100 hover:text-slate-700"
-                title="View"
-              >
-                <Eye className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => handleEdit(lead)}
-                className="rounded-lg p-2 text-green-600 transition-colors hover:bg-slate-100 hover:text-slate-700"
-                title="Edit"
-              >
-                <Edit2 className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => handleDelete(lead)}
-                className="rounded-lg p-2  transition-colors hover:bg-slate-100 text-red-600"
-                title="Delete"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Pagination */}

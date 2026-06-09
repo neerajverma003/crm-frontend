@@ -35,21 +35,6 @@ const B2bAddCompany = () => {
   console.log(companyId);
 
 
-  // fetch company details on mount
-  // useEffect(() => {
-  //   const fetchCompanyDetails = async () => {
-  //     try {
-  //       const res = await fetch(`${import.meta.env.VITE_API_URL}/company/companybyname?name=${activeTab}`);
-  //       if (!res.ok) throw new Error("Failed to fetch company details");
-  //       const data = await res.json();
-  //       setCompany(data.companies || []); // Assuming the response has a 'companies' array
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   };
-  //   fetchCompanyDetails();
-  // }, []);
-
   if (role === "employee") {
     useEffect(() => {
       const fetchEmployeeCompany = async () => {
@@ -322,8 +307,8 @@ const B2bAddCompany = () => {
   console.log(company);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f6f8fa] to-[#e9ecef] p-4 sm:p-8">
-      <div className="w-full max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-[#f6f8fa] to-[#e9ecef] p-4 sm:p-8 lg:p-12">
+      <div className="w-full max-w-6xl mx-auto space-y-8">
         {/* Header & Tabs */}
         <div className="flex flex-col space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -391,7 +376,7 @@ const B2bAddCompany = () => {
 
         {/* ADD FORM */}
         {!editData && (
-        <div className="bg-white/90 p-6 sm:p-8 rounded-2xl shadow-xl border border-slate-100 transition-all">
+        <div className="md:bg-white/90 p-0 sm:p-8 md:rounded-2xl md:shadow-xl md:border border-slate-100 transition-all mt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">Country</label>
@@ -503,7 +488,7 @@ const B2bAddCompany = () => {
       )}
 
       {/* TABLE LISTING COMPANIES */}
-      <div className="bg-white/90 rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+      <div className="sm:bg-white/90 sm:rounded-2xl sm:shadow-xl sm:border border-slate-100 overflow-hidden">
         
         {/* MOBILE VIEW */}
         <div className="block sm:hidden divide-y divide-slate-100">

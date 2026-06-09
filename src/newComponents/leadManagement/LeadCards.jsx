@@ -458,7 +458,7 @@ const LeadCards = ({ activeTab, selectedEmployeeId }) => {
         return (
           <div
             key={index}
-            className={`flex-none w-[150px] md:w-auto snap-start group relative overflow-hidden rounded-xl p-4 sm:p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 bg-gradient-to-br ${card.gradient} ${card.border || ""}`}
+            className={`w-full group relative overflow-hidden rounded-xl p-4 sm:p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 bg-gradient-to-br ${card.gradient} ${card.border || ""}`}
           >
             <div className="relative z-10 flex flex-col items-start h-full">
               <div className={`rounded-lg sm:rounded-xl ${card.iconBg} p-1.5 sm:p-2 mb-2 sm:mb-4 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shadow-inner`}>

@@ -47,18 +47,25 @@ const MainLeadManagement = () => {
         {/* Tab Navigation */}
         <section className="px-4 sm:px-8 pt-4 sm:pt-6 pb-3 sm:pb-4 bg-white/80 border-b border-slate-100 overflow-hidden w-full max-w-full">
           <div 
-            className="flex flex-row overflow-x-auto whitespace-nowrap items-center gap-2 sm:gap-3 [&::-webkit-scrollbar]:hidden"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            className="flex flex-row flex-wrap gap-2 sm:gap-3 w-full bg-white/40 p-2 sm:p-2.5 rounded-2xl border border-white/60 shadow-lg shadow-indigo-100/50 backdrop-blur-xl"
           >
             <button
               onClick={() => setActiveTab("all-leads")}
-              className={`rounded px-4 py-2 font-medium transition-colors ${activeTab === "all-leads" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+              className={`flex-auto text-center px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs sm:text-sm font-bold tracking-wide uppercase transition-all duration-300 active:scale-95
+                ${activeTab === "all-leads"
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/30 ring-1 ring-blue-500'
+                  : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-indigo-600 hover:shadow-sm border border-slate-100'}
+              `}
             >
               All Leads
             </button>
             <button
               onClick={() => setActiveTab("employee-own")}
-              className={`rounded px-4 py-2 font-medium transition-colors ${activeTab === "employee-own" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+              className={`flex-auto text-center px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs sm:text-sm font-bold tracking-wide uppercase transition-all duration-300 active:scale-95
+                ${activeTab === "employee-own"
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/30 ring-1 ring-blue-500'
+                  : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-indigo-600 hover:shadow-sm border border-slate-100'}
+              `}
             >
               Employee Own Leads
             </button>
@@ -66,8 +73,7 @@ const MainLeadManagement = () => {
         </section>
         <section className="relative z-0 mb-0 px-4 sm:px-8 pt-4 sm:pt-8 pb-2 sm:pb-4 bg-gradient-to-r from-white/80 to-blue-50/60">
           <div 
-            className="flex flex-row overflow-x-auto md:grid md:grid-cols-3 lg:grid-cols-5 gap-4 w-full pb-2 snap-x [&::-webkit-scrollbar]:hidden"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 w-full pb-2"
           >
             <LeadCards activeTab={activeTab} selectedEmployeeId={selectedEmployeeId} />
           </div>
@@ -156,8 +162,8 @@ const MainLeadManagement = () => {
             </section>
 
             {/* Lead Table */}
-            <section className="px-3 sm:px-6 w-full py-4 sm:py-6 bg-white/95">
-              <div className="overflow-hidden rounded-2xl shadow-lg border border-slate-100">
+            <section className="px-0 sm:px-6 w-full py-2 sm:py-6 bg-transparent sm:bg-white/95">
+              <div className="overflow-hidden sm:rounded-2xl sm:shadow-lg sm:border border-slate-100">
                 <LeadTable
                   searchText={searchText}
                   searchType={searchType}
@@ -172,8 +178,8 @@ const MainLeadManagement = () => {
         )}
 
         {activeTab === "employee-own" && (
-          <section className="px-3 sm:px-6 w-full py-2 sm:py-4 bg-white/95">
-              <div className="overflow-hidden rounded-2xl shadow-lg border border-slate-100">
+          <section className="px-0 sm:px-6 w-full py-2 sm:py-4 bg-transparent sm:bg-white/95">
+              <div className="overflow-hidden sm:rounded-2xl sm:shadow-lg sm:border border-slate-100">
               <EmployeeOwnLeads activeTab={activeTab} selectedEmployeeId={selectedEmployeeId} onEmployeeSelect={setSelectedEmployeeId} />
             </div>
           </section>

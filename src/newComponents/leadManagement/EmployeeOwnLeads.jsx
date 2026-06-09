@@ -821,8 +821,9 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
           </div>
         ) : (
           <>
-            <div className="mt-4 overflow-x-auto">
-              <div className="rounded-3xl shadow-lg border border-gray-200 overflow-hidden bg-white/90">
+            <div className="mt-4">
+              {/* Desktop Table View */}
+              <div className="hidden md:block rounded-3xl shadow-lg border border-gray-200 overflow-x-auto bg-white/90">
                 <table className="min-w-full">
                   <thead className="bg-gradient-to-r from-blue-50 to-blue-100">
                     <tr>
@@ -853,17 +854,17 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
                           <div className="flex justify-center gap-2 flex-col sm:flex-row">
                             <div className="flex flex-col justify-center gap-2">
                                 <div>
-                                  <button onClick={() => handleView(lead)} className="p-2 mx-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 shadow-sm transition-all" title="View Lead"><Eye size={16} /></button>
-                                  <button onClick={() => handleEdit(lead)} className="p-2 mx-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 shadow-sm transition-all" title="Edit Lead"><Edit2 size={16} /></button>
-                                  <button onClick={() => handleAddMessage(lead)} className="p-2 mx-2 rounded-full bg-purple-100 text-purple-600 hover:bg-purple-200 shadow-sm transition-all" title="Add Message"><MessageSquare size={16} /></button>
+                                  <button onClick={() => handleView(lead)} className="p-2 mx-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 shadow-sm transition-all" title="View Lead"><Eye size={16} /></button>
+                                  <button onClick={() => handleEdit(lead)} className="p-2 mx-1 rounded-full bg-green-100 text-green-600 hover:bg-green-200 shadow-sm transition-all" title="Edit Lead"><Edit2 size={16} /></button>
+                                  <button onClick={() => handleAddMessage(lead)} className="p-2 mx-1 rounded-full bg-purple-100 text-purple-600 hover:bg-purple-200 shadow-sm transition-all" title="Add Message"><MessageSquare size={16} /></button>
                                 </div>
-                              <div className="flex">
+                              <div className="flex justify-center">
                                 <div className="flex flex-col sm:flex-row gap-2">
                                   <select
                                     value={lead.leadInterestStatus || ""}
                                     onChange={(e) => handleStatusChange(lead._id, e.target.value)}
                                     disabled={statusSavingId === lead._id}
-                                    className={`px-3 py-2 rounded-full text-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 cursor-pointer transition-all ${statusSavingId === lead._id ? 'bg-blue-50 border-blue-400 text-gray-600 cursor-not-allowed opacity-70' : 'border border-gray-200'} ${lead.leadInterestStatus ? 'font-semibold text-blue-600' : 'text-gray-500'}`}
+                                    className={`px-3 py-1.5 rounded-full text-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 cursor-pointer transition-all ${statusSavingId === lead._id ? 'bg-blue-50 border-blue-400 text-gray-600 cursor-not-allowed opacity-70' : 'border border-gray-200'} ${lead.leadInterestStatus ? 'font-semibold text-blue-600' : 'text-gray-500'}`}
                                   >
                                     <option value="">Select Status</option>
                                     <option value="Interested">Interested</option>
@@ -887,7 +888,7 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
                                   setSelectedEmployeeForAssign(e.target.value);
                                 }
                               }}
-                              className="px-3 py-2 rounded-full text-sm bg-green-50 border border-gray-200"
+                              className="px-3 py-1.5 rounded-full text-sm bg-green-50 border border-gray-200"
                             >
                               <option value="">{lead.assignedEmployee ? 'Reassign' : 'Assign to Employee'}</option>
                               {employees.map((emp) => (
@@ -900,6 +901,82 @@ const EmployeeOwnLeads = ({ onEmployeeSelect, activeTab, selectedEmployeeId }) =
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="block md:hidden bg-slate-50 p-4 space-y-4 rounded-xl border border-slate-200">
+                {visibleLeads.map((lead) => (
+                  <div key={lead._id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-3">
+                    <div className="flex justify-between items-start mb-1">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-bold text-slate-900 text-base leading-tight">{lead.leadName || lead.name || "—"}</span>
+                        <span className="text-xs text-slate-500 font-medium">{lead.email || "—"}</span>
+                        <span className="text-xs text-slate-400">{lead.phoneNumber || lead.phone || "—"}</span>
+                      </div>
+                      <select
+                        value={lead.leadInterestStatus || ""}
+                        onChange={(e) => handleStatusChange(lead._id, e.target.value)}
+                        disabled={statusSavingId === lead._id}
+                        className={`max-w-[130px] px-2 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider focus:ring-2 focus:ring-blue-400 cursor-pointer transition-all ${statusSavingId === lead._id ? 'bg-blue-50 border-blue-400 text-gray-600 cursor-not-allowed opacity-70' : 'border border-gray-200'} ${lead.leadInterestStatus ? 'text-blue-700 bg-blue-50' : 'text-gray-500 bg-gray-50'}`}
+                      >
+                        <option value="">Status</option>
+                        <option value="Interested">Interested</option>
+                        <option value="Not Interested">Not Interested</option>
+                        <option value="Connected">Connected</option>
+                        <option value="Not Connected">Not Connected</option>
+                        <option value="Follow Up">Follow Up</option>
+                      </select>
+                    </div>
+
+                    <div className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100 grid grid-cols-2 gap-2">
+                      <div>
+                        <span className="text-slate-400 block mb-0.5">Destination</span>
+                        <span className="font-medium text-slate-700">{lead.destination || "—"}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block mb-0.5">Departure</span>
+                        <span className="font-medium text-slate-700">{lead.departureCity || "—"}</span>
+                      </div>
+                      <div className="col-span-2">
+                        <span className="text-slate-400 block mb-0.5">Travel Date</span>
+                        <span className="font-medium text-slate-800">{lead.expectedTravelDate ? new Date(lead.expectedTravelDate).toLocaleDateString() : "—"}</span>
+                      </div>
+                    </div>
+
+                    {localStorage.getItem("role") && (localStorage.getItem("role").toLowerCase() === "superadmin") && (
+                      <div className="mt-1">
+                        <span className="text-xs text-slate-400 block mb-1">Assign Employee</span>
+                        <select
+                          value={lead.assignedEmployee || ""}
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              setAssignEmployeeModal({ isOpen: true, lead });
+                              setSelectedEmployeeForAssign(e.target.value);
+                            }
+                          }}
+                          className="w-full px-3 py-2 rounded-lg text-sm bg-green-50 border border-green-100"
+                        >
+                          <option value="">{lead.assignedEmployee ? 'Reassign' : 'Assign to Employee'}</option>
+                          {employees.map((emp) => (
+                            <option key={emp._id} value={emp._id}>{emp.fullName || emp.name || 'Unknown'}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    <div className="flex gap-2 mt-2 pt-3 border-t border-slate-100">
+                      <button onClick={() => handleView(lead)} className="flex-1 flex items-center justify-center gap-1.5 bg-blue-50 text-blue-700 py-2 rounded-lg font-medium text-xs hover:bg-blue-100 transition">
+                        <Eye className="w-3.5 h-3.5" /> View
+                      </button>
+                      <button onClick={() => handleEdit(lead)} className="flex-1 flex items-center justify-center gap-1.5 bg-green-50 text-green-700 border border-green-200 py-2 rounded-lg font-medium text-xs hover:bg-green-100 transition">
+                        <Edit2 className="w-3.5 h-3.5" /> Edit
+                      </button>
+                      <button onClick={() => handleAddMessage(lead)} className="flex-1 flex items-center justify-center gap-1.5 bg-purple-50 text-purple-700 border border-purple-200 py-2 rounded-lg font-medium text-xs hover:bg-purple-100 transition">
+                        <MessageSquare className="w-3.5 h-3.5" /> MSG
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 

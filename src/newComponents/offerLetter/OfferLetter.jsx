@@ -335,9 +335,9 @@ const OfferLetter = () => {
   };
 
   return (
-    <div className="min-h-[85vh] bg-gradient-to-br from-[#eff3f8] via-[#f8faff] to-[#eef2f6] py-8 px-4 sm:px-8">
-      <div className="mx-auto w-full max-w-8xl rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-xl backdrop-blur-sm">
-        <div className="mb-6 flex flex-col gap-2 border-b border-slate-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="min-h-[85vh] bg-gradient-to-br from-[#eff3f8] via-[#f8faff] to-[#eef2f6] py-4 sm:py-8 px-0 sm:px-8">
+      <div className="mx-auto w-full max-w-8xl sm:rounded-3xl border-0 sm:border border-slate-200 bg-white/95 p-4 sm:p-6 shadow-none sm:shadow-xl backdrop-blur-sm">
+        <div className="mb-6 flex flex-col gap-2 border-b border-slate-200 pb-4 sm:flex-row sm:items-center sm:justify-between px-4 sm:px-0">
           <div>
             <h1 className="text-3xl font-extrabold text-slate-900">Offer Letter Management</h1>
             <p className="text-sm text-slate-500">Add and manage offer letters in HRMS.</p>
@@ -567,7 +567,7 @@ const OfferLetter = () => {
           </div>
 
           {/* JOB RESPONSIBILITIES */}
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 overflow-x-auto">
             <label className="block text-sm font-semibold text-slate-700 mb-2">Job Responsibilities</label>
             {ReactQuill ? (
               <ReactQuill
@@ -651,66 +651,98 @@ const OfferLetter = () => {
 
       {error && <p className="mb-4 text-red-600">{error}</p>}
 
-      <div className="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm">
-        <table className="min-w-full divide-y divide-slate-200 text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-2 text-left">Candidate</th>
-              <th className="px-4 py-2 text-left">Job Title</th>
-              <th className="px-4 py-2 text-left">Email</th>
-              <th className="px-4 py-2 text-left">Status</th>
-              <th className="px-4 py-2 text-left">Joining Date</th>
-              <th className="px-4 py-2 text-left">Salary</th>
-              <th className="px-4 py-2 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 bg-white">
-            {offerLetters.map((offer) => (
-              <tr key={offer._id} className="transition hover:bg-slate-50">
-                <td className="px-4 py-2 font-medium text-slate-700">{offer.candidateName}</td>
-                <td className="px-4 py-2 text-slate-600">{offer.jobTitle || "-"}</td>
-                <td className="px-4 py-2 text-slate-600">{offer.candidateEmail || "-"}</td>
-                <td className="px-4 py-2 text-sm">
-                  <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 text-blue-700">
-                    {offer.status}
-                  </span>
-                </td>
-                <td className="px-4 py-2 text-slate-600">{offer.joiningDate ? new Date(offer.joiningDate).toLocaleDateString() : "-"}</td>
-                <td className="px-4 py-2 text-slate-600">{offer.salary}</td>
-                 <td className="px-4 py-2 flex gap-2">
-                  <button
-                    onClick={() => handleView(offer)}
-                    className="rounded-lg bg-indigo-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-600"
-                    disabled={loading}
-                  >
-                    View
-                  </button>
-                  <button
-                    onClick={() => handleEdit(offer)}
-                    className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600"
-                    disabled={loading}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(offer._id)}
-                    className="rounded-lg bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600"
-                    disabled={loading}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="md:rounded-2xl md:border md:border-slate-200 md:shadow-sm bg-transparent md:bg-white overflow-hidden px-4 sm:px-0">
+        {offerLetters.length === 0 ? (
+          <p className="text-center text-gray-500 italic py-6">No offer letters found.</p>
+        ) : (
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="min-w-full divide-y divide-slate-200 text-sm">
+                <thead className="bg-slate-50 text-slate-600 font-semibold">
+                  <tr>
+                    <th className="px-4 py-3 text-left">Candidate</th>
+                    <th className="px-4 py-3 text-left">Job Title</th>
+                    <th className="px-4 py-3 text-left">Email</th>
+                    <th className="px-4 py-3 text-left">Status</th>
+                    <th className="px-4 py-3 text-left">Joining Date</th>
+                    <th className="px-4 py-3 text-left">Salary</th>
+                    <th className="px-4 py-3 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 bg-white">
+                  {offerLetters.map((offer) => (
+                    <tr key={offer._id} className="transition hover:bg-slate-50">
+                      <td className="px-4 py-3 font-medium text-slate-800">{offer.candidateName}</td>
+                      <td className="px-4 py-3 text-slate-600">{offer.jobTitle || "-"}</td>
+                      <td className="px-4 py-3 text-slate-600">{offer.candidateEmail || "-"}</td>
+                      <td className="px-4 py-3 text-sm">
+                        <span className={`inline-flex rounded-md px-2.5 py-1 text-xs font-semibold border ${
+                          offer.status === "Accepted" ? "bg-green-50 text-green-700 border-green-200" :
+                          offer.status === "Rejected" ? "bg-red-50 text-red-700 border-red-200" :
+                          offer.status === "Sent" ? "bg-blue-50 text-blue-700 border-blue-200" :
+                          "bg-yellow-50 text-yellow-700 border-yellow-200"
+                        }`}>
+                          {offer.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">{offer.joiningDate ? new Date(offer.joiningDate).toLocaleDateString() : "-"}</td>
+                      <td className="px-4 py-3 text-slate-600 font-medium">{offer.salary}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-center gap-2">
+                          <button onClick={() => handleView(offer)} className="rounded-md bg-indigo-50 text-indigo-600 px-3 py-1.5 text-xs font-semibold hover:bg-indigo-100 transition border border-indigo-200" disabled={loading}>View</button>
+                          <button onClick={() => handleEdit(offer)} className="rounded-md bg-amber-50 text-amber-600 px-3 py-1.5 text-xs font-semibold hover:bg-amber-100 transition border border-amber-200" disabled={loading}>Edit</button>
+                          <button onClick={() => handleDelete(offer._id)} className="rounded-md bg-red-50 text-red-600 px-3 py-1.5 text-xs font-semibold hover:bg-red-100 transition border border-red-200" disabled={loading}>Delete</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="block md:hidden space-y-4">
+              {offerLetters.map((offer) => (
+                <div key={offer._id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-3 relative">
+                  <div className="flex justify-between items-start mb-1 gap-2">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-slate-900 text-base truncate">{offer.candidateName}</h3>
+                      <p className="text-xs text-slate-500 font-medium mt-0.5 truncate">{offer.jobTitle || "No Title"} • {offer.candidateEmail || "No Email"}</p>
+                    </div>
+                    <span className={`flex-shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                      offer.status === "Accepted" ? "bg-green-50 text-green-700 border-green-200" :
+                      offer.status === "Rejected" ? "bg-red-50 text-red-700 border-red-200" :
+                      offer.status === "Sent" ? "bg-blue-50 text-blue-700 border-blue-200" :
+                      "bg-yellow-50 text-yellow-700 border-yellow-200"
+                    }`}>
+                      {offer.status}
+                    </span>
+                  </div>
+
+                  <div className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100 flex items-center justify-between">
+                    <div><span className="text-slate-400 block mb-0.5">Salary</span> <span className="font-medium text-slate-700">{offer.salary}</span></div>
+                    <div className="text-slate-300">|</div>
+                    <div className="text-right"><span className="text-slate-400 block mb-0.5">Joining Date</span> <span className="font-medium text-slate-700">{offer.joiningDate ? new Date(offer.joiningDate).toLocaleDateString() : "-"}</span></div>
+                  </div>
+
+                  <div className="flex gap-2 mt-2 pt-3 border-t border-slate-100">
+                    <button onClick={() => handleView(offer)} className="flex-1 flex items-center justify-center bg-indigo-50 text-indigo-700 py-2 rounded-lg font-medium text-xs hover:bg-indigo-100 transition border border-indigo-200">View</button>
+                    <button onClick={() => handleEdit(offer)} className="flex-1 flex items-center justify-center bg-amber-50 text-amber-700 py-2 rounded-lg font-medium text-xs hover:bg-amber-100 transition border border-amber-200">Edit</button>
+                    <button onClick={() => handleDelete(offer._id)} className="flex-1 flex items-center justify-center bg-red-50 text-red-700 py-2 rounded-lg font-medium text-xs hover:bg-red-100 transition border border-red-200">Delete</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
         {showViewModal && viewFormatData && (
-        <PreviewOfferLetter
-          formatData={viewFormatData}
-          company={companies.find(c => c._id === (selectedOffer?.companyId?._id || selectedOffer?.companyId)) || selectedOffer?.companyId}
-          onClose={() => setShowViewModal(false)}
-        />
-      )}
+          <PreviewOfferLetter
+            formatData={viewFormatData}
+            company={companies.find(c => c._id === (selectedOffer?.companyId?._id || selectedOffer?.companyId)) || selectedOffer?.companyId}
+            onClose={() => setShowViewModal(false)}
+          />
+        )}
       </div>
     </div>
   </div>

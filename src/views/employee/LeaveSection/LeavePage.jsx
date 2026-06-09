@@ -457,74 +457,95 @@ export const LeavePage = () => {
       </div>
 
       {/* Leave History Table */}
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm p-6">
+      <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-4 md:p-6 mb-8">
         <h2 className="text-lg font-semibold mb-4 text-gray-800">
           My Leave History
         </h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead className="bg-gray-100 text-gray-700">
-              <tr>
-                <th className="p-3 text-left font-semibold">Leave Type</th>
-                <th className="p-3 text-left font-semibold">Start Date</th>
-                <th className="p-3 text-left font-semibold">End Date</th>
-                <th className="p-3 text-left font-semibold">Status</th>
-                <th className="p-3 text-left font-semibold">Admin Remark</th>
-                <th className="p-3 text-center font-semibold">View</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {myLeaves.length > 0 ? (
-                myLeaves.map((leave) => (
-                  <tr
-                    key={leave._id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="p-3">{leave.leaveType}</td>
-                    <td className="p-3">
-                      {new Date(leave.startDate).toLocaleDateString()}
-                    </td>
-                    <td className="p-3">
-                      {new Date(leave.endDate).toLocaleDateString()}
-                    </td>
-                    <td
-                      className={`p-3 font-medium ${
-                        leave.status === "Approved"
-                          ? "text-green-600"
-                          : leave.status === "Rejected"
-                          ? "text-red-600"
-                          : "text-yellow-600"
-                      }`}
-                    >
-                      {leave.status}
-                    </td>
-                    <td className="p-3 text-gray-700">
-                      {leave.adminRemark || "—"}
-                    </td>
-                    <td className="p-3 text-center">
-                      <button
-                        onClick={() => setSelectedLeave(leave)}
-                        className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition"
-                        title="View Reason"
-                      >
-                        <FaEye className="w-4 h-4" />
-                      </button>
-                    </td>
+        {myLeaves.length === 0 ? (
+          <p className="text-center text-gray-500 italic py-6 bg-gray-50 rounded-lg border border-gray-100">
+            No leave records found.
+          </p>
+        ) : (
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="min-w-full text-sm text-left">
+                <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                  <tr>
+                    <th className="p-4">Leave Type</th>
+                    <th className="p-4">Duration</th>
+                    <th className="p-4">Status</th>
+                    <th className="p-4">Admin Remark</th>
+                    <th className="p-4 text-center">View</th>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan="6"
-                    className="p-4 text-center text-gray-500 italic"
-                  >
-                    No leave records found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {myLeaves.map((leave) => (
+                    <tr key={leave._id} className="hover:bg-slate-50 transition-colors">
+                      <td className="p-4 font-medium text-slate-700">
+                        <span className="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-md text-xs border border-blue-100">{leave.leaveType}</span>
+                      </td>
+                      <td className="p-4 text-slate-600 text-xs">
+                        {new Date(leave.startDate).toLocaleDateString()} <span className="text-slate-400 mx-1">to</span> {new Date(leave.endDate).toLocaleDateString()}
+                      </td>
+                      <td className="p-4 font-medium">
+                        <span className={`px-2.5 py-1 rounded-full text-xs border ${
+                          leave.status === "Approved" ? "bg-green-50 text-green-700 border-green-200" :
+                          leave.status === "Rejected" ? "bg-red-50 text-red-700 border-red-200" :
+                          "bg-yellow-50 text-yellow-700 border-yellow-200"
+                        }`}>
+                          {leave.status}
+                        </span>
+                      </td>
+                      <td className="p-4 text-slate-600 text-xs max-w-[200px] truncate" title={leave.adminRemark}>
+                        {leave.adminRemark || "—"}
+                      </td>
+                      <td className="p-4 text-center">
+                        <button onClick={() => setSelectedLeave(leave)} className="bg-slate-100 text-slate-600 p-1.5 rounded-md hover:bg-slate-200 transition" title="View Reason">
+                          <FaEye className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="block md:hidden space-y-4">
+              {myLeaves.map((leave) => (
+                <div key={leave._id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-3">
+                  <div className="flex justify-between items-start mb-1">
+                    <span className="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-md text-xs font-semibold border border-blue-100">{leave.leaveType}</span>
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                      leave.status === "Approved" ? "bg-green-50 text-green-700 border-green-200" :
+                      leave.status === "Rejected" ? "bg-red-50 text-red-700 border-red-200" :
+                      "bg-yellow-50 text-yellow-700 border-yellow-200"
+                    }`}>
+                      {leave.status}
+                    </span>
+                  </div>
+
+                  <div className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100 flex items-center justify-between">
+                    <div><span className="text-slate-400 block mb-0.5">Start Date</span> <span className="font-medium text-slate-700">{new Date(leave.startDate).toLocaleDateString()}</span></div>
+                    <div className="text-slate-300">→</div>
+                    <div className="text-right"><span className="text-slate-400 block mb-0.5">End Date</span> <span className="font-medium text-slate-700">{new Date(leave.endDate).toLocaleDateString()}</span></div>
+                  </div>
+
+                  <div className="flex items-center justify-between mt-1 pt-3 border-t border-slate-100">
+                    <div className="flex-1 mr-3">
+                      <span className="text-[10px] text-slate-400 font-semibold block uppercase">Admin Remark</span>
+                      <p className="text-xs text-slate-700 font-medium truncate">{leave.adminRemark || "—"}</p>
+                    </div>
+                    <button onClick={() => setSelectedLeave(leave)} className="flex items-center gap-2 bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg font-medium text-xs hover:bg-slate-200 transition">
+                      <FaEye className="w-3.5 h-3.5" /> View
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* 👁️ Subtle Reason Popup */}

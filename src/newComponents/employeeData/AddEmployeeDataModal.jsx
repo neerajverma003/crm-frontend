@@ -204,28 +204,28 @@ const AddEmployeeDataModal = ({ isOpen, onClose, onSave, initialData = null }) =
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl my-8">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[10000] p-2 sm:p-4 overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl my-auto sm:my-8 relative">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6 flex items-center justify-between rounded-t-xl">
-          <div>
-            <h1 className="text-3xl font-bold text-white">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-600 to-blue-700 px-4 sm:px-8 py-4 sm:py-6 flex items-start sm:items-center justify-between rounded-t-xl">
+          <div className="pr-2">
+            <h1 className="text-xl sm:text-3xl font-bold text-white">
               {initialData ? "Edit Employee Information" : "Add New Employee"}
             </h1>
-            <p className="text-blue-100 text-sm mt-1">
+            <p className="text-blue-100 text-xs sm:text-sm mt-1">
               {initialData ? "Update employee profile details" : "Create a new employee record"}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-blue-500 rounded-lg transition-all text-white"
+            className="p-1.5 sm:p-2 hover:bg-blue-500 rounded-lg transition-all text-white flex-shrink-0 mt-0.5 sm:mt-0"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-8 space-y-8 max-h-[calc(100vh-240px)] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-8 space-y-6 sm:space-y-8 max-h-[calc(100vh-120px)] sm:max-h-[calc(100vh-240px)] overflow-y-auto">
           {error && (
             <div className="p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg text-sm font-medium flex items-start gap-3">
               <span className="text-lg leading-none">⚠️</span>
@@ -462,7 +462,7 @@ const AddEmployeeDataModal = ({ isOpen, onClose, onSave, initialData = null }) =
         </form>
 
         {/* Footer */}
-        <div className="border-t border-gray-200 bg-gray-50 px-8 py-4 flex justify-end gap-3 rounded-b-xl">
+        <div className="border-t border-gray-200 bg-gray-50 px-4 sm:px-8 py-3 sm:py-4 flex justify-end gap-3 rounded-b-xl">
           <button
             onClick={onClose}
             className="px-6 py-2.5 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-all font-semibold"

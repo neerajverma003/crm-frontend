@@ -351,27 +351,45 @@ export default function AssignLeads() {
 
   return (
     <div className="max-w-8xl mx-auto p-6 bg-white shadow-md rounded-lg">
-      {/* Top nav: Assigned Lead first as requested */}
-      <div className="flex items-center gap-3 mb-4">
-        <button
-          onClick={() => setActiveTab("assigned")}
-          className={`px-4 py-2 rounded ${activeTab === 'assigned' ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}
-        >
-          Assigned Lead
-        </button>
-        <button
-          onClick={() => setActiveTab("assign")}
-          className={`px-4 py-2 rounded ${activeTab === 'assign' ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}
-        >
-          Assign Leads to Employee
-        </button>
-        <button
-          onClick={() => setActiveTab("employeeOwn")}
-          className={`px-4 py-2 rounded ${activeTab === 'employeeOwn' ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}
-        >
-          Employee Own Lead
-        </button>
-      </div>
+      {/* Top nav: Premium Animated Tabs */}
+      <nav className="mb-6 w-full relative z-10">
+        <div className="flex w-full">
+          <div 
+            className="flex flex-row flex-wrap gap-2 sm:gap-3 w-full bg-slate-50 p-2 sm:p-2.5 rounded-2xl border border-slate-200/60 shadow-inner"
+          >
+            <button
+              onClick={() => setActiveTab("assigned")}
+              className={`flex-auto text-center px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all duration-300 active:scale-95
+                ${activeTab === "assigned"
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/30 ring-1 ring-blue-500'
+                  : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-indigo-600 hover:shadow-sm border border-slate-100'}
+              `}
+            >
+              Assigned Lead
+            </button>
+            <button
+              onClick={() => setActiveTab("assign")}
+              className={`flex-auto text-center px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all duration-300 active:scale-95
+                ${activeTab === "assign"
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/30 ring-1 ring-blue-500'
+                  : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-indigo-600 hover:shadow-sm border border-slate-100'}
+              `}
+            >
+              Assign Leads to Employee
+            </button>
+            <button
+              onClick={() => setActiveTab("employeeOwn")}
+              className={`flex-auto text-center px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all duration-300 active:scale-95
+                ${activeTab === "employeeOwn"
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/30 ring-1 ring-blue-500'
+                  : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-indigo-600 hover:shadow-sm border border-slate-100'}
+              `}
+            >
+              Employee Own Lead
+            </button>
+          </div>
+        </div>
+      </nav>
 
       {activeTab === 'assign' ? (
         <div>
@@ -438,46 +456,104 @@ export default function AssignLeads() {
                   </button>
                 </div>
               )}
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse border">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="border px-3 py-2 text-center">
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto rounded-xl shadow-sm border border-gray-200">
+                <table className="w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-center w-16">
                         <input
                           type="checkbox"
                           ref={selectAllRef}
                           checked={visibleLeads.length > 0 && visibleLeads.every((l) => selectedLeads.map(String).includes(String(l._id)))}
                           onChange={handleSelectAllVisible}
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
-                        <div className="text-xs">All Select</div>
+                        <div className="text-[10px] text-gray-500 mt-1 uppercase font-semibold tracking-wider">Select</div>
                       </th>
-                      <th className="border px-3 py-2">Name</th>
-                      <th className="border px-3 py-2">Email</th>
-                      <th className="border px-3 py-2">Phone</th>
-                      <th className="border px-3 py-2">WhatsApp No</th>
-                      <th className="border px-3 py-2">Destination</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Phone</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">WhatsApp No</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Destination</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="bg-white divide-y divide-gray-200">
                     {(leads || [])
                       .map((lead) => (
-                        <tr key={lead._id}>
-                          <td className="border px-3 py-2 text-center">
+                        <tr key={lead._id} className={`hover:bg-blue-50/50 transition-colors ${selectedLeads.includes(lead._id) ? 'bg-blue-50' : ''}`}>
+                          <td className="px-4 py-3 text-center">
                             <input
                               type="checkbox"
                               checked={selectedLeads.includes(lead._id)}
                               onChange={() => handleLeadCheck(lead._id)}
+                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
                             />
                           </td>
-                          <td className="border px-3 py-2">{lead.name}</td>
-                          <td className="border px-3 py-2">{lead.email}</td>
-                          <td className="border px-3 py-2">{lead.phone}</td>
-                          <td className="border px-3 py-2">{lead.whatsAppNo}</td>
-                          <td className="border px-3 py-2">{lead.destination}</td>
+                          <td className="px-4 py-3 text-sm text-gray-900 font-medium">{lead.name || "—"}</td>
+                          <td className="px-4 py-3 text-sm text-gray-500">{lead.email || "—"}</td>
+                          <td className="px-4 py-3 text-sm text-gray-600">{lead.phone || "—"}</td>
+                          <td className="px-4 py-3 text-sm text-gray-600">{lead.whatsAppNo || "—"}</td>
+                          <td className="px-4 py-3 text-sm text-gray-600">{lead.destination || "—"}</td>
                         </tr>
                       ))}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="block md:hidden space-y-4">
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    ref={selectAllRef}
+                    checked={visibleLeads.length > 0 && visibleLeads.every((l) => selectedLeads.map(String).includes(String(l._id)))}
+                    onChange={handleSelectAllVisible}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-5 h-5 cursor-pointer"
+                  />
+                  <label className="text-sm font-semibold text-gray-700 select-none cursor-pointer uppercase tracking-wide" onClick={handleSelectAllVisible}>Select All on Page</label>
+                </div>
+                {(leads || []).map((lead) => (
+                  <div 
+                    key={lead._id} 
+                    className={`bg-white border rounded-xl p-4 shadow-sm transition-all duration-200 ${selectedLeads.includes(lead._id) ? 'border-blue-500 ring-1 ring-blue-500/20 shadow-blue-100' : 'border-gray-200 shadow-gray-100/50'}`}
+                    onClick={() => handleLeadCheck(lead._id)}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="pt-1">
+                        <input
+                          type="checkbox"
+                          checked={selectedLeads.includes(lead._id)}
+                          onChange={() => handleLeadCheck(lead._id)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-5 h-5 cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                        <div className="flex justify-between items-start">
+                          <span className="font-bold text-gray-900 text-base">{lead.name || "Unknown"}</span>
+                          <span className="bg-blue-50 text-blue-700 text-[10px] px-2 py-0.5 rounded-md font-semibold tracking-wide border border-blue-100 uppercase">{lead.destination || "N/A"}</span>
+                        </div>
+                        <div className="text-sm text-gray-500 truncate flex items-center gap-1.5">
+                          <svg className="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                          {lead.email || "No Email"}
+                        </div>
+                        <div className="flex items-center justify-between text-sm mt-1">
+                          <div className="flex items-center gap-1.5 text-gray-600 font-medium">
+                            <svg className="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                            {lead.phone || "—"}
+                          </div>
+                          {lead.whatsAppNo && (
+                            <div className="flex items-center gap-1.5 text-emerald-600 font-medium">
+                              <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                              {lead.whatsAppNo}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
 
               {/* Pagination controls */}
@@ -631,48 +707,109 @@ export default function AssignLeads() {
                       </button>
                     </div>
                   )}
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse border">
-                      <thead>
-                        <tr className="bg-gray-100">
-                            <th className="border px-3 py-2 text-center">
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block overflow-x-auto rounded-xl shadow-sm border border-gray-200">
+                    <table className="w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                            <th className="px-4 py-3 text-center w-16">
                               <input
                                 type="checkbox"
                                 ref={selectAllAssignedRef}
                                 checked={visibleAssignedLeads.length > 0 && visibleAssignedLeads.every((l) => selectedAssignedLeads.map(String).includes(String(l.assignmentId)))}
                                 onChange={handleSelectAllAssignedVisible}
+                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                               />
-                              <div className="text-xs">All Select</div>
+                              <div className="text-[10px] text-gray-500 mt-1 uppercase font-semibold tracking-wider">Select</div>
                             </th>
-                          <th className="border px-3 py-2">Name</th>
-                          <th className="border px-3 py-2">Email</th>
-                          <th className="border px-3 py-2">Phone</th>
-                          <th className="border px-3 py-2">WhatsApp No</th>
-                          <th className="border px-3 py-2">Destination</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Phone</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">WhatsApp No</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Destination</th>
                         </tr>
                       </thead>
-                      <tbody>
+                      <tbody className="bg-white divide-y divide-gray-200">
                         {(
                           (assignedLeads || [])
                             .slice((assignedCurrentPage - 1) * pageSize, assignedCurrentPage * pageSize)
                         ).map((lead) => (
-                          <tr key={lead._id}>
-                            <td className="border px-3 py-2 text-center">
+                          <tr key={lead._id} className={`hover:bg-blue-50/50 transition-colors ${selectedAssignedLeads.includes(lead.assignmentId) ? 'bg-blue-50' : ''}`}>
+                            <td className="px-4 py-3 text-center">
                               <input
                                 type="checkbox"
                                 checked={selectedAssignedLeads.includes(lead.assignmentId)}
                                 onChange={() => handleAssignedLeadCheck(lead.assignmentId)}
+                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
                               />
                             </td>
-                            <td className="border px-3 py-2">{lead.name}</td>
-                            <td className="border px-3 py-2">{lead.email}</td>
-                            <td className="border px-3 py-2">{lead.phone}</td>
-                            <td className="border px-3 py-2">{lead.whatsAppNo}</td>
-                            <td className="border px-3 py-2">{lead.destination}</td>
+                            <td className="px-4 py-3 text-sm text-gray-900 font-medium">{lead.name || "—"}</td>
+                            <td className="px-4 py-3 text-sm text-gray-500">{lead.email || "—"}</td>
+                            <td className="px-4 py-3 text-sm text-gray-600">{lead.phone || "—"}</td>
+                            <td className="px-4 py-3 text-sm text-gray-600">{lead.whatsAppNo || "—"}</td>
+                            <td className="px-4 py-3 text-sm text-gray-600">{lead.destination || "—"}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
+                  </div>
+
+                  {/* Mobile Card View */}
+                  <div className="block md:hidden space-y-4">
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        ref={selectAllAssignedRef}
+                        checked={visibleAssignedLeads.length > 0 && visibleAssignedLeads.every((l) => selectedAssignedLeads.map(String).includes(String(l.assignmentId)))}
+                        onChange={handleSelectAllAssignedVisible}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-5 h-5 cursor-pointer"
+                      />
+                      <label className="text-sm font-semibold text-gray-700 select-none cursor-pointer uppercase tracking-wide" onClick={handleSelectAllAssignedVisible}>Select All on Page</label>
+                    </div>
+                    {(
+                      (assignedLeads || [])
+                        .slice((assignedCurrentPage - 1) * pageSize, assignedCurrentPage * pageSize)
+                    ).map((lead) => (
+                      <div 
+                        key={lead._id} 
+                        className={`bg-white border rounded-xl p-4 shadow-sm transition-all duration-200 ${selectedAssignedLeads.includes(lead.assignmentId) ? 'border-blue-500 ring-1 ring-blue-500/20 shadow-blue-100' : 'border-gray-200 shadow-gray-100/50'}`}
+                        onClick={() => handleAssignedLeadCheck(lead.assignmentId)}
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="pt-1">
+                            <input
+                              type="checkbox"
+                              checked={selectedAssignedLeads.includes(lead.assignmentId)}
+                              onChange={() => handleAssignedLeadCheck(lead.assignmentId)}
+                              onClick={(e) => e.stopPropagation()}
+                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-5 h-5 cursor-pointer"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                            <div className="flex justify-between items-start">
+                              <span className="font-bold text-gray-900 text-base">{lead.name || "Unknown"}</span>
+                              <span className="bg-blue-50 text-blue-700 text-[10px] px-2 py-0.5 rounded-md font-semibold tracking-wide border border-blue-100 uppercase">{lead.destination || "N/A"}</span>
+                            </div>
+                            <div className="text-sm text-gray-500 truncate flex items-center gap-1.5">
+                              <svg className="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                              {lead.email || "No Email"}
+                            </div>
+                            <div className="flex items-center justify-between text-sm mt-1">
+                              <div className="flex items-center gap-1.5 text-gray-600 font-medium">
+                                <svg className="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                                {lead.phone || "—"}
+                              </div>
+                              {lead.whatsAppNo && (
+                                <div className="flex items-center gap-1.5 text-emerald-600 font-medium">
+                                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                                  {lead.whatsAppNo}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
                     {/* Pagination controls for Assigned Leads */}

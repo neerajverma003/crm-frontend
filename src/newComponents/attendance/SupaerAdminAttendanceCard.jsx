@@ -12,11 +12,11 @@ const SuperAdminAttendanceCard = ({ statsData }) => {
     ];
 
     return (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {stats.map((stat, index) => (
                 <div
                     key={index}
-                    className="group relative overflow-hidden rounded-3xl bg-white p-6 shadow-sm ring-1 ring-gray-100 transition-all duration-500 hover:shadow-2xl hover:ring-2 hover:ring-indigo-100"
+                    className="group relative overflow-hidden rounded-2xl md:rounded-3xl bg-white p-4 md:p-6 shadow-sm ring-1 ring-gray-100 transition-all duration-500 hover:shadow-2xl hover:ring-2 hover:ring-indigo-100"
                 >
                     <div
                         className={`absolute inset-0 bg-gradient-to-br ${
@@ -31,15 +31,15 @@ const SuperAdminAttendanceCard = ({ statsData }) => {
                     />
 
                     <div
-                        className={`relative z-10 mb-4 flex h-14 w-14 items-center justify-center rounded-2xl p-3 text-2xl font-bold transition-transform duration-300 group-hover:scale-110 ${
+                        className={`relative z-10 mb-3 md:mb-4 flex h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-xl md:rounded-2xl p-2 md:p-3 text-xl md:text-2xl font-bold transition-transform duration-300 group-hover:scale-110 ${
                             index === 0 ? "bg-indigo-100" : index === 1 ? "bg-emerald-100" : index === 2 ? "bg-rose-100" : "bg-amber-100"
                         }`}
                     >
                         {stat.icon}
                     </div>
 
-                    <p className="mb-1 text-3xl font-bold leading-tight text-gray-900">{stat.value}</p>
-                    <p className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500 transition-colors group-hover:text-gray-700">
+                    <p className="mb-0.5 md:mb-1 text-2xl md:text-3xl font-bold leading-tight text-gray-900">{stat.value}</p>
+                    <p className="mb-2 md:mb-3 text-[10px] md:text-xs font-medium uppercase tracking-wide text-gray-500 transition-colors group-hover:text-gray-700">
                         {stat.label}
                     </p>
                     <div className="flex items-center gap-1">

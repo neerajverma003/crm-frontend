@@ -474,7 +474,7 @@ export default function SecuritySettings() {
           const showField = field === "currentPassword" ? showCurrent : field === "newPassword" ? showNew : showConfirm;
           const toggleShow = field === "currentPassword" ? () => setShowCurrent(!showCurrent)
             : field === "newPassword" ? () => setShowNew(!showNew)
-            : () => setShowConfirm(!showConfirm);
+              : () => setShowConfirm(!showConfirm);
 
           const labelMap = {
             currentPassword: "Current Password",

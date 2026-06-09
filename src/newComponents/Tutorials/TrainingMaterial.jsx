@@ -1,111 +1,3 @@
-// import React, { useState, useEffect } from "react";
-
-// const TrainingMaterial = () => {
-//   const [tutorials, setTutorials] = useState([]);
-//   const [companies, setCompanies] = useState([]);
-//   const [selectedCompany, setSelectedCompany] = useState("");
-
-//   // Fetch tutorials on component mount
-//   useEffect(() => {
-//     const fetchTutorials = async () => {
-//       try {
-//         const res = await fetch(`${import.meta.env.VITE_API_URL}/tutorials/all`);
-//         const data = await res.json();
-//         setTutorials(data.tutorials || []);
-
-//         // Extract unique companies from tutorials
-//         const uniqueCompanies = Array.from(
-//           new Map(
-//             (data.tutorials || []).map((tut) => [tut.company._id, tut.company])
-//           ).values()
-//         );
-//         setCompanies(uniqueCompanies);
-//       } catch (err) {
-//         console.error("Failed to fetch tutorials:", err);
-//       }
-//     };
-
-//     fetchTutorials();
-//   }, []);
-
-//   // Filter tutorials by selected company
-//   const filteredTutorials = selectedCompany
-//     ? tutorials.filter((tut) => tut.company._id === selectedCompany)
-//     : tutorials;
-
-//   return (
-//     <div className="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-//       <h2 className="text-2xl font-bold text-center mb-6">Training Materials</h2>
-
-//       {/* Company Filter */}
-//       <div className="mb-4">
-//         <label className="font-semibold mr-2">Filter by Company:</label>
-//         <select
-//           value={selectedCompany}
-//           onChange={(e) => setSelectedCompany(e.target.value)}
-//           className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-//         >
-//           <option value="">All Companies</option>
-//           {companies.map((c) => (
-//             <option key={c._id} value={c._id}>
-//               {c.companyName}
-//             </option>
-//           ))}
-//         </select>
-//       </div>
-
-//       {/* Tutorials List */}
-//       {filteredTutorials.length === 0 ? (
-//         <p className="text-center text-gray-500">No tutorials found.</p>
-//       ) : (
-//         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//           {filteredTutorials.map((tut) => (
-//             <div
-//               key={tut._id}
-//               className="border border-gray-300 rounded-md p-4 flex flex-col items-center"
-//             >
-//               <h3 className="font-semibold mb-2 text-center">{tut.title}</h3>
-//               <p className="text-sm text-gray-500 mb-2">
-//                 Company: {tut.company.companyName}
-//               </p>
-
-//               {tut.fileType === "image" && (
-//                 <img
-//                   src={tut.fileUrl}
-//                   alt={tut.originalName}
-//                   className="w-full max-h-48 object-cover rounded-md"
-//                 />
-//               )}
-
-//               {tut.fileType === "video" && (
-//                 <video
-//                   src={tut.fileUrl}
-//                   controls
-//                   className="w-full max-h-48 rounded-md"
-//                 />
-//               )}
-
-//               {(tut.fileType === "pdf" || tut.fileType === "ppt") && (
-//                 <a
-//                   href={tut.fileUrl}
-//                   target="_blank"
-//                   rel="noopener noreferrer"
-//                   className="text-blue-600 underline mt-2"
-//                 >
-//                   {tut.originalName}
-//                 </a>
-//               )}
-//             </div>
-//           ))}
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default TrainingMaterial;
-
-
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Search, Image, Video, FileText, File, Download, ExternalLink, X } from "lucide-react";
 
@@ -330,8 +222,8 @@ const TrainingMaterial = () => {
             <div className="text-xs font-semibold text-slate-400 whitespace-nowrap">{formatDate(tut.createdAt)}</div>
           </div>
 
-          <div className="mt-auto pt-4 flex items-center justify-between border-t border-slate-100">
-            <div className="flex items-center gap-2 text-sm font-medium text-slate-600 truncate mr-3">
+          <div className="mt-auto pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-100">
+            <div className="flex items-center gap-2 text-sm font-medium text-slate-600 truncate pr-2 flex-1 min-w-0">
               {tut.fileType === 'image' && <Image className="w-4 h-4 text-indigo-500 flex-shrink-0" />}
               {tut.fileType === 'video' && <Video className="w-4 h-4 text-indigo-500 flex-shrink-0" />}
               {tut.fileType === 'pdf' && <FileText className="w-4 h-4 text-indigo-500 flex-shrink-0" />}
@@ -366,7 +258,7 @@ const TrainingMaterial = () => {
               <div className="text-center text-gray-500 max-w-xl">
                 <div className="mb-3 text-lg font-semibold">Preview unavailable</div>
                 <div className="mb-3 text-sm">{previewError}</div>
-                <div className="flex justify-center gap-3">
+                <div className="flex flex-wrap justify-center gap-3">
                   <a href={preview?.originalUrl || preview?.url} target="_blank" rel="noopener noreferrer" className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Open original</a>
                   <button onClick={() => { const link = preview?.originalUrl || preview?.url; navigator.clipboard && navigator.clipboard.writeText(link); alert('Link copied to clipboard'); }} className="inline-block bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Copy link</button>
                   <button onClick={() => {
@@ -404,7 +296,7 @@ const TrainingMaterial = () => {
                           <iframe title={preview?.title} src={iframeSrc} className="w-full h-[60vh]" />
                         </div>
 
-                        <div className="flex gap-3 justify-center">
+                        <div className="flex flex-wrap gap-3 justify-center">
                           <button onClick={() => handleDownloadPreview(downloadSrc, fileName)} className="inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition font-medium">⬇️ Download</button>
                           <a href={viewerUrl || preview?.url} target="_blank" rel="noopener noreferrer" className="inline-block bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700 transition font-medium">🔗 Open in new tab</a>
                         </div>

@@ -1,194 +1,36 @@
-
-// import { useState, useEffect } from "react";
-// import axios from "axios";
-// import MyCards from "../UserManagement/MyCards.jsx";
-// import SearchCompanies from "./SearchCompanies.jsx";
-// import SearchCompanyByStatus from "./SearchCompanyByStatus.jsx";
-// import AddCompany from "./AddCompany.jsx";
-// import CompanyCard from "./CompanyCard.jsx";
-// import BusinessProfileCard from "./BusinessProfileCard.jsx";
-
-// const MainAllCompanies = () => {
-//   const [view, setView] = useState("Grid");
-//   const [companies, setCompanies] = useState([]);
-//   const [filteredCompanies, setFilteredCompanies] = useState([]);
-//   const [selectedStatus, setSelectedStatus] = useState("All Status");
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState("");
-//   const [isEditOpen, setIsEditOpen] = useState(false);
-//   const [editingCompany, setEditingCompany] = useState(null);
-
-//   // ✅ Fetch companies from API
-//   useEffect(() => {
-//     const fetchCompanies = async () => {
-//       try {
-//         setLoading(true);
-//         setError("");
-
-//         const res = await axios.get(`${import.meta.env.VITE_API_URL}/company/all`);
-//         const data = res?.data?.companies || [];
-//         setCompanies(data);
-//         setFilteredCompanies(data); // initial list
-//       } catch (err) {
-//         console.error("Error fetching companies:", err);
-//         setError("Failed to fetch companies. Please try again later.");
-//         setCompanies([]);
-//         setFilteredCompanies([]);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchCompanies();
-//   }, []);
-
-//   // ✅ Filter companies whenever status changes
-//   useEffect(() => {
-//     if (selectedStatus === "All Status") {
-//       setFilteredCompanies(companies);
-//     } else {
-//       const filtered = companies.filter(
-//         (c) => c.status?.toLowerCase() === selectedStatus.toLowerCase()
-//       );
-//       setFilteredCompanies(filtered);
-//     }
-//   }, [selectedStatus, companies]);
-
-//   // ✅ Helper for CompanyCard props
-//   const mapCompanyProps = (company) => ({
-//     companyName: company.companyName || "N/A",
-//     industry: company.industry || "N/A",
-//     status: company.status || "Pending",
-//     email: company.email || "N/A",
-//     phoneNumber: company.phoneNumber || "N/A",
-//     website: company.website || "N/A",
-//     numberOfEmployees: company.numberOfEmployees || 0,
-//     deals: company.deals || 0,
-//     value: company.value || "$0",
-//     logo: company.logo || "",
-//   });
-
-//   return (
-//     <div className="max-h-[85vh] overflow-y-auto bg-[#f8f9fa] p-8">
-//       {/* Dashboard Summary Cards */}
-//       <div className="flex flex-col sm:flex-row gap-4">
-//         <MyCards />
-//       </div>
-
-//       {/* Search and View Controls */}
-//       <div className="my-4 flex w-full justify-between items-center">
-//         <div className="flex gap-3">
-//           <SearchCompanies aria-label="Search companies by name" />
-//           {/* ✅ Hook up filter here */}
-//           <SearchCompanyByStatus onStatusChange={setSelectedStatus} />
-//         </div>
-
-//         <div className="flex gap-1">
-//           <button
-//             type="button"
-//             onClick={() => setView("Grid")}
-//             className={`w-fit px-3 py-2 rounded-md ${
-//               view === "Grid" ? "bg-black text-white" : "border border-gray-200"
-//             }`}
-//           >
-//             Grid
-//           </button>
-
-//           <button
-//             type="button"
-//             onClick={() => setView("List")}
-//             className={`w-fit px-3 py-2 rounded-md ${
-//               view === "List" ? "bg-black text-white" : "border border-gray-200"
-//             }`}
-//           >
-//             List
-//           </button>
-
-//           <AddCompany />
-//           {/* Controlled AddCompany used for editing existing companies */}
-//           <AddCompany
-//             isOpen={isEditOpen}
-//             onClose={() => {
-//               setIsEditOpen(false);
-//               setEditingCompany(null);
-//             }}
-//             initialData={editingCompany}
-//             onSaved={(saved) => {
-//               // Update companies list after edit
-//               const updated = saved && saved._id ? saved : saved.company || saved;
-//               if (updated && updated._id) {
-//                 setCompanies((prev) => prev.map((c) => (c._id === updated._id ? { ...c, ...updated } : c)));
-//                 setFilteredCompanies((prev) => prev.map((c) => (c._id === updated._id ? { ...c, ...updated } : c)));
-//               }
-//               setIsEditOpen(false);
-//               setEditingCompany(null);
-//             }}
-//           />
-//         </div>
-//       </div>
-
-//       {/* Companies List */}
-//       <div
-//         className={`border border-gray-200 rounded-md bg-[#ffffff] p-4 ${
-//           view === "Grid"
-//             ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-//             : "flex flex-col gap-4"
-//         }`}
-//         role="region"
-//         aria-label="List of all companies"
-//       >
-//         {loading ? (
-//           <p className="text-center text-gray-500">Loading companies...</p>
-//         ) : error ? (
-//           <p className="text-center text-red-500">{error}</p>
-//         ) : filteredCompanies.length === 0 ? (
-//           <p className="text-center text-gray-500">
-//             No companies found for “{selectedStatus}”
-//           </p>
-//         ) : (
-//               filteredCompanies.map((company) =>
-//             view === "Grid" ? (
-//               <CompanyCard
-//                 key={company._id}
-//                 _id={company._id}
-//                 {...mapCompanyProps(company)}
-//                     onDelete={(deletedId) => setCompanies((prev) => prev.filter((c) => c._id !== deletedId))}
-//                     onEdit={(data) => {
-//                       setEditingCompany(company);
-//                       setIsEditOpen(true);
-//                     }}
-//               />
-//             ) : (
-//               <BusinessProfileCard
-//                 key={company._id}
-//                 _id={company._id}
-//                 {...mapCompanyProps(company)}
-//                     onDelete={(deletedId) => setCompanies((prev) => prev.filter((c) => c._id !== deletedId))}
-//                     onEdit={(data) => {
-//                       setEditingCompany(company);
-//                       setIsEditOpen(true);
-//                     }}
-//               />
-//             )
-//           )
-//         )}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default MainAllCompanies;
-
-
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { MdAdd, MdGridView, MdList, MdBusiness, MdCheckCircle, MdHourglassEmpty } from "react-icons/md";
+import {
+  MdAdd, MdGridView, MdList, MdBusiness,
+  MdCheckCircle, MdHourglassEmpty, MdSearch, MdFilterList
+} from "react-icons/md";
 import MyCards from "../UserManagement/MyCards.jsx";
 import SearchCompanies from "./SearchCompanies.jsx";
 import SearchCompanyByStatus from "./SearchCompanyByStatus.jsx";
 import AddCompany from "./AddCompany.jsx";
 import CompanyCard from "./CompanyCard.jsx";
 import BusinessProfileCard from "./BusinessProfileCard.jsx";
+
+const StatCard = ({ label, value, icon, color }) => {
+  const colors = {
+    blue:   { bg: "bg-blue-50",   text: "text-blue-600",   val: "text-blue-700"   },
+    green:  { bg: "bg-emerald-50", text: "text-emerald-600", val: "text-emerald-700" },
+    amber:  { bg: "bg-amber-50",  text: "text-amber-600",  val: "text-amber-700"  },
+  };
+  const c = colors[color] || colors.blue;
+
+  return (
+    <div className="bg-white rounded-2xl border border-slate-100 p-4 sm:p-5 shadow-sm hover:shadow-md transition-shadow flex items-center gap-4">
+      <div className={`w-11 h-11 sm:w-12 sm:h-12 ${c.bg} ${c.text} rounded-xl flex items-center justify-center shrink-0`}>
+        {icon}
+      </div>
+      <div>
+        <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{label}</p>
+        <p className={`text-2xl sm:text-3xl font-bold ${c.val} leading-tight mt-0.5`}>{value}</p>
+      </div>
+    </div>
+  );
+};
 
 const MainAllCompanies = () => {
   const [view, setView] = useState("Grid");
@@ -199,18 +41,17 @@ const MainAllCompanies = () => {
   const [error, setError] = useState("");
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
 
-  // ✅ Fetch companies from API
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
         setLoading(true);
         setError("");
-
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/company/all`);
         const data = res?.data?.companies || [];
         setCompanies(data);
-        setFilteredCompanies(data); // initial list
+        setFilteredCompanies(data);
       } catch (err) {
         console.error("Error fetching companies:", err);
         setError("Failed to fetch companies. Please try again later.");
@@ -220,195 +61,242 @@ const MainAllCompanies = () => {
         setLoading(false);
       }
     };
-
     fetchCompanies();
   }, []);
 
-  // ✅ Filter companies whenever status changes
   useEffect(() => {
     if (selectedStatus === "All Status") {
       setFilteredCompanies(companies);
     } else {
-      const filtered = companies.filter(
-        (c) => c.status?.toLowerCase() === selectedStatus.toLowerCase()
+      setFilteredCompanies(
+        companies.filter((c) => c.status?.toLowerCase() === selectedStatus.toLowerCase())
       );
-      setFilteredCompanies(filtered);
     }
   }, [selectedStatus, companies]);
 
-  // ✅ Helper for CompanyCard props
   const mapCompanyProps = (company) => ({
-    companyName: company.companyName || "N/A",
-    industry: company.industry || "N/A",
-    status: company.status || "Pending",
-    email: company.email || "N/A",
-    phoneNumber: company.phoneNumber || "N/A",
-    website: company.website || "N/A",
+    companyName:       company.companyName       || "N/A",
+    industry:          company.industry          || "N/A",
+    status:            company.status            || "Pending",
+    email:             company.email             || "N/A",
+    phoneNumber:       company.phoneNumber       || "N/A",
+    website:           company.website           || "N/A",
     numberOfEmployees: company.numberOfEmployees || 0,
-    deals: company.deals || 0,
-    value: company.value || "$0",
-    logo: company.logo || "",
-    logoKey: company.logoKey || "",
+    deals:             company.deals             || 0,
+    value:             company.value             || "$0",
+    logo:              company.logo              || "",
+    logoKey:           company.logoKey           || "",
   });
 
-  const activeCount = companies.filter((c) => c.status?.toLowerCase() === "active").length;
+  const activeCount  = companies.filter((c) => c.status?.toLowerCase() === "active").length;
   const pendingCount = companies.filter((c) => c.status?.toLowerCase() === "pending").length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 p-8 overflow-y-auto">
-      {/* Page Header */}
-      <div className="mb-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+    <div className="min-h-screen bg-slate-50 font-sans">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
+
+        {/* ── Page Header ── */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">All Companies</h1>
-            <p className="text-sm sm:text-base text-gray-600">Manage and organize all your business partners</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+              All Companies
+            </h1>
+            <p className="text-sm text-slate-500 mt-1">
+              Manage and organize all your business partners
+            </p>
           </div>
-          <div className="w-full sm:w-auto self-start">
+          <div className="shrink-0">
             <AddCompany />
           </div>
         </div>
-      </div>
 
+        {/* ── Quick Stats ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <StatCard
+            label="Total Companies"
+            value={companies.length}
+            icon={<MdBusiness size={22} />}
+            color="blue"
+          />
+          <StatCard
+            label="Active"
+            value={activeCount}
+            icon={<MdCheckCircle size={22} />}
+            color="green"
+          />
+          <StatCard
+            label="Pending"
+            value={pendingCount}
+            icon={<MdHourglassEmpty size={22} />}
+            color="amber"
+          />
+        </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm font-medium">Total Companies</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{companies.length}</p>
+        {/* ── Controls Bar ── */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm mb-6 sm:mb-8 overflow-hidden">
+          {/* Top row: always visible */}
+          <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-5 sm:py-4">
+            {/* Filter toggle (mobile) / Search (desktop) */}
+            <div className="flex-1 min-w-0">
+              {/* Desktop: show search inline */}
+              <div className="hidden sm:block">
+                <SearchCompanies />
+              </div>
+              {/* Mobile: show a search icon label */}
+              <button
+                type="button"
+                onClick={() => setShowFilters((p) => !p)}
+                className="sm:hidden flex items-center gap-2 text-sm font-medium text-slate-600 bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl w-full touch-manipulation"
+              >
+                <MdSearch size={18} className="text-slate-400 shrink-0" />
+                <span className="text-slate-400 truncate">Search or filter…</span>
+                <MdFilterList size={18} className="text-slate-400 ml-auto shrink-0" />
+              </button>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
-              <MdBusiness size={24} />
+
+            {/* View toggle — always visible */}
+            <div className="flex items-center gap-1.5 shrink-0 bg-slate-100 rounded-xl p-1">
+              <button
+                type="button"
+                onClick={() => setView("Grid")}
+                title="Grid view"
+                className={`
+                  flex items-center justify-center gap-1.5
+                  px-3 py-1.5 rounded-lg text-sm font-semibold
+                  transition-all duration-150 touch-manipulation
+                  ${view === "Grid"
+                    ? "bg-white text-slate-800 shadow-sm"
+                    : "text-slate-500 hover:text-slate-700"}
+                `}
+              >
+                <MdGridView size={17} />
+                <span className="hidden sm:inline">Grid</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setView("List")}
+                title="List view"
+                className={`
+                  flex items-center justify-center gap-1.5
+                  px-3 py-1.5 rounded-lg text-sm font-semibold
+                  transition-all duration-150 touch-manipulation
+                  ${view === "List"
+                    ? "bg-white text-slate-800 shadow-sm"
+                    : "text-slate-500 hover:text-slate-700"}
+                `}
+              >
+                <MdList size={17} />
+                <span className="hidden sm:inline">List</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Expandable filter row (mobile) / always visible (desktop) */}
+          <div className={`
+            border-t border-slate-100
+            px-4 pb-4 pt-3 sm:px-5
+            sm:block
+            ${showFilters ? "block" : "hidden"}
+          `}>
+            <div className="flex flex-col sm:flex-row gap-3">
+              {/* Mobile search */}
+              <div className="sm:hidden">
+                <SearchCompanies />
+              </div>
+              <SearchCompanyByStatus onStatusChange={setSelectedStatus} />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm font-medium">Active</p>
-              <p className="text-3xl font-bold text-green-600 mt-2">{activeCount}</p>
-            </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center text-green-600">
-              <MdCheckCircle size={24} />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm font-medium">Pending</p>
-              <p className="text-3xl font-bold text-amber-600 mt-2">{pendingCount}</p>
-            </div>
-            <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600">
-              <MdHourglassEmpty size={24} />
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Search and View Controls */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8 shadow-sm">
-        <div className="flex flex-col md:flex-row w-full justify-between items-start md:items-center gap-4">
-          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-            <SearchCompanies aria-label="Search companies by name" />
-            <SearchCompanyByStatus onStatusChange={setSelectedStatus} />
-          </div>
+        {/* ── Hidden edit modal ── */}
+        <AddCompany
+          isOpen={isEditOpen}
+          onClose={() => { setIsEditOpen(false); setEditingCompany(null); }}
+          initialData={editingCompany}
+          onSaved={(saved) => {
+            const updated = saved?._id ? saved : saved?.company || saved;
+            if (updated?._id) {
+              const patch = (prev) => prev.map((c) => c._id === updated._id ? { ...c, ...updated } : c);
+              setCompanies(patch);
+              setFilteredCompanies(patch);
+            }
+            setIsEditOpen(false);
+            setEditingCompany(null);
+          }}
+        />
 
-          <div className="flex gap-2 w-full md:w-auto">
-            <button
-              type="button"
-              onClick={() => setView("Grid")}
-              className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                view === "Grid"
-                  ? "bg-gray-900 text-white shadow-md"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              <MdGridView size={18} />
-              <span className="hidden sm:inline">Grid</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setView("List")}
-              className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                view === "List"
-                  ? "bg-gray-900 text-white shadow-md"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              <MdList size={18} />
-              <span className="hidden sm:inline">List</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Controlled AddCompany used for editing existing companies */}
-      <AddCompany
-        isOpen={isEditOpen}
-        onClose={() => {
-          setIsEditOpen(false);
-          setEditingCompany(null);
-        }}
-        initialData={editingCompany}
-        onSaved={(saved) => {
-          // Update companies list after edit
-          const updated = saved && saved._id ? saved : saved.company || saved;
-          if (updated && updated._id) {
-            setCompanies((prev) => prev.map((c) => (c._id === updated._id ? { ...c, ...updated } : c)));
-            setFilteredCompanies((prev) => prev.map((c) => (c._id === updated._id ? { ...c, ...updated } : c)));
-          }
-          setIsEditOpen(false);
-          setEditingCompany(null);
-        }}
-      />
-
-      {/* Companies List */}
-      <div
-        className={`border border-gray-200 rounded-md bg-[#ffffff] p-4 ${
-          view === "Grid"
-            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-            : "flex flex-col gap-4"
-        }`}
-        role="region"
-        aria-label="List of all companies"
-      >
+        {/* ── Company List / Grid ── */}
         {loading ? (
-          <p className="text-center text-gray-500">Loading companies...</p>
+          <div className="flex flex-col items-center justify-center py-24 gap-4">
+            <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+            <p className="text-sm text-slate-500 font-medium">Loading companies…</p>
+          </div>
         ) : error ? (
-          <p className="text-center text-red-500">{error}</p>
+          <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+            <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mb-4">
+              <MdBusiness size={26} className="text-red-400" />
+            </div>
+            <p className="text-slate-700 font-semibold mb-1">Something went wrong</p>
+            <p className="text-sm text-slate-500 mb-5">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 active:bg-blue-800 transition-colors touch-manipulation"
+            >
+              Retry
+            </button>
+          </div>
         ) : filteredCompanies.length === 0 ? (
-          <p className="text-center text-gray-500">
-            No companies found for “{selectedStatus}”
-          </p>
+          <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+            <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mb-4">
+              <MdBusiness size={26} className="text-indigo-400" />
+            </div>
+            <p className="text-slate-700 font-semibold mb-1">No companies found</p>
+            <p className="text-sm text-slate-500">
+              {selectedStatus !== "All Status"
+                ? `No results for status "${selectedStatus}"`
+                : "Try adjusting your search or filters."}
+            </p>
+          </div>
         ) : (
-              filteredCompanies.map((company) =>
-            view === "Grid" ? (
-              <CompanyCard
-                key={company._id}
-                _id={company._id}
-                {...mapCompanyProps(company)}
-                    onDelete={(deletedId) => setCompanies((prev) => prev.filter((c) => c._id !== deletedId))}
-                    onEdit={(data) => {
-                      setEditingCompany(company);
-                      setIsEditOpen(true);
-                    }}
-              />
-            ) : (
-              <BusinessProfileCard
-                key={company._id}
-                _id={company._id}
-                {...mapCompanyProps(company)}
-                    onDelete={(deletedId) => setCompanies((prev) => prev.filter((c) => c._id !== deletedId))}
-                    onEdit={(data) => {
-                      setEditingCompany(company);
-                      setIsEditOpen(true);
-                    }}
-              />
-            )
-          )
+          <div
+            className={
+              view === "Grid"
+                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5"
+                : "flex flex-col gap-3 sm:gap-4"
+            }
+            role="region"
+            aria-label="List of all companies"
+          >
+            {filteredCompanies.map((company) =>
+              view === "Grid" ? (
+                <CompanyCard
+                  key={company._id}
+                  _id={company._id}
+                  {...mapCompanyProps(company)}
+                  onDelete={(id) => setCompanies((prev) => prev.filter((c) => c._id !== id))}
+                  onEdit={() => { setEditingCompany(company); setIsEditOpen(true); }}
+                />
+              ) : (
+                <BusinessProfileCard
+                  key={company._id}
+                  _id={company._id}
+                  {...mapCompanyProps(company)}
+                  onDelete={(id) => setCompanies((prev) => prev.filter((c) => c._id !== id))}
+                  onEdit={() => { setEditingCompany(company); setIsEditOpen(true); }}
+                />
+              )
+            )}
+          </div>
+        )}
+
+        {/* ── Footer count ── */}
+        {!loading && !error && filteredCompanies.length > 0 && (
+          <div className="mt-8 flex justify-center">
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-100 text-slate-500 text-xs font-medium shadow-sm">
+              <MdBusiness size={14} />
+              Showing {filteredCompanies.length} of {companies.length} companies
+            </span>
+          </div>
         )}
       </div>
     </div>

@@ -184,74 +184,6 @@ const SuperAdminAttendance = () => {
         };
 
         return (
-            //     <div className="fixed inset-0 flex items-center justify-center bg-blur-sm
-            //  z-50">
-            //       <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-            //         <h2 className="text-lg font-semibold mb-4 text-center">Edit Attendance</h2>
-
-            //         <div className="space-y-4">
-            //           {/* Clock In */}
-            //           <div>
-            //             <label className="block text-sm font-medium text-gray-700 mb-1">
-            //               Clock In Time
-            //             </label>
-            //             <input
-            //               type="datetime-local"
-            //               className="w-full border border-gray-300 rounded-md px-3 py-2"
-            //               value={clockIn}
-            //               onChange={(e) => setClockIn(e.target.value)}
-            //             />
-            //           </div>
-
-            //           {/* Clock Out */}
-            //           <div>
-            //             <label className="block text-sm font-medium text-gray-700 mb-1">
-            //               Clock Out Time
-            //             </label>
-            //             <input
-            //               type="datetime-local"
-            //               className="w-full border border-gray-300 rounded-md px-3 py-2"
-            //               value={clockOut}
-            //               onChange={(e) => setClockOut(e.target.value)}
-            //               placeholder="Select clock out time"
-            //             />
-            //           </div>
-
-            //           {/* Status */}
-            //           <div>
-            //             <label className="block text-sm font-medium text-gray-700 mb-1">
-            //               Status
-            //             </label>
-            //             <select
-            //               className="w-full border border-gray-300 rounded-md px-3 py-2"
-            //               value={status}
-            //               onChange={(e) => setStatus(e.target.value)}
-            //             >
-            //               {statusOptions.map((s) => (
-            //                 <option key={s} value={s}>
-            //                   {s}
-            //                 </option>
-            //               ))}
-            //             </select>
-            //           </div>
-            //         </div>
-
-            //         <div className="flex justify-end gap-3 mt-6">
-            //           <button
-            //             onClick={onClose}
-            //             className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800"
-            //           >
-            //             Cancel
-            //           </button>
-            //           <button
-            //             onClick={handleSubmit}
-            //             className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white"
-            //           >
-            //             Save Changes
-            //           </button>
-            //         </div>
-            //       </div>
-            //     </div>
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
                 {/* Modal Card */}
                 <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
@@ -1346,7 +1278,7 @@ const SuperAdminAttendance = () => {
     /* 🧾 Render */
     /* -------------------------------------------------------------------------- */
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-6">
+        <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-4 md:p-6">
 
             {/* Header Section */}
             <div className="mb-8">

@@ -353,7 +353,7 @@ const OfferLetterFormat = () => {
 
             <div className="space-y-4">
               {fields.map(([name, label]) => (
-                <div key={name} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <div key={name} className="rounded-lg border border-slate-200 bg-slate-50 p-3 overflow-x-auto">
                   <label className="block text-sm font-semibold text-slate-700 mb-2">{label}</label>
                   <ReactQuill
                     theme="snow"
@@ -369,7 +369,7 @@ const OfferLetterFormat = () => {
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-200 p-4">
+          <div className="rounded-xl border border-slate-200 p-4 overflow-x-auto">
             <h2 className="mb-2 text-xl font-bold">ANNEXURE A</h2>
             <ReactQuill
               theme="snow"
@@ -382,11 +382,11 @@ const OfferLetterFormat = () => {
             />
           </div>
 
-          <div className="rounded-xl border border-slate-200 p-4">
+          <div className="rounded-xl border border-slate-200 p-4 overflow-x-auto">
             <h2 className="mb-4 text-xl font-bold">Non Disclosure Agreement (NDA)</h2>
             
             {/* Main NDA Description */}
-            <div className="mb-4">
+            <div className="mb-4 overflow-x-auto">
               <label className="mb-2 block text-sm font-semibold">Data Non-Disclosure Agreement (NDA)</label>
               <ReactQuill
                 theme="snow"
@@ -400,7 +400,7 @@ const OfferLetterFormat = () => {
             </div>
 
             {/* WHEREAS Section */}
-            <div className="mb-4">
+            <div className="mb-4 overflow-x-auto">
               <label className="mb-2 block text-sm font-semibold">WHEREAS</label>
               <ReactQuill
                 theme="snow"
@@ -425,7 +425,7 @@ const OfferLetterFormat = () => {
                 { key: "ndaGoverningLaw", label: "7. Governing Law and Jurisdiction" },
                 { key: "ndaAdditionalObligations", label: "8. Additional Obligations" },
               ].map(({ key, label }) => (
-                <div key={key}>
+                <div key={key} className="overflow-x-auto">
                   <label className="mb-2 block text-sm font-semibold">{label}</label>
                   <ReactQuill
                     theme="snow"

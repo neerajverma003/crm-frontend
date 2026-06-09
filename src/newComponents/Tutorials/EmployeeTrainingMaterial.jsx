@@ -286,17 +286,17 @@ const EmployeeTrainingMaterial = () => {
             <div className="text-xs text-gray-400">{formatDate(tut.createdAt)}</div>
           </div>
 
-          <div className="mt-3 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              {tut.fileType === 'image' && <Image className="w-4 h-4" />}
-              {tut.fileType === 'video' && <Video className="w-4 h-4" />}
-              {tut.fileType === 'pdf' && <FileText className="w-4 h-4" />}
-              {tut.fileType === 'ppt' && <File className="w-4 h-4" />}
-              <span>{tut.originalName || 'Material'}</span>
+          <div className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-gray-100 pt-3">
+            <div className="flex items-center gap-2 text-sm text-gray-600 truncate pr-2 flex-1 min-w-0">
+              {tut.fileType === 'image' && <Image className="w-4 h-4 flex-shrink-0" />}
+              {tut.fileType === 'video' && <Video className="w-4 h-4 flex-shrink-0" />}
+              {tut.fileType === 'pdf' && <FileText className="w-4 h-4 flex-shrink-0" />}
+              {tut.fileType === 'ppt' && <File className="w-4 h-4 flex-shrink-0" />}
+              <span className="truncate">{tut.originalName || 'Material'}</span>
             </div>
 
-            <div className="flex items-center gap-2">
-              <a href={(tut.fileType === 'pdf' || tut.fileType === 'ppt') ? `${API_BASE_URL}/tutorials/preview/${tut._id}` : getViewerUrl(url, tut.fileType)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-blue-600"><Download className="w-4 h-4" /> Open</a>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <a href={(tut.fileType === 'pdf' || tut.fileType === 'ppt') ? `${API_BASE_URL}/tutorials/preview/${tut._id}` : getViewerUrl(url, tut.fileType)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors"><Download className="w-4 h-4" /> Open</a>
             </div>
           </div>
         </div>
@@ -376,14 +376,14 @@ const EmployeeTrainingMaterial = () => {
   );
 
   return (
-    <div className="max-w-6xl mx-auto mt-8 p-6 bg-white rounded-2xl shadow-lg">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-3xl font-bold">Training Materials</h2>
+    <div className="max-w-6xl mx-auto mt-4 md:mt-8 p-4 md:p-6 bg-white md:rounded-2xl shadow-lg">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+        <h2 className="text-2xl md:text-3xl font-bold">Training Materials</h2>
 
-        <div className="flex items-center gap-3">
-          <div className="relative">
+        <div className="w-full md:w-auto">
+          <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by title..." className="pl-10 pr-3 py-2 rounded-lg border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Search training materials" />
+            <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by title..." className="w-full pl-10 pr-3 py-2 rounded-lg border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Search training materials" />
           </div>
         </div>
       </div>

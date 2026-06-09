@@ -217,7 +217,7 @@ const EmployeeDataTable = ({ searchText = "", refreshTrigger = 0, onRefresh }) =
       </div>
 
       {/* Mobile View: Card Layout */}
-      <div className="block md:hidden space-y-4 p-4">
+      <div className="block md:hidden space-y-4 py-4">
         {employees.length === 0 ? (
           <div className="text-center py-12 text-gray-500 bg-white rounded-2xl border border-gray-100 shadow-sm">
             No employee data found
@@ -269,7 +269,7 @@ const EmployeeDataTable = ({ searchText = "", refreshTrigger = 0, onRefresh }) =
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-2 border-t border-gray-100 pt-3 mt-1">
+              <div className="flex flex-wrap items-center justify-end gap-2 border-t border-gray-100 pt-3 mt-1">
                 <button
                   onClick={() => handleView(employee)}
                   className="flex items-center justify-center gap-1 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl transition-all font-semibold text-xs border border-blue-100"

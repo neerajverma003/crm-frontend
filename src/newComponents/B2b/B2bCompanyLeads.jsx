@@ -78,7 +78,7 @@ const SelectField = ({ name, options, required, value, error, onChange }) => (
 const Modal = ({ isOpen, onClose, size = "large", children }) => {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999]" onClick={onClose}>
       <div
         className={`bg-white rounded-lg shadow-lg ${size === "large" ? "w-full max-w-4xl" : "w-full max-w-md"} max-h-[95vh] overflow-auto`}
         onClick={(e) => e.stopPropagation()}
@@ -228,8 +228,8 @@ const LeadForm = ({ initialData = {}, onSubmit, onClose, isEditing = false }) =>
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 p-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <form onSubmit={handleSubmit} className="space-y-4 p-2 sm:p-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <InputField name="referenceId" value={formData.referenceId} onChange={handleChange} disabled={true} />
         <CompanySearchBox name="companyName" value={formData.companyName} onChange={handleChange} required error={errors.companyName} />
         <InputField name="companyEmail" type="email" value={formData.companyEmail} onChange={handleChange} required error={errors.companyEmail} />
@@ -248,26 +248,28 @@ const LeadForm = ({ initialData = {}, onSubmit, onClose, isEditing = false }) =>
           <InputField name="customNoOfDays" placeholder="Enter custom duration" value={formData.customNoOfDays || ""} onChange={handleChange} />
         )}
 
-        <div className="col-span-2">
-          <label className="block text-xs font-medium text-gray-700 mb-0.5">Places to Cover</label>
-          <div className="flex flex-wrap gap-1 mb-1">
+        <div className="md:col-span-2">
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Places to Cover</label>
+          <div className="flex flex-wrap gap-2 mb-2">
             {(formData.placesToCoverArray || []).map((place, idx) => (
-              <span key={idx} className="bg-blue-100 text-blue-700 px-2 py-1 rounded flex items-center gap-1 text-sm">
+              <span key={idx} className="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm font-medium">
                 {place}
-                <button type="button" onClick={() => removePlace(idx)}>x</button>
+                <button type="button" onClick={() => removePlace(idx)} className="text-blue-500 hover:text-blue-800 focus:outline-none">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
               </span>
             ))}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               placeholder="Type a place, press Enter or click Add"
               value={placeInput}
               onChange={(e) => setPlaceInput(e.target.value)}
               onKeyDown={(e) => handleAddPlace(e)}
-              className="flex-1 px-3 py-1.5 border rounded-lg text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
             />
-            <button type="button" onClick={handleAddPlace} className="px-3 py-1 bg-blue-600 text-white rounded">Add</button>
+            <button type="button" onClick={handleAddPlace} className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all active:scale-95 whitespace-nowrap">Add Place</button>
           </div>
         </div>
 
@@ -275,15 +277,22 @@ const LeadForm = ({ initialData = {}, onSubmit, onClose, isEditing = false }) =>
         <InputField name="noOfChild" type="number" value={formData.noOfChild} onChange={handleChange} />
         <InputField name="groupNumber" type="text" value={formData.groupNumber} onChange={handleChange} />
 
-        <div className="col-span-2">
-          <label className="block text-xs font-medium text-gray-700 mb-0.5">Child Ages</label>
-          {formData.childAges.map((age, idx) => (
-            <div key={idx} className="flex gap-2 mb-1">
-              <input type="number" value={age} onChange={(e) => handleChildAgeChange(idx, e.target.value)} placeholder="Child Age" className="w-full px-3 py-1.5 border rounded-lg text-sm" />
-              <button type="button" onClick={() => removeChildAge(idx)} className="bg-red-100 px-2 rounded hover:bg-red-200">X</button>
-            </div>
-          ))}
-          <button type="button" onClick={addChildAge} className="mt-1 text-blue-600 hover:underline text-sm">+ Add Child Age</button>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Child Ages</label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+            {formData.childAges.map((age, idx) => (
+              <div key={idx} className="flex gap-2">
+                <input type="number" value={age} onChange={(e) => handleChildAgeChange(idx, e.target.value)} placeholder="Age" className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" />
+                <button type="button" onClick={() => removeChildAge(idx)} className="bg-red-50 text-red-500 px-3 py-2 rounded-lg hover:bg-red-100 hover:text-red-700 transition-colors">
+                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+              </div>
+            ))}
+          </div>
+          <button type="button" onClick={addChildAge} className="mt-2 text-blue-600 hover:text-blue-800 text-sm font-semibold flex items-center gap-1 transition-colors">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            Add Child Age
+          </button>
         </div>
 
         <SelectField name="leadSource" options={leadSources} value={formData.leadSource} onChange={handleChange} />
@@ -754,28 +763,15 @@ const B2bCompanyLeads = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
+    <div className="max-w-6xl mx-auto my-6 sm:my-10 px-4 sm:px-6 lg:px-8">
+      <div className="bg-white shadow-sm border border-slate-200 rounded-3xl p-6 sm:p-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Company Leads</h1>
-          <p className="text-gray-600">Manage B2B company leads and opportunities</p>
-        </div>
-
-        {/* Action Bar */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex-1 mr-4">
-            <div className="relative">
-              <FiSearch className="absolute left-3 top-3 text-gray-400" size={20} />
-              <input
-                type="text"
-                placeholder="Search by company name, contact person, or email..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 mb-8">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-blue-900 tracking-tight">Company Leads</h2>
+            <p className="text-slate-500 font-medium mt-1">Manage B2B company leads and opportunities</p>
           </div>
+          
           <button
             onClick={async () => {
               setEditingId(null);
@@ -793,35 +789,56 @@ const B2bCompanyLeads = () => {
               }
               setShowForm(true);
             }}
-            className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-blue-200 hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all flex justify-center items-center gap-2 whitespace-nowrap"
           >
-            <FiPlus size={20} />
+            <FiPlus size={20} strokeWidth={3} />
             Add Lead
           </button>
-
         </div>
 
-        {/* Table Tabs */}
-        <div className="mb-4">
-          <div className="flex items-center gap-2">
+        {/* Action Bar (Search and Tabs) */}
+        <div className="flex flex-col-reverse lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 bg-slate-50 p-3 sm:p-4 rounded-2xl border border-slate-200">
+          {/* Table Tabs */}
+          <div className="flex items-center gap-2 w-full lg:w-auto overflow-x-auto pb-1 lg:pb-0 scrollbar-hide">
             <button
               onClick={() => setActiveTableTab("all")}
-              className={`px-4 py-2 rounded-full text-sm font-semibold ${activeTableTab === 'all' ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:bg-gray-100'}`}
+              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-[11px] sm:text-sm tracking-wide whitespace-nowrap transition-all ${
+                activeTableTab === 'all'
+                  ? "bg-blue-100 text-blue-700 border border-blue-200 shadow-sm"
+                  : "bg-white text-slate-500 border border-slate-200 hover:border-blue-300 hover:text-blue-600 shadow-sm"
+              }`}
             >
               All Leads
             </button>
             <button
               onClick={() => setActiveTableTab("transfer")}
-              className={`px-4 py-2 rounded-full text-sm font-semibold ${activeTableTab === 'transfer' ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:bg-gray-100'}`}
+              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-[11px] sm:text-sm tracking-wide whitespace-nowrap transition-all ${
+                activeTableTab === 'transfer'
+                  ? "bg-blue-100 text-blue-700 border border-blue-200 shadow-sm"
+                  : "bg-white text-slate-500 border border-slate-200 hover:border-blue-300 hover:text-blue-600 shadow-sm"
+              }`}
             >
               Transfer Leads
             </button>
+          </div>
+
+          <div className="w-full lg:w-[400px]">
+            <div className="relative">
+              <FiSearch className="absolute left-3 top-3 sm:top-3.5 text-slate-400" size={16} />
+              <input
+                type="text"
+                placeholder="Search by company name, contact person, or email..."
+                className="w-full pl-9 sm:pl-10 pr-4 py-2.5 sm:py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:border-indigo-400 font-medium text-xs sm:text-sm text-slate-700 shadow-sm transition-all"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 
         {/* View Lead Modal */}
         {showViewModal && viewingLead && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
             <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-2xl font-bold text-gray-900">Lead Details</h3>
@@ -1155,7 +1172,7 @@ const B2bCompanyLeads = () => {
 
         {/* Message Modal (used by status 'Follow Up' and Add Message) */}
         {messageModal.isOpen && messageModal.lead && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={() => setMessageModal({ isOpen: false, lead: null })}>
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999]" onClick={() => setMessageModal({ isOpen: false, lead: null })}>
             <div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               <button onClick={() => setMessageModal({ isOpen: false, lead: null })} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700">Close</button>
               <h3 className="text-lg font-semibold mb-4 text-center">Add Message for {messageModal.lead.companyName || messageModal.lead.referenceId}</h3>
@@ -1188,7 +1205,7 @@ const B2bCompanyLeads = () => {
 
         {/* Details Modal */}
         {detailsModal.isOpen && detailsModal.lead && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 overflow-y-auto" onClick={() => setDetailsModal({ isOpen: false, lead: null })}>
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] overflow-y-auto" onClick={() => setDetailsModal({ isOpen: false, lead: null })}>
             <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative my-8 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               <button onClick={() => setDetailsModal({ isOpen: false, lead: null })} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700">✕</button>
               <h3 className="text-lg font-semibold mb-4 text-center">Add Details for {detailsModal.lead.companyName}</h3>
@@ -1489,72 +1506,165 @@ const B2bCompanyLeads = () => {
           {isLoading ? (
             <div className="p-6 text-center text-gray-500">Loading leads...</div>
           ) : filteredLeads.length === 0 ? (
-            <div className="p-6 text-center text-gray-500">
-              {leads.length === 0 ? "No leads added yet" : "No leads match your search"}
+            <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-10 text-center shadow-sm">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                <FiSearch className="w-8 h-8 text-slate-300" />
+              </div>
+              <p className="text-slate-500 font-bold text-lg">
+                {leads.length === 0 ? "No leads added yet" : "No leads match your search"}
+              </p>
             </div>
           ) : (
-            <table className="w-full">
-              <thead className="bg-gray-100 border-b">
-                <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                    Reference ID
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                    Company Name
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredLeads.map((lead, index) => (
-                  <tr
-                    key={lead._id}
-                    className={`${
-                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                    } border-b hover:bg-gray-100 transition`}
-                  >
-                    <td className="px-6 py-4 text-sm text-gray-900 font-semibold">
-                      {lead.referenceId}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      {lead.companyName}
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      <div className="flex justify-center gap-2 flex-col sm:flex-row">
-                        <div className="flex justify-center gap-2 flex-wrap">
-                          {/* 1. View Button (always show) */}
+            <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-slate-50 md:bg-white">
+              
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead className="text-xs text-slate-500 uppercase bg-slate-50 font-bold border-b border-slate-200">
+                    <tr>
+                      <th className="px-6 py-4 whitespace-nowrap">Reference ID</th>
+                      <th className="px-6 py-4 whitespace-nowrap">Company Name</th>
+                      <th className="px-6 py-4 text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {filteredLeads.map((lead, index) => (
+                      <tr
+                        key={lead._id}
+                        className="hover:bg-blue-50/30 transition-colors bg-white"
+                      >
+                        <td className="px-6 py-4 font-bold text-slate-700">
+                          {lead.referenceId}
+                        </td>
+                        <td className="px-6 py-4 font-bold text-blue-900">
+                          {lead.companyName}
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <div className="flex justify-center items-center gap-2">
+                            {/* 1. View Button (always show) */}
+                            <button
+                              onClick={() => handleViewLead(lead)}
+                              className="p-2 rounded-lg bg-slate-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 border border-slate-200 hover:border-blue-200 transition-colors"
+                              title="View"
+                            >
+                              <FiEye size={16} strokeWidth={2.5} />
+                            </button>
+
+                            {/* All other buttons only show in All Leads tab (not in Transfer Leads) */}
+                            {activeTableTab !== "transfer" && (
+                              <>
+                                {/* 2. Edit Button */}
+                                <button
+                                  onClick={() => handleEdit(lead)}
+                                  className="p-2 rounded-lg bg-slate-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 border border-slate-200 hover:border-amber-200 transition-colors"
+                                  title="Edit"
+                                >
+                                  <FiEdit2 size={16} strokeWidth={2.5} />
+                                </button>
+
+                                {/* 3. Dropdown */}
+                                <select
+                                  value={lead.leadStatus || ""}
+                                  onChange={(e) => handleStatusChange(lead._id, e.target.value)}
+                                  disabled={statusSavingId === lead._id}
+                                  className={`px-3 py-1.5 border-2 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-400 cursor-pointer transition-all min-w-[140px] ${
+                                    statusSavingId === lead._id ? 'bg-blue-50 border-blue-200 text-gray-500 cursor-not-allowed opacity-70' : 'bg-white border-slate-200'
+                                  } ${
+                                    lead.leadStatus ? 'text-indigo-600' : 'text-slate-500'
+                                  }`}
+                                >
+                                  <option value="">Select Status</option>
+                                  <option value="Interested">Interested</option>
+                                  <option value="Not Interested">Not Interested</option>
+                                  <option value="Connected">Connected</option>
+                                  <option value="Not Connected">Not Connected</option>
+                                  <option value="Follow Up">Follow Up</option>
+                                </select>
+
+                                {/* 4. Msg Button (only if Follow Up) */}
+                                {lead.leadStatus === "Follow Up" && (
+                                  <button onClick={() => handleAddMessage(lead)} className="p-2 rounded-lg bg-slate-50 text-purple-600 hover:bg-purple-100 hover:text-purple-700 border border-slate-200 hover:border-purple-200 transition-colors" title="Add Message">
+                                    <FiMessageCircle size={16} strokeWidth={2.5} />
+                                  </button>
+                                )}
+
+                                {/* 5. Details Button (only if Follow Up) */}
+                                {lead.leadStatus === "Follow Up" && (
+                                  <button onClick={() => handleAddDetails(lead)} className="px-3 py-1.5 rounded-lg bg-slate-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 border border-slate-200 hover:border-emerald-200 transition-colors text-xs font-bold tracking-wide uppercase" title="Add Details">Details</button>
+                                )}
+
+                                {/* 6. Confirm Button (only if Follow Up) */}
+                                {lead.leadStatus === "Follow Up" && (
+                                  <button onClick={() => handleConfirmTransfer(lead)} className="px-3 py-1.5 rounded-lg bg-slate-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 border border-slate-200 hover:border-amber-200 transition-colors text-xs font-bold tracking-wide uppercase" title="Confirm">Confirm</button>
+                                )}
+
+                                {/* 7. Delete Button */}
+                                <button
+                                  onClick={() => handleDelete(lead._id)}
+                                  className="p-2 rounded-lg bg-slate-50 text-red-500 hover:bg-red-50 hover:text-red-600 border border-slate-200 hover:border-red-200 transition-colors"
+                                  title="Delete"
+                                >
+                                  <FiTrash2 size={16} strokeWidth={2.5} />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="block md:hidden">
+                <div className="flex flex-col gap-4 p-4">
+                  {filteredLeads.map((lead) => (
+                    <div key={lead._id} className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col gap-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Ref ID</p>
+                          <h4 className="font-bold text-slate-800 text-sm">{lead.referenceId}</h4>
+                        </div>
+                        <span className="bg-indigo-50 text-indigo-700 border border-indigo-200 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">
+                          {lead.leadStatus || "New Lead"}
+                        </span>
+                      </div>
+                      
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Company Name</p>
+                        <h3 className="font-extrabold text-blue-900 text-base leading-tight">{lead.companyName}</h3>
+                      </div>
+
+                      <div className="mt-2 pt-3 border-t border-slate-100">
+                        <div className="flex flex-wrap gap-2 justify-start items-center">
+                          {/* 1. View Button */}
                           <button
                             onClick={() => handleViewLead(lead)}
-                            className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200"
+                            className="p-2 rounded-lg bg-slate-50 text-blue-600 hover:bg-blue-100 border border-slate-200 transition-colors"
                             title="View"
                           >
-                            <FiEye size={16} />
+                            <FiEye size={16} strokeWidth={2.5} />
                           </button>
 
-                          {/* All other buttons only show in All Leads tab (not in Transfer Leads) */}
+                          {/* All other buttons */}
                           {activeTableTab !== "transfer" && (
                             <>
-                              {/* 2. Edit Button */}
                               <button
                                 onClick={() => handleEdit(lead)}
-                                className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200"
+                                className="p-2 rounded-lg bg-slate-50 text-amber-600 hover:bg-amber-100 border border-slate-200 transition-colors"
                                 title="Edit"
                               >
-                                <FiEdit2 size={16} />
+                                <FiEdit2 size={16} strokeWidth={2.5} />
                               </button>
 
-                              {/* 3. Dropdown */}
                               <select
                                 value={lead.leadStatus || ""}
                                 onChange={(e) => handleStatusChange(lead._id, e.target.value)}
                                 disabled={statusSavingId === lead._id}
-                                className={`px-2 py-1 border rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 cursor-pointer transition ${
-                                  statusSavingId === lead._id ? 'bg-blue-50 border-blue-400 text-gray-600 cursor-not-allowed opacity-70' : 'border-gray-300'
-                                } ${
-                                  lead.leadStatus ? 'font-semibold text-blue-600' : 'text-gray-500'
-                                }`}
+                                className={`px-3 py-1.5 border-2 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-400 cursor-pointer flex-1 min-w-[120px] transition-all ${
+                                  statusSavingId === lead._id ? 'bg-blue-50 border-blue-200 text-gray-500 cursor-not-allowed opacity-70' : 'bg-white border-slate-200'
+                                } ${lead.leadStatus ? 'text-indigo-600' : 'text-slate-500'}`}
                               >
                                 <option value="">Select Status</option>
                                 <option value="Interested">Interested</option>
@@ -1564,40 +1674,33 @@ const B2bCompanyLeads = () => {
                                 <option value="Follow Up">Follow Up</option>
                               </select>
 
-                              {/* 4. Msg Button (only if Follow Up) */}
-                              {lead.leadStatus === "Follow Up" && (
-                                <button onClick={() => handleAddMessage(lead)} className="p-2 rounded-full bg-purple-100 text-purple-600 hover:bg-purple-200" title="Add Message">
-                                  <FiMessageCircle size={16} />
-                                </button>
-                              )}
-
-                              {/* 5. Details Button (only if Follow Up) */}
-                              {lead.leadStatus === "Follow Up" && (
-                                <button onClick={() => handleAddDetails(lead)} className="px-3 py-1 rounded bg-indigo-100 text-indigo-700 hover:bg-indigo-200 text-sm font-medium" title="Add Details">Details</button>
-                              )}
-
-                              {/* 6. Confirm Button (only if Follow Up) */}
-                              {lead.leadStatus === "Follow Up" && (
-                                <button onClick={() => handleConfirmTransfer(lead)} className="px-3 py-1 rounded bg-yellow-100 text-yellow-800 hover:bg-yellow-200 text-sm font-medium" title="Confirm">Confirm</button>
-                              )}
-
-                              {/* 7. Delete Button */}
                               <button
                                 onClick={() => handleDelete(lead._id)}
-                                className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200"
+                                className="p-2 rounded-lg bg-slate-50 text-red-500 hover:bg-red-50 border border-slate-200 transition-colors"
                                 title="Delete"
                               >
-                                <FiTrash2 size={16} />
+                                <FiTrash2 size={16} strokeWidth={2.5} />
                               </button>
+
+                              {/* Conditional Buttons (Follow Up) */}
+                              {lead.leadStatus === "Follow Up" && (
+                                <div className="w-full flex gap-2 mt-1">
+                                  <button onClick={() => handleAddMessage(lead)} className="flex-1 py-2 rounded-lg bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 text-xs font-bold uppercase flex justify-center items-center gap-1.5 transition-colors">
+                                    <FiMessageCircle size={14} strokeWidth={2.5} /> Msg
+                                  </button>
+                                  <button onClick={() => handleAddDetails(lead)} className="flex-1 py-2 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold uppercase transition-colors">Details</button>
+                                  <button onClick={() => handleConfirmTransfer(lead)} className="flex-1 py-2 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 text-xs font-bold uppercase transition-colors">Confirm</button>
+                                </div>
+                              )}
                             </>
                           )}
                         </div>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>

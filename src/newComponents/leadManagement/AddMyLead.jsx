@@ -1701,18 +1701,17 @@ const EmployeeLeads = () => {
         <div className="hidden sm:block text-sm text-gray-400">&nbsp;</div>
       </nav> */}
 
-      <nav className="mb-3 w-full">
+      <nav className="mb-4 w-full relative z-10">
         <div className="flex w-full">
           <div 
-            className="flex flex-row overflow-x-auto whitespace-nowrap gap-2 w-full bg-white/60 p-1.5 rounded-2xl border border-gray-100 shadow-sm backdrop-blur-md [&::-webkit-scrollbar]:hidden"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            className="flex flex-row flex-wrap gap-2 sm:gap-3 w-full bg-white/40 p-2 sm:p-2.5 rounded-2xl border border-white/60 shadow-lg shadow-indigo-100/50 backdrop-blur-xl"
           >
             <button
               onClick={() => setActiveTab('my-leads')}
-              className={`flex-none px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
+              className={`flex-auto text-center px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs sm:text-sm font-bold tracking-wide uppercase transition-all duration-300 active:scale-95
                 ${activeTab === 'my-leads'
-                  ? 'bg-white text-indigo-600 shadow-sm ring-1 ring-indigo-100'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-500'}
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/30 ring-1 ring-blue-500'
+                  : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-indigo-600 hover:shadow-sm border border-slate-100'}
               `}
             >
               MY LEADS
@@ -1723,10 +1722,10 @@ const EmployeeLeads = () => {
                 userRole.toLowerCase() !== 'superadmin')) && (
                 <button
                   onClick={() => setActiveTab('special-lead')}
-                  className={`flex-none px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
+                  className={`flex-auto text-center px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs sm:text-sm font-bold tracking-wide uppercase transition-all duration-300 active:scale-95
                     ${activeTab === 'special-lead'
-                      ? 'bg-white text-indigo-600 shadow-sm ring-1 ring-indigo-100'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-500'}
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/30 ring-1 ring-blue-500'
+                      : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-indigo-600 hover:shadow-sm border border-slate-100'}
                   `}
                 >
                   SPECIAL LEAD
@@ -1735,10 +1734,10 @@ const EmployeeLeads = () => {
 
             <button
               onClick={() => setActiveTab('assigned')}
-              className={`flex-none px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
+              className={`flex-auto text-center px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs sm:text-sm font-bold tracking-wide uppercase transition-all duration-300 active:scale-95
                 ${activeTab === 'assigned'
-                  ? 'bg-white text-indigo-600 shadow-sm ring-1 ring-indigo-100'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-500'}
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/30 ring-1 ring-blue-500'
+                  : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-indigo-600 hover:shadow-sm border border-slate-100'}
               `}
             >
               MY ASSIGNED LEAD
@@ -1746,10 +1745,10 @@ const EmployeeLeads = () => {
 
             <button
               onClick={() => setActiveTab('destination-assigned')}
-              className={`flex-none px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
+              className={`flex-auto text-center px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs sm:text-sm font-bold tracking-wide uppercase transition-all duration-300 active:scale-95
                 ${activeTab === 'destination-assigned'
-                  ? 'bg-white text-indigo-600 shadow-sm ring-1 ring-indigo-100'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-500'}
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/30 ring-1 ring-blue-500'
+                  : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-indigo-600 hover:shadow-sm border border-slate-100'}
               `}
             >
               ASSIGNED BY DESTINATION
@@ -1757,10 +1756,10 @@ const EmployeeLeads = () => {
 
             <button
               onClick={() => setActiveTab('transfer')}
-              className={`flex-none px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
+              className={`flex-auto text-center px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs sm:text-sm font-bold tracking-wide uppercase transition-all duration-300 active:scale-95
                 ${activeTab === 'transfer'
-                  ? 'bg-white text-indigo-600 shadow-sm ring-1 ring-indigo-100'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-500'}
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/30 ring-1 ring-blue-500'
+                  : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-indigo-600 hover:shadow-sm border border-slate-100'}
               `}
             >
               TRANSFER TO OPERATION
@@ -1817,10 +1816,9 @@ const EmployeeLeads = () => {
           </div>
 
           {/* Sub-Navbar for Status Filters */}
-          <div className="mb-1 sm:mb-2 w-full max-w-full overflow-hidden">
+          <div className="mb-2 sm:mb-3 w-full max-w-full">
             <div 
-              className="flex flex-row overflow-x-auto whitespace-nowrap gap-1 sm:gap-2 bg-white p-1 rounded-xl shadow-sm border border-gray-100 w-full sm:w-fit [&::-webkit-scrollbar]:hidden"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              className="flex flex-row flex-wrap gap-1 sm:gap-2 bg-white/50 p-1.5 rounded-xl shadow-sm border border-slate-200/60 w-full"
             >
               {[
                 { id: 'all', label: 'All' },
@@ -1833,10 +1831,10 @@ const EmployeeLeads = () => {
                 <button
                   key={tab.id}
                   onClick={() => setSubNavFilter(tab.id)}
-                  className={`flex-none relative px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300
+                  className={`flex-auto text-center relative px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-bold tracking-wide transition-all duration-200 active:scale-95
                     ${subNavFilter === tab.id
-                      ? 'bg-indigo-50 text-indigo-700 shadow-sm ring-1 ring-indigo-200/50'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-600'}
+                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                      : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-indigo-600 border border-slate-100'}
                   `}
                 >
                   {tab.label}

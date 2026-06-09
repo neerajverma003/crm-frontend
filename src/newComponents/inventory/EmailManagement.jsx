@@ -23,18 +23,18 @@ const ViewModal = ({ item, isOpen, onClose, users, onAssign, onUnassign, assigni
   const formatDate = (date) => new Date(date).toLocaleDateString() + " " + new Date(date).toLocaleTimeString();
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000] p-2 sm:p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-gradient-to-r from-green-600 to-green-700 text-white p-6 flex justify-between items-center">
-          <h2 className="text-xl font-bold">Email Details</h2>
-          <button onClick={onClose} className="text-2xl font-bold hover:text-green-100">&times;</button>
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-4 sm:p-6 flex justify-between items-center rounded-t-lg">
+          <h2 className="text-lg sm:text-xl font-bold">Email Details</h2>
+          <button onClick={onClose} className="text-2xl font-bold hover:text-blue-100 flex-shrink-0">&times;</button>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Email Info */}
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Email Address</h3>
-            <p className="text-2xl font-bold text-green-600">{item.email}</p>
+            <p className="text-xl sm:text-2xl font-bold text-blue-600 break-all">{item.email}</p>
             <p className="text-sm text-gray-500 mt-2">Created: {formatDate(item.createdAt)}</p>
           </div>
 
@@ -64,11 +64,11 @@ const ViewModal = ({ item, isOpen, onClose, users, onAssign, onUnassign, assigni
           {/* Assign to */}
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-3">Assign to</h3>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-3">
               <select
                 value={selectedUser}
                 onChange={(e) => setSelectedUser(e.target.value)}
-                className="flex-1 border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-green-300"
+                className="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-300"
               >
                 <option value="">-- Select Admin or Employee --</option>
                 {users.map(user => (
@@ -80,7 +80,7 @@ const ViewModal = ({ item, isOpen, onClose, users, onAssign, onUnassign, assigni
               <button
                 onClick={handleAssign}
                 disabled={assigning || !selectedUser}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded disabled:opacity-60"
+                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded disabled:opacity-60 whitespace-nowrap"
               >
                 {assigning ? "..." : "Assign"}
               </button>
@@ -93,7 +93,7 @@ const ViewModal = ({ item, isOpen, onClose, users, onAssign, onUnassign, assigni
             {item.assignmentHistory && item.assignmentHistory.length > 0 ? (
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {item.assignmentHistory.slice().reverse().map((record, idx) => (
-                  <div key={idx} className="bg-gray-50 p-3 rounded border-l-4 border-green-500">
+                  <div key={idx} className="bg-gray-50 p-3 rounded border-l-4 border-blue-500">
                     <p className="font-semibold text-sm text-gray-900">{record.assignedToName || "Unknown"}</p>
                     <p className="text-xs text-gray-600">Type: {record.assignedToType}</p>
                     <p className="text-xs text-gray-500">
@@ -303,7 +303,7 @@ const EmailManagement = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter email address"
-              className="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-green-300"
+              className="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-300"
             />
             <p className="text-xs text-gray-400 mt-1">Enter a valid email address to store.</p>
           </div>
@@ -312,7 +312,7 @@ const EmailManagement = () => {
             <button
               type="submit"
               disabled={saving}
-              className="w-full bg-green-600 text-white px-4 py-2 rounded disabled:opacity-60"
+              className="w-full bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-60"
             >
               {saving ? "Adding..." : "Add Email"}
             </button>
@@ -320,7 +320,8 @@ const EmailManagement = () => {
         </form>
       </div>
 
-      <div className="bg-white border rounded shadow-sm overflow-x-auto">
+      {/* Desktop Table View */}
+      <div className="hidden md:block bg-white border rounded shadow-sm overflow-x-auto">
         <table className="min-w-full table-auto">
           <thead className="bg-gray-50">
             <tr>
@@ -346,7 +347,7 @@ const EmailManagement = () => {
                   <td className="px-6 py-4 align-top text-sm text-gray-900 font-medium">{item.email}</td>
                   <td className="px-6 py-4 align-top text-sm">
                     {item.assignedToName ? (
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold">
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">
                         {item.assignedToName}
                       </span>
                     ) : (
@@ -360,7 +361,7 @@ const EmailManagement = () => {
                           setSelectedItem(item);
                           setViewModal(true);
                         }}
-                        className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm"
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
                       >
                         View
                       </button>
@@ -378,6 +379,58 @@ const EmailManagement = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="block md:hidden space-y-4">
+        {loading ? (
+          <div className="p-6 text-center text-gray-500 bg-white border rounded shadow-sm">Loading...</div>
+        ) : list.length === 0 ? (
+          <div className="p-8 text-center text-gray-500 bg-white border rounded shadow-sm">No emails found.</div>
+        ) : (
+          list.map((item, idx) => (
+            <div key={item._id || item.id} className="bg-white border rounded-lg shadow-sm p-4 relative flex flex-col gap-3">
+              <div className="absolute top-4 right-4 bg-gray-100 text-gray-600 font-bold text-xs px-2 py-1 rounded">
+                # {idx + 1}
+              </div>
+              
+              <div>
+                <p className="text-xs text-gray-500 mb-0.5">Email Address</p>
+                <p className="text-sm font-bold text-blue-900 break-all pr-8">{item.email}</p>
+              </div>
+
+              <div className="pt-2 border-t border-gray-100">
+                <p className="text-xs text-gray-500 mb-1.5">Assignment Status</p>
+                {item.assignedToName ? (
+                  <span className="bg-blue-100 text-blue-800 px-2.5 py-1 rounded text-xs font-semibold inline-block">
+                    {item.assignedToName}
+                  </span>
+                ) : (
+                  <span className="text-gray-400 italic text-xs">Unassigned</span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 pt-2 border-t border-gray-100 mt-1">
+                <button
+                  onClick={() => {
+                    setSelectedItem(item);
+                    setViewModal(true);
+                  }}
+                  className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 py-2 rounded text-sm font-semibold border border-blue-100"
+                >
+                  View / Assign
+                </button>
+                <button
+                  onClick={() => handleDelete(item._id || item.id)}
+                  disabled={deletingId === (item._id || item.id)}
+                  className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 py-2 rounded text-sm font-semibold border border-red-100 disabled:opacity-50"
+                >
+                  {deletingId === (item._id || item.id) ? "..." : "Delete"}
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <ViewModal

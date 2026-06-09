@@ -9,24 +9,24 @@ const ViewEmployeeModal = ({ isOpen, onClose, data }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl my-8">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[10000] p-2 sm:p-4 overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl my-auto sm:my-8 relative">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6 flex items-center justify-between rounded-t-xl">
-          <div>
-            <h1 className="text-3xl font-bold text-white">Employee Information</h1>
-            <p className="text-blue-100 text-sm mt-1">Complete employee profile details</p>
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-600 to-blue-700 px-4 sm:px-8 py-4 sm:py-6 flex items-start sm:items-center justify-between rounded-t-xl">
+          <div className="pr-2">
+            <h1 className="text-xl sm:text-3xl font-bold text-white">Employee Information</h1>
+            <p className="text-blue-100 text-xs sm:text-sm mt-1">Complete employee profile details</p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-blue-500 rounded-lg transition-all text-white"
+            className="p-1.5 sm:p-2 hover:bg-blue-500 rounded-lg transition-all text-white flex-shrink-0 mt-0.5 sm:mt-0"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-8 space-y-8 max-h-[calc(100vh-200px)] overflow-y-auto">
+        <div className="p-4 sm:p-8 space-y-6 sm:space-y-8 max-h-[calc(100vh-120px)] sm:max-h-[calc(100vh-200px)] overflow-y-auto">
           {/* Personal Information Section */}
           <div>
             <h2 className="text-lg font-bold text-gray-900 mb-4 pb-3 border-b-2 border-blue-600 flex items-center">
@@ -286,7 +286,7 @@ const ViewEmployeeModal = ({ isOpen, onClose, data }) => {
         </div>
 
         {/* Footer */}
-        <div className="border-t border-gray-200 bg-gray-50 px-8 py-4 flex justify-end gap-3 rounded-b-xl">
+        <div className="border-t border-gray-200 bg-gray-50 px-4 sm:px-8 py-3 sm:py-4 flex justify-end gap-3 rounded-b-xl">
           <button
             onClick={onClose}
             className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-all font-semibold"

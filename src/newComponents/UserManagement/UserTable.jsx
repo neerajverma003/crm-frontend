@@ -299,8 +299,8 @@ const UserTable = ({ onlyAdmins = false, searchTerm, roleFilter, filterStatus = 
 
     return (
         <>
-            <div className="w-full min-w-0 px-2 sm:px-4 lg:px-6">
-                <div className="overflow-hidden rounded-xl border border-blue-100 bg-white shadow-md">
+            <div className="w-full min-w-0 px-0 sm:px-4 lg:px-6">
+                <div className="overflow-hidden md:rounded-xl md:border md:border-blue-100 md:bg-white md:shadow-md">
                     <div className="flex items-center justify-between border-b bg-gradient-to-r from-blue-50 to-blue-100 px-6 py-4">
                         <h2 className="text-base font-bold text-blue-900 sm:text-lg">
                             {userRole === "superAdmin" ? "Admin & Employee List" : "Employee List"}
@@ -332,9 +332,9 @@ const UserTable = ({ onlyAdmins = false, searchTerm, roleFilter, filterStatus = 
                                                 {u.fullName?.[0]?.toUpperCase() || "?"}
                                             </div>
 
-                                            <div className="min-w-0">
+                                            <div className="flex-1 min-w-0">
                                                 <p className="truncate text-sm font-semibold text-gray-800">{u.fullName}</p>
-                                                <p className="max-w-[220px] truncate text-xs text-gray-500">{u.email}</p>
+                                                <p className="truncate text-xs text-gray-500">{u.email}</p>
                                             </div>
                                         </div>
 

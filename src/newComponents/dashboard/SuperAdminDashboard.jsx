@@ -346,7 +346,7 @@ const SuperAdminDashboard = () => {
                           </button>
                       </div>
 
-                      <div className="max-h-[320px] overflow-y-auto overflow-x-auto p-0">
+                      <div className="max-h-[320px] overflow-y-auto p-0">
                           {loadingLeads ? (
                               <p className="text-center text-sm text-gray-500 py-6">Loading leads...</p>
                           ) : lead.length === 0 ? (
@@ -354,8 +354,9 @@ const SuperAdminDashboard = () => {
                           ) : (
                               <>
                                   {/* Desktop Table View */}
-                                  <table className="hidden sm:table w-full min-w-[650px] divide-y divide-gray-200 text-sm">
-                                      <thead className="bg-gray-50 sticky top-0 z-10">
+                                  <div className="hidden sm:block overflow-x-auto">
+                                    <table className="w-full min-w-[650px] divide-y divide-gray-200 text-sm">
+                                        <thead className="bg-gray-50 sticky top-0 z-10">
                                           <tr>
                                               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Contact Information</th>
                                               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Group</th>
@@ -396,7 +397,8 @@ const SuperAdminDashboard = () => {
                                               );
                                           })}
                                       </tbody>
-                                  </table>
+                                    </table>
+                                  </div>
 
                                   {/* Mobile Card View */}
                                   <div className="sm:hidden flex flex-col gap-3 p-4">
@@ -404,13 +406,13 @@ const SuperAdminDashboard = () => {
                                           const leadName = item.name || "—";
                                           return (
                                               <div key={item._id} className="border border-gray-200 rounded-xl p-4 bg-white shadow-sm flex flex-col gap-3">
-                                                  <div className="flex justify-between items-start">
-                                                      <div className="flex flex-col">
-                                                          <span className="font-bold text-gray-900 text-base">{leadName}</span>
-                                                          <span className="text-xs text-gray-500">{item.email || "—"}</span>
-                                                          <span className="text-xs text-gray-400">{item.phone || "—"}</span>
+                                                  <div className="flex justify-between items-start gap-2">
+                                                      <div className="flex flex-col flex-1 min-w-0">
+                                                          <span className="font-bold text-gray-900 text-base truncate">{leadName}</span>
+                                                          <span className="text-xs text-gray-500 truncate">{item.email || "—"}</span>
+                                                          <span className="text-xs text-gray-400 truncate">{item.phone || "—"}</span>
                                                       </div>
-                                                      <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${getSourceBadgeColor(item.leadSource)}`}>
+                                                      <span className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${getSourceBadgeColor(item.leadSource)}`}>
                                                           {item.leadSource || "—"}
                                                       </span>
                                                   </div>
@@ -473,11 +475,12 @@ const SuperAdminDashboard = () => {
                       ) : activeAdminAttendance.length === 0 ? (
                         <div className="text-center text-sm text-gray-500">No active attendance records found for {selectedDate}.</div>
                       ) : (
-                        <div className="max-h-72 overflow-y-auto overflow-x-auto rounded-lg border border-gray-100 ring-1 ring-gray-50">
+                        <div className="max-h-72 overflow-y-auto rounded-lg border border-gray-100 ring-1 ring-gray-50">
                           <>
                             {/* Desktop Table View */}
-                            <table className="hidden sm:table w-full min-w-[450px] divide-y divide-gray-200 text-sm">
-                              <thead className="bg-gray-50 sticky top-0 z-10">
+                            <div className="hidden sm:block overflow-x-auto">
+                              <table className="w-full min-w-[450px] divide-y divide-gray-200 text-sm">
+                                <thead className="bg-gray-50 sticky top-0 z-10">
                                 <tr>
                                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Name</th>
                                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Status</th>
@@ -519,7 +522,8 @@ const SuperAdminDashboard = () => {
                                   );
                                 })}
                               </tbody>
-                            </table>
+                              </table>
+                            </div>
 
                             {/* Mobile Card View */}
                             <div className="sm:hidden flex flex-col gap-3 p-4">
@@ -537,14 +541,14 @@ const SuperAdminDashboard = () => {
 
                                   return (
                                     <div key={item._id} className="border border-gray-200 rounded-xl p-4 bg-white shadow-sm flex flex-col gap-3">
-                                      <div className="flex justify-between items-center">
-                                        <div className="flex items-center gap-3">
+                                      <div className="flex justify-between items-center gap-2">
+                                        <div className="flex items-center gap-3 flex-1 min-w-0">
                                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
                                             {name.charAt(0)}
                                           </div>
-                                          <span className="font-bold text-gray-900 text-base">{name}</span>
+                                          <span className="font-bold text-gray-900 text-base truncate">{name}</span>
                                         </div>
-                                        <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${statusColor}`}>
+                                        <span className={`inline-flex shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${statusColor}`}>
                                           {item.status || "—"}
                                         </span>
                                       </div>

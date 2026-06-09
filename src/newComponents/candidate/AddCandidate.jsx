@@ -623,7 +623,7 @@ export default function AddCandidate() {
         backgroundColor: '#fff', borderBottom: '1px solid #e5e7eb',
         padding: `0 ${isMobile ? '16px' : '24px'}`,
         height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        position: 'sticky', top: 0, zIndex: 100,
+        position: 'sticky', top: 0, zIndex: 20,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{ width: '34px', height: '34px', borderRadius: '9px', background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>

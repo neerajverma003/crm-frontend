@@ -305,8 +305,8 @@ const Designation = () => {
             </div>
           </div>
 
-          {/* Table */}
-          <div className="overflow-x-auto">
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="min-w-full divide-y divide-slate-100">
               <thead className="bg-slate-50/80">
                 <tr>
@@ -351,6 +351,50 @@ const Designation = () => {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="block md:hidden bg-slate-50/30 p-4 space-y-4">
+            {filteredDesignations.length === 0 ? (
+              <div className="px-6 py-12 text-center text-sm text-slate-500 font-medium bg-white rounded-xl border border-slate-100 shadow-sm">
+                No designations found
+              </div>
+            ) : (
+              filteredDesignations.map((d) => (
+                <div key={d._id} className="bg-white border border-slate-100 rounded-xl shadow-sm p-4 flex flex-col gap-3 relative">
+                  <div>
+                    <p className="text-xs text-slate-500 font-medium mb-1">Company</p>
+                    <p className="text-sm font-bold text-slate-800">
+                      {companies.find((c) => c._id === d.company)?.companyName || "—"}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-xs text-slate-500 font-medium mb-1">Department</p>
+                    <p className="text-sm font-bold text-slate-700">
+                      {allDepartments.find((dep) => dep._id === d.dep)?.dep || "—"}
+                    </p>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-50 flex justify-between items-end">
+                    <div>
+                      <p className="text-xs text-slate-500 font-medium mb-1.5">Designation</p>
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 ring-1 ring-indigo-500/10">
+                        {d.designation}
+                      </span>
+                    </div>
+                    
+                    <button
+                      onClick={() => handleDelete(d._id)}
+                      className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 transition-colors"
+                      title="Delete Designation"
+                    >
+                      <MdDelete className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
