@@ -699,9 +699,9 @@ const CreateInvoice = () => {
             </div>
 
             {/* Receipt Preview Section */}
-            <div>
+            <div className="w-full flex justify-center overflow-x-auto">
               {selectedCustomer ? (
-                <div id="receipt-to-print" className="bg-white p-6 rounded-2xl shadow-inner border border-gray-50">
+                <div id="receipt-to-print" className="bg-white p-1 sm:p-6 rounded-2xl shadow-inner border border-gray-50 flex justify-center w-full max-w-full">
                   <PaymentReceipt
                     customer={selectedCustomer}
                     invoiceNo={form.invoiceNo}

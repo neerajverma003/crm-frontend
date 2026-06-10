@@ -94,6 +94,7 @@ import EmailManagement from "./newComponents/inventory/EmailManagement.jsx";
 import TaskAssign from "./newComponents/TaskManagement/TaskAssign.jsx";
 import TaskReport from "./newComponents/TaskManagement/TaskReport.jsx";
 import EmployeeTasks from "./newComponents/dashboard/EmployeeTasks.jsx";
+import MyTeamDashboard from "./newComponents/Teams/MyTeamDashboard.jsx";
 
 // ✅ Role groups
 const roles = {
@@ -730,6 +731,14 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      {
+        path: "/my-team-dashboard",
+        element: (
+          <ProtectedRoute allowedRoles={roles.employeeOnly}>
+            <MyTeamDashboard />
+          </ProtectedRoute>
+        ),
+      },
 
       // ✅ Dashboard shortcuts
       {
@@ -742,13 +751,21 @@ const router = createBrowserRouter([
       },
     ],
   },
-]);
+], {
+  future: {
+    v7_relativeSplatPath: true,
+    v7_fetcherPersist: true,
+    v7_normalizeFormMethod: true,
+    v7_partialHydration: true,
+    v7_skipActionErrorRevalidation: true,
+  }
+});
 
 // ✅ ROOT RENDER
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <>
-      <RouterProvider router={router} />
+      <RouterProvider router={router} future={{ v7_startTransition: true }} />
       <ToastContainer position="top-right" autoClose={3000} />
     </>
   </React.StrictMode>

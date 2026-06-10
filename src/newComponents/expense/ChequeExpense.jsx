@@ -71,7 +71,7 @@ const css = `
 }
 
 .ce-modal-overlay {
-  position: fixed; inset: 0; z-index: 100;
+  position: fixed; inset: 0; z-index: 9999;
   background: rgba(0,0,0,0.45); backdrop-filter: blur(6px);
   display: flex; align-items: center; justify-content: center; padding: 16px;
   animation: ceFadeIn 0.2s ease;
@@ -494,7 +494,7 @@ export default function ChequeExpense() {
                         <span style={{ fontWeight: 700, fontSize: 16, color: "#111827" }}>Cheques</span>
                         {filtered.length > 0 && <span style={{ fontSize: 12, background: "#f3f4f6", color: "#6b7280", padding: "2px 8px", borderRadius: 99, fontWeight: 500 }}>{filtered.length}</span>}
                     </div>
-                    <div style={{ overflowX: "auto" }}>
+                    <div className="hidden md:block" style={{ overflowX: "auto" }}>
                         {loading ? (
                             <div style={{ padding: "60px 24px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
                                 <div style={{ width: 32, height: 32, border: "2.5px solid #e5e7eb", borderTopColor: "#6366f1", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
@@ -559,6 +559,62 @@ export default function ChequeExpense() {
                                     ))}
                                 </tbody>
                             </table>
+                        )}
+                    </div>
+
+                    {/* Mobile View */}
+                    <div className="block md:hidden">
+                        {loading ? (
+                            <div style={{ padding: "60px 24px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+                                <div style={{ width: 32, height: 32, border: "2.5px solid #e5e7eb", borderTopColor: "#6366f1", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
+                                <span style={{ fontSize: 13, color: "#9ca3af" }}>Loading cheques…</span>
+                            </div>
+                        ) : filtered.length === 0 ? (
+                            <div style={{ padding: "64px 24px", textAlign: "center" }}>
+                                <div style={{ width: 52, height: 52, borderRadius: 16, background: "#f3f4f6", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                                    <CreditCard size={24} color="#d1d5db" />
+                                </div>
+                                <p style={{ fontSize: 16, fontWeight: 700, color: "#374151", marginBottom: 6 }}>No cheques found</p>
+                                <p style={{ fontSize: 13, color: "#9ca3af" }}>Try adjusting your filters or add a new cheque.</p>
+                            </div>
+                        ) : (
+                            <div style={{ display: "flex", flexDirection: "column", gap: 12, padding: 16 }}>
+                                {paginatedCheques.map((c) => (
+                                    <div key={c._id} style={{ background: "#fff", border: "1px solid #f0f0f0", borderRadius: 16, padding: 16, boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+                                            <div>
+                                                <h4 style={{ fontSize: 15, fontWeight: 700, color: "#111827", marginBottom: 4 }}>{c.receiverName || "—"}</h4>
+                                                <span style={{ fontWeight: 700, fontSize: 12, color: "#111827", letterSpacing: "0.03em", background: "#f3f4f6", padding: "3px 8px", borderRadius: 6 }}>{c.chequeNumber || "—"}</span>
+                                            </div>
+                                            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
+                                                <span className="ce-amount-display" style={{ fontSize: 16, color: "#059669", fontWeight: 700 }}>{formatINR(parseAmount(c.chequeAmount))}</span>
+                                                <StatusBadge status={c.status} />
+                                            </div>
+                                        </div>
+                                        
+                                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12, fontSize: 12 }}>
+                                            <div>
+                                                <span style={{ color: "#9ca3af", fontWeight: 600, display: "block", marginBottom: 2, fontSize: 10, textTransform: "uppercase" }}>Issued</span>
+                                                <span style={{ color: "#374151", fontWeight: 500 }}>{fmtDate(c.chequeIssuedDate)}</span>
+                                            </div>
+                                            <div>
+                                                <span style={{ color: "#9ca3af", fontWeight: 600, display: "block", marginBottom: 2, fontSize: 10, textTransform: "uppercase" }}>Present</span>
+                                                <span style={{ color: "#374151", fontWeight: 500 }}>{fmtDate(c.chequePresentDate)}</span>
+                                            </div>
+                                        </div>
+
+                                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 12, borderTop: "1px solid #f3f4f6" }}>
+                                            <select value={c.status || "pending"} onChange={e => handleStatusSelection(c, e.target.value)} className="ce-select" style={{ padding: "4px 8px", fontSize: 11 }}>
+                                                {STATUS_KEYS.map(s => <option key={s} value={s}>{s}</option>)}
+                                            </select>
+                                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                                <button className="ce-icon-btn edit" onClick={() => openEditModal(c)} title="Edit"><Edit2 size={14} /></button>
+                                                <button className="ce-icon-btn view" onClick={() => setViewCheque(c)} title="View"><Eye size={14} /></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         )}
                     </div>
 

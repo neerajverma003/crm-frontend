@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, Search, FolderPlus, Trash, Edit, Plus, ChevronRight, ChevronDown, BookOpen } from "lucide-react";
+import { X, Search, FolderPlus, Trash, Edit, Plus, ChevronRight, ChevronDown, BookOpen, BarChart2, Folder, FileText, FolderOpen } from "lucide-react";
 
 const Ledger = () => {
     const [showModal, setShowModal] = useState(false);
@@ -330,7 +330,7 @@ const Ledger = () => {
             <div className="mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                        📊 Accounts Ledger Management
+                        <BarChart2 className="text-blue-600" size={28} /> Accounts Ledger Management
                     </h2>
                     <p className="text-sm text-gray-500 mt-0.5">Organize accounts, create groups, associate ledgers, and track transactions.</p>
                 </div>
@@ -340,23 +340,23 @@ const Ledger = () => {
             <div className="flex gap-4 border-b border-gray-200 pb-3 mb-6">
                 <button
                     onClick={() => setActiveTab("groups")}
-                    className={`px-5 py-2.5 font-bold text-sm rounded-lg transition-all ${
+                    className={`px-5 py-2.5 font-bold text-sm rounded-lg transition-all flex items-center justify-center gap-2 ${
                         activeTab === "groups"
                             ? "bg-blue-600 text-white shadow-md"
                             : "bg-white text-gray-700 border hover:bg-gray-100"
                     }`}
                 >
-                    📁 Ledger Groups
+                    <Folder size={16} /> Ledger Groups
                 </button>
                 <button
                     onClick={() => setActiveTab("ledgers")}
-                    className={`px-5 py-2.5 font-bold text-sm rounded-lg transition-all ${
+                    className={`px-5 py-2.5 font-bold text-sm rounded-lg transition-all flex items-center justify-center gap-2 ${
                         activeTab === "ledgers"
                             ? "bg-blue-600 text-white shadow-md"
                             : "bg-white text-gray-700 border hover:bg-gray-100"
                     }`}
                 >
-                    📄 All Ledgers
+                    <FileText size={16} /> All Ledgers
                 </button>
             </div>
 
@@ -414,7 +414,7 @@ const Ledger = () => {
                                         <div className="p-5 flex items-start justify-between bg-gradient-to-br from-gray-50 to-white border-b">
                                             <div className="space-y-1 cursor-pointer flex-1" onClick={() => setSelectedGroup(isExpanded ? null : group)}>
                                                 <h3 className="font-bold text-gray-800 text-base flex items-center gap-2">
-                                                    📁 {group.name}
+                                                    <Folder className="text-blue-500" size={18} /> {group.name}
                                                 </h3>
                                                 <p className="text-xs text-gray-500 font-semibold">
                                                     Total Ledgers: <span className="text-blue-600 font-bold">{group.members?.length || 0}</span>
@@ -482,8 +482,9 @@ const Ledger = () => {
                                 );
                             })
                         ) : (
-                            <div className="col-span-full bg-white border rounded-xl p-12 text-center text-gray-400 shadow-sm font-medium">
-                                📁 No ledger groups found. Create a group and add ledgers to track them!
+                            <div className="col-span-full bg-white border rounded-xl p-12 flex flex-col items-center justify-center text-gray-400 shadow-sm font-medium gap-3">
+                                <FolderOpen size={32} className="text-gray-300" />
+                                No ledger groups found. Create a group and add ledgers to track them!
                             </div>
                         )}
                     </div>
@@ -494,7 +495,7 @@ const Ledger = () => {
                             <div className="flex items-center justify-between border-b pb-4">
                                 <div>
                                     <h3 className="font-bold text-lg text-gray-900 flex items-center gap-2">
-                                        📂 Group Ledgers: {selectedGroup.name}
+                                        <FolderOpen className="text-blue-600" size={20} /> Group Ledgers: {selectedGroup.name}
                                     </h3>
                                     <p className="text-xs text-gray-500 mt-0.5">Showing all {selectedGroup.members?.length || 0} ledgers in this group.</p>
                                 </div>
@@ -629,7 +630,7 @@ const Ledger = () => {
                     <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden border animate-scaleIn">
                         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 flex items-center justify-between">
                             <h2 className="text-lg font-bold flex items-center gap-2">
-                                📁 {editingGroup ? "Edit Ledger Group" : "Create Ledger Group"}
+                                <FolderPlus size={20} /> {editingGroup ? "Edit Ledger Group" : "Create Ledger Group"}
                             </h2>
                             <button
                                 onClick={() => setShowGroupModal(false)}

@@ -229,7 +229,7 @@ const CreateTransport = () => {
       <div className="p-6 max-w-7xl mx-auto pb-8">
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">All Transports</h2>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto hidden md:block">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
@@ -272,6 +272,42 @@ const CreateTransport = () => {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Yeh mobile ke liye naya view hai */}
+          <div className="block md:hidden mt-4">
+            <div className="flex flex-col gap-4">
+              {transports.length === 0 ? (
+                <div className="text-center text-gray-500 p-4 bg-gray-50 rounded-lg">
+                   No transports found.
+                </div>
+              ) : (
+                transports.map((t) => (
+                  <div key={t._id} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col gap-2">
+                     {/* Card Heading: Name and Type */}
+                     <div className="flex justify-between items-start">
+                       <h4 className="font-bold text-gray-900">{t.transportName}</h4>
+                       <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${t.type === "Domestic" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"}`}>
+                         {t.type}
+                       </span>
+                     </div>
+                     
+                     {/* Info Grid */}
+                     <div className="grid grid-cols-2 gap-2 text-sm mt-2">
+                       <div>
+                         <p className="text-[10px] text-gray-500 uppercase font-bold">Location</p>
+                         <p className="text-gray-800 font-medium">{t.state?.state || "N/A"}</p>
+                         <p className="text-xs text-gray-500">{t.destination?.destinationName || "N/A"}</p>
+                       </div>
+                       <div>
+                         <p className="text-[10px] text-gray-500 uppercase font-bold">Contact</p>
+                         <p className="text-gray-800 font-medium">{t.phoneNumber}</p>
+                       </div>
+                     </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
       </div>

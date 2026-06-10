@@ -143,17 +143,18 @@ const NavMenuItem = ({ item, setIsOpen }) => (
         }`
       }
     >
-      <span className="text-lg transition-all duration-200">{item.icon}</span>
-      <span className="text-sm font-bold">{item.label}</span>
-      {/* Active Indicator Bar */}
-      <NavLink
-        to={item.url}
-        className={({ isActive }) =>
-          `active-indicator absolute left-0 top-1/2 -translate-y-1/2 w-1 bg-blue-600 rounded-r-full transition-all duration-300 ${
-            isActive ? "h-6 opacity-100" : "h-0 opacity-0"
-          }`
-        }
-      />
+      {({ isActive }) => (
+        <>
+          <span className="text-lg transition-all duration-200">{item.icon}</span>
+          <span className="text-sm font-bold">{item.label}</span>
+          {/* Active Indicator Bar */}
+          <span
+            className={`active-indicator absolute left-0 top-1/2 -translate-y-1/2 w-1 bg-blue-600 rounded-r-full transition-all duration-300 ${
+              isActive ? "h-6 opacity-100" : "h-0 opacity-0"
+            }`}
+          />
+        </>
+      )}
     </NavLink>
   </li>
 );

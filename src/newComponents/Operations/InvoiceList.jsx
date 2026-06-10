@@ -201,8 +201,8 @@ const InvoiceList = () => {
 
                 {/* Expanded Nested Cards Modal */}
                 {expandedCustomers[customerId] && (
-                  <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-40" onClick={(e) => e.stopPropagation()}>
-                    <div className="bg-white rounded-xl shadow-xl max-w-3xl w-full mx-4 overflow-auto max-h-[85vh] border border-gray-200">
+                  <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-40 p-4" onClick={(e) => e.stopPropagation()}>
+                    <div className="bg-white rounded-xl shadow-xl max-w-3xl w-full sm:w-11/12 overflow-auto max-h-[85vh] border border-gray-200 flex flex-col">
                       {/* Modal Header */}
                       <div className="sticky top-0 bg-white p-6 flex justify-between items-center border-b border-gray-100 z-50">
                         <div>
@@ -287,8 +287,8 @@ const InvoiceList = () => {
         </div>
       )}
       {selectedInvoice && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full mx-4 overflow-auto" style={{ maxHeight: '90vh' }}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full sm:w-11/12 overflow-auto flex flex-col" style={{ maxHeight: '90vh' }}>
             <div className="flex justify-between items-center p-4 border-b">
               <h3 className="text-lg font-semibold">Invoice Receipt</h3>
               <div className="flex gap-2">
@@ -301,7 +301,7 @@ const InvoiceList = () => {
                 </button>
               </div>
             </div>
-            <div className="p-4" ref={receiptRef}>
+            <div className="p-1 sm:p-4 overflow-x-auto flex justify-center" ref={receiptRef}>
               {modalLoading ? (
                 <div className="text-center p-8">Loading receipt...</div>
               ) : (

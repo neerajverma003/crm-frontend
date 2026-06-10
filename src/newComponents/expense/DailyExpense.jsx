@@ -230,20 +230,22 @@ const DailyExpense = () => {
                             </select>
                         </div>
 
-                        <div className="relative w-full sm:flex-none sm:w-[150px]">
-                            <Calendar size={16} className="absolute left-3.5 top-3.5 text-slate-400 pointer-events-none" />
-                            <input 
-                                type="date" value={startDate} onChange={e => setStartDate(e.target.value)} 
-                                className="w-full pl-10 pr-3 py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:border-indigo-400 text-xs sm:text-sm font-medium text-slate-700 shadow-sm transition-all" 
-                            />
-                        </div>
+                        <div className="flex w-full sm:w-auto gap-3">
+                            <div className="relative flex-1 sm:flex-none sm:w-[150px]">
+                                <Calendar size={16} className="absolute left-3.5 top-3.5 text-slate-400 pointer-events-none" />
+                                <input 
+                                    type="date" value={startDate} onChange={e => setStartDate(e.target.value)} 
+                                    className="w-full pl-10 pr-3 py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:border-indigo-400 text-xs sm:text-sm font-medium text-slate-700 shadow-sm transition-all" 
+                                />
+                            </div>
 
-                        <div className="relative w-full sm:flex-none sm:w-[150px]">
-                            <Calendar size={16} className="absolute left-3.5 top-3.5 text-slate-400 pointer-events-none" />
-                            <input 
-                                type="date" value={endDate} onChange={e => setEndDate(e.target.value)} 
-                                className="w-full pl-10 pr-3 py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:border-indigo-400 text-xs sm:text-sm font-medium text-slate-700 shadow-sm transition-all" 
-                            />
+                            <div className="relative flex-1 sm:flex-none sm:w-[150px]">
+                                <Calendar size={16} className="absolute left-3.5 top-3.5 text-slate-400 pointer-events-none" />
+                                <input 
+                                    type="date" value={endDate} onChange={e => setEndDate(e.target.value)} 
+                                    className="w-full pl-10 pr-3 py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:border-indigo-400 text-xs sm:text-sm font-medium text-slate-700 shadow-sm transition-all" 
+                                />
+                            </div>
                         </div>
 
                         {(searchQuery || methodFilter !== "All" || startDate || endDate) && (
@@ -427,7 +429,7 @@ const DailyExpense = () => {
 
             {/* Add Expense Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200" onClick={() => !loading && setShowModal(false)}>
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-in fade-in duration-200" onClick={() => !loading && setShowModal(false)}>
                     <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden relative flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
                         
                         {/* Modal Header */}
@@ -543,7 +545,7 @@ const DailyExpense = () => {
 
             {/* Lightbox */}
             {viewBillUrl && (
-                <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setViewBillUrl(null)}>
+                <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setViewBillUrl(null)}>
                     <div className="relative max-w-2xl w-full max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
                         <button 
                             onClick={() => setViewBillUrl(null)}
@@ -551,7 +553,7 @@ const DailyExpense = () => {
                         >
                             <X size={20} strokeWidth={2.5} />
                         </button>
-                        <img 
+                                                                                                                                                                                               <img 
                             src={viewBillUrl} alt="Receipt" 
                             className="w-full h-auto max-h-[85vh] object-contain rounded-2xl shadow-2xl bg-black/50" 
                         />

@@ -157,7 +157,7 @@ const TrainingMaterial = () => {
 
   // small components
   const Filters = () => (
-    <div className="md:col-span-1 space-y-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-200/60 h-fit sticky top-4">
+    <div className="md:col-span-1 space-y-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-200/60 h-fit md:sticky md:top-4">
       <div>
         <label className="block text-sm font-semibold text-slate-700 mb-2">Company</label>
         <select className="w-full border border-slate-300 bg-slate-50/30 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none" value={selectedCompany} onChange={(e) => { setSelectedCompany(e.target.value); setSelectedDepartment(''); }} aria-label="Filter by company">

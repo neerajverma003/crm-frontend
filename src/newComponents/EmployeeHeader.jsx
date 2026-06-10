@@ -147,7 +147,7 @@ const EmployeeHeader = () => {
             {/* 🔹 DESKTOP VIEW */}
             <div className="hidden flex-col gap-4 rounded-2xl w-full bg-white p-6 shadow-sm sm:flex sm:flex-row sm:items-center sm:justify-between">
                 {/* LEFT — User Info */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 ml-16 lg:ml-0">
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-500 text-xl font-bold text-white">
                         {userName?.[0]?.toUpperCase()}
                     </div>

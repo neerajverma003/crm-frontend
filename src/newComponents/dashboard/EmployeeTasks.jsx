@@ -646,6 +646,7 @@ const EmployeeTasks = () => {
                                                                                         <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 2</th>
                                                                                         <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 3</th>
                                                                                         <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">Column 4</th>
+                                                                                        <th className="border border-gray-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-600 min-w-[150px]">Call Status</th>
                                                                                     </tr>
                                                                                 </thead>
                                                                                 <tbody>
@@ -671,6 +672,30 @@ const EmployeeTasks = () => {
                                                                                                     </td>
                                                                                                 );
                                                                                             })}
+                                                                                            <td className="border border-gray-200 px-3 py-2 text-sm">
+                                                                                                <select
+                                                                                                    value={row.callStatus || ""}
+                                                                                                    onChange={(e) => handleNumberCellChange(t._id, rowIndex, "callStatus", e.target.value)}
+                                                                                                    disabled={row.callStatus === "Enquiry"}
+                                                                                                    className={`w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                                                                                                        row.callStatus === "Enquiry" ? "bg-amber-100 text-amber-800 font-semibold cursor-not-allowed" : "bg-white text-gray-900"
+                                                                                                    }`}
+                                                                                                    onClick={(e) => e.stopPropagation()}
+                                                                                                >
+                                                                                                    <option value="">Select Status</option>
+                                                                                                    <option value="Connected">Connected</option>
+                                                                                                    <option value="Not Connected">Not Connected</option>
+                                                                                                    <option value="Interested">Interested</option>
+                                                                                                    <option value="Not Interested">Not Interested</option>
+                                                                                                    <option value="Busy">Busy</option>
+                                                                                                    <option value="Call Cut">Call Cut</option>
+                                                                                                    <option value="Call Back Later">Call Back Later</option>
+                                                                                                    <option value="Invalid Number">Invalid Number</option>
+                                                                                                    <option value="Language Issues">Language Issues</option>
+                                                                                                    <option value="Enquiry">Enquiry</option>
+                                                                                                    <option value="Connected on WhatsApp">Connected on WhatsApp</option>
+                                                                                                </select>
+                                                                                            </td>
                                                                                         </tr>
                                                                                     ))}
                                                                                 </tbody>

@@ -1,1163 +1,523 @@
-// // import React, { useState, useEffect } from "react";
-// // import axios from "axios";
-
-// // const AllTeam = () => {
-// //   const [teams, setTeams] = useState([]);
-// //   const [selectedTeam, setSelectedTeam] = useState(null);
-// //   const [loading, setLoading] = useState(true);
-// //   const [error, setError] = useState("");
-
-// //   useEffect(() => {
-// //     const fetchTeams = async () => {
-// //       try {
-// //         const res = await axios.get(`${import.meta.env.VITE_API_URL}/teams/`);
-// //         setTeams(res.data || []);
-// //       } catch (err) {
-// //         console.error(err);
-// //         setError("Failed to fetch teams.");
-// //       } finally {
-// //         setLoading(false);
-// //       }
-// //     };
-
-// //     fetchTeams();
-// //   }, []);
-
-// //   const handleCardClick = (team) => {
-// //     setSelectedTeam(team);
-// //   };
-
-// //   if (loading) {
-// //     return <div className="p-6 text-center text-gray-500">Loading teams...</div>;
-// //   }
-
-// //   if (error) {
-// //     return <div className="p-6 text-center text-red-500">{error}</div>;
-// //   }
-
-// //   return (
-// //     <div className="p-6 bg-gray-100 min-h-screen">
-// //       <h2 className="text-3xl font-bold mb-6 text-center">All Teams</h2>
-
-// //       {/* ------------------ TEAM LIST VIEW ------------------ */}
-// //       {!selectedTeam ? (
-// //         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-// //           {teams.length > 0 ? (
-// //             teams.map((team) => (
-// //               <div
-// //                 key={team._id}
-// //                 className="bg-white p-6 rounded-xl shadow-md cursor-pointer hover:shadow-lg transition"
-// //                 onClick={() => handleCardClick(team)}
-// //               >
-// //                 <h3 className="text-xl font-semibold mb-2">
-// //                   Team {team.teamLeader?.fullName.split(" ")[0]}'s Team
-// //                 </h3>
-
-// //                 <p className="text-gray-500">
-// //                   <strong>Leader:</strong> {team.teamLeader?.fullName}
-// //                 </p>
-
-// //                 <p className="text-gray-500">
-// //                   <strong>Total Members:</strong> {team.members?.length}
-// //                 </p>
-// //               </div>
-// //             ))
-// //           ) : (
-// //             <p className="text-gray-500 text-center col-span-3">No teams found.</p>
-// //           )}
-// //         </div>
-// //       ) : (
-// //         /* ------------------ TEAM DETAILS VIEW ------------------ */
-// //         <div className="bg-white p-6 rounded-xl shadow-md">
-// //           <button
-// //             className="mb-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-// //             onClick={() => setSelectedTeam(null)}
-// //           >
-// //             ← Back to Teams
-// //           </button>
-
-// //           <h3 className="text-2xl font-bold mb-2">
-// //             Team Details - {selectedTeam.teamLeader?.fullName}
-// //           </h3>
-
-// //           <p className="mb-4 text-gray-600">
-// //             <strong>Leader Email:</strong> {selectedTeam.teamLeader?.email}
-// //           </p>
-
-// //           <h4 className="text-xl font-semibold mb-4">Team Members</h4>
-
-// //           <div className="space-y-4">
-// //             {selectedTeam.members?.length > 0 ? (
-// //               selectedTeam.members.map((member) => (
-// //                 <div
-// //                   key={member._id}
-// //                   className="border rounded p-4 shadow-sm bg-gray-50"
-// //                 >
-// //                   <p>
-// //                     <strong>Name:</strong> {member.fullName}
-// //                   </p>
-// //                   <p>
-// //                     <strong>Email:</strong> {member.email}
-// //                   </p>
-// //                 </div>
-// //               ))
-// //             ) : (
-// //               <p>No members found.</p>
-// //             )}
-// //           </div>
-// //         </div>
-// //       )}
-// //     </div>
-// //   );
-// // };
-
-// // export default AllTeam;
-
-
-
-
-// import React, { useState, useEffect } from "react";
-// import axios from "axios";
-
-// const AllTeam = () => {
-//   const [teams, setTeams] = useState([]);
-//   const [selectedTeam, setSelectedTeam] = useState(null);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState("");
-
-//   useEffect(() => {
-//     const fetchTeams = async () => {
-//       try {
-//         const res = await axios.get(`${import.meta.env.VITE_API_URL}/teams/`);
-//         setTeams(res.data || []);
-//       } catch (err) {
-//         console.error(err);
-//         setError("Failed to fetch teams.");
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchTeams();
-//   }, []);
-
-//   const handleCardClick = (team) => {
-//     setSelectedTeam(team);
-//   };
-
-//   // Calculate team stats
-//   const calculateTeamStats = (team) => {
-//     const totalMembers = team.members?.length || 0;
-//     const myLeads = Math.floor(Math.random() * 50); // Replace with actual data
-//     const myClosed = Math.floor(Math.random() * 20); // Replace with actual data
-//     const myRate = myLeads > 0 ? ((myClosed / myLeads) * 100).toFixed(1) : "0.0";
-//     const teamRate = "32.9"; // Replace with actual calculation
-    
-//     return { totalMembers, myLeads, myClosed, myRate, teamRate };
-//   };
-
-//   if (loading) {
-//     return (
-//       <div className="min-h-screen bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
-//         <div className="text-black text-xl">Loading teams...</div>
-//       </div>
-//     );
-//   }
-
-//   if (error) {
-//     return (
-//       <div className="min-h-screen bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
-//         <div className="text-black text-xl">{error}</div>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="min-h-screen bg-gradient-to-br from-blue-500 to-blue-700 p-8">
-//       {/* ------------------ TEAM LIST VIEW ------------------ */}
-//       {!selectedTeam ? (
-//         <div className="max-w-7xl mx-auto space-y-8">
-//           <h2 className="text-4xl font-bold text-black mb-8">All Teams</h2>
-          
-//           <div className="grid grid-cols-1 gap-8">
-//             {teams.length > 0 ? (
-//               teams.map((team) => {
-//                 const stats = calculateTeamStats(team);
-//                 const leader = team.teamLeader || {};
-//                 const initials = leader.fullName
-//                   ? leader.fullName.split(" ").map(n => n[0]).join("").toUpperCase()
-//                   : "T";
-                
-//                 return (
-//                   <div
-//                     key={team._id}
-//                     className="bg-white bg-opacity-10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl cursor-pointer hover:bg-opacity-15 transition-all duration-300"
-//                     onClick={() => handleCardClick(team)}
-//                   >
-//                     {/* Header Section */}
-//                     <div className="flex items-start justify-between mb-8">
-//                       <div className="flex items-center gap-6">
-//                         <div className="w-20 h-20 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center">
-//                           <span className="text-3xl font-bold text-black">{initials}</span>
-//                         </div>
-//                         <div>
-//                           <h3 className="text-3xl font-bold text-black mb-2">
-//                             {leader.fullName || "Team Leader"}
-//                           </h3>
-//                           <div className="flex items-center gap-4 text-black text-opacity-90">
-//                             <span className="flex items-center gap-2">
-//                               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-//                                 <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-//                                 <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-//                               </svg>
-//                               {leader.email || "email@company.com"}
-//                             </span>
-//                             <span className="flex items-center gap-2">
-//                               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-//                                 <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-//                               </svg>
-//                               +1 (555) 999-0001
-//                             </span>
-//                           </div>
-//                           <p className="text-black text-opacity-80 mt-3 flex items-center gap-2">
-//                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-//                               <path fillRule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clipRule="evenodd" />
-//                               <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z" />
-//                             </svg>
-//                             Leading Enterprise Sales Team in San Francisco Bay Area - Strategic partnerships and key accounts
-//                           </p>
-//                         </div>
-//                       </div>
-//                     </div>
-
-//                     {/* Stats Grid */}
-//                     <div className="grid grid-cols-5 gap-4 mb-6">
-//                       <div className="bg-white bg-opacity-10 rounded-2xl p-4 backdrop-blur-sm">
-//                         <div className="flex items-center gap-2 text-black text-opacity-80 text-sm mb-2">
-//                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-//                             <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-//                           </svg>
-//                           <span>My Leads</span>
-//                         </div>
-//                         <div className="text-3xl font-bold text-black">{stats.myLeads}</div>
-//                       </div>
-
-//                       <div className="bg-white bg-opacity-10 rounded-2xl p-4 backdrop-blur-sm">
-//                         <div className="flex items-center gap-2 text-black text-opacity-80 text-sm mb-2">
-//                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-//                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-//                           </svg>
-//                           <span>My Closed</span>
-//                         </div>
-//                         <div className="text-3xl font-bold text-black">{stats.myClosed}</div>
-//                       </div>
-
-//                       <div className="bg-white bg-opacity-10 rounded-2xl p-4 backdrop-blur-sm">
-//                         <div className="flex items-center gap-2 text-black text-opacity-80 text-sm mb-2">
-//                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-//                             <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
-//                           </svg>
-//                           <span>My Rate</span>
-//                         </div>
-//                         <div className="text-3xl font-bold text-black">{stats.myRate}%</div>
-//                       </div>
-
-//                       <div className="bg-white bg-opacity-10 rounded-2xl p-4 backdrop-blur-sm">
-//                         <div className="flex items-center gap-2 text-black text-opacity-80 text-sm mb-2">
-//                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-//                             <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-//                           </svg>
-//                           <span>Team Size</span>
-//                         </div>
-//                         <div className="text-3xl font-bold text-black">{stats.totalMembers}</div>
-//                       </div>
-
-//                       <div className="bg-white bg-opacity-10 rounded-2xl p-4 backdrop-blur-sm">
-//                         <div className="flex items-center gap-2 text-black text-opacity-80 text-sm mb-2">
-//                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-//                             <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
-//                           </svg>
-//                           <span>Team Rate</span>
-//                         </div>
-//                         <div className="text-3xl font-bold text-black">{stats.teamRate}%</div>
-//                       </div>
-//                     </div>
-
-//                     {/* Bottom Stats */}
-//                     <div className="grid grid-cols-3 gap-4">
-//                       <div className="bg-white bg-opacity-5 rounded-xl p-4">
-//                         <div className="text-black text-opacity-70 text-sm mb-1">Total Team Leads</div>
-//                         <div className="text-2xl font-bold text-black">234</div>
-//                       </div>
-//                       <div className="bg-white bg-opacity-5 rounded-xl p-4">
-//                         <div className="text-black text-opacity-70 text-sm mb-1">Total Closed Deals</div>
-//                         <div className="text-2xl font-bold text-black">77</div>
-//                       </div>
-//                       <div className="bg-white bg-opacity-5 rounded-xl p-4">
-//                         <div className="text-black text-opacity-70 text-sm mb-1">Overall Conversion</div>
-//                         <div className="text-2xl font-bold text-black">32.9%</div>
-//                       </div>
-//                     </div>
-//                   </div>
-//                 );
-//               })
-//             ) : (
-//               <div className="text-black text-center text-xl">No teams found.</div>
-//             )}
-//           </div>
-//         </div>
-//       ) : (
-//         /* ------------------ TEAM DETAILS VIEW ------------------ */
-//         <div className="max-w-7xl mx-auto">
-//           <button
-//             className="mb-6 px-6 py-3 bg-white bg-opacity-20 backdrop-blur-sm text-black rounded-xl hover:bg-opacity-30 transition-all"
-//             onClick={() => setSelectedTeam(null)}
-//           >
-//             ← Back to Teams
-//           </button>
-
-//           <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl">
-//             <h3 className="text-3xl font-bold text-black mb-6">
-//               Team Members - {selectedTeam.teamLeader?.fullName}
-//             </h3>
-
-//             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-//               {selectedTeam.members?.length > 0 ? (
-//                 selectedTeam.members.map((member) => (
-//                   <div
-//                     key={member._id}
-//                     className="bg-white bg-opacity-10 rounded-2xl p-6 backdrop-blur-sm"
-//                   >
-//                     <div className="flex items-center gap-4 mb-3">
-//                       <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
-//                         <span className="text-lg font-bold text-black">
-//                           {member.fullName?.split(" ").map(n => n[0]).join("").toUpperCase()}
-//                         </span>
-//                       </div>
-//                       <div>
-//                         <p className="font-semibold text-black text-lg">{member.fullName}</p>
-//                         <p className="text-black text-opacity-70 text-sm">{member.email}</p>
-//                       </div>
-//                     </div>
-//                   </div>
-//                 ))
-//               ) : (
-//                 <p className="text-black text-opacity-80">No members found.</p>
-//               )}
-//             </div>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default AllTeam;
-
-
-// import React, { useState, useEffect } from "react";
-// import axios from "axios";
-
-// const AllTeam = () => {
-//   const [teams, setTeams] = useState([]);
-//   const [selectedTeam, setSelectedTeam] = useState(null);
-//   const [expandedTeamId, setExpandedTeamId] = useState(null);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState("");
-
-//   useEffect(() => {
-//     const fetchTeams = async () => {
-//       try {
-//         const res = await axios.get(`${import.meta.env.VITE_API_URL}/teams/`);
-//         setTeams(res.data || []);
-//       } catch (err) {
-//         console.error(err);
-//         setError("Failed to fetch teams.");
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchTeams();
-//   }, []);
-
-//   const handleCardClick = (team) => {
-//     setSelectedTeam(team);
-//   };
-
-//   const toggleTeamMembers = (teamId) => {
-//     setExpandedTeamId(expandedTeamId === teamId ? null : teamId);
-//   };
-
-//   // Calculate team stats
-//   const calculateTeamStats = (team) => {
-//     const totalMembers = team.members?.length || 0;
-//     const myLeads = Math.floor(Math.random() * 50); // Replace with actual data
-//     const myClosed = Math.floor(Math.random() * 20); // Replace with actual data
-//     const myRate = myLeads > 0 ? ((myClosed / myLeads) * 100).toFixed(1) : "0.0";
-//     const teamRate = "32.9"; // Replace with actual calculation
-    
-//     return { totalMembers, myLeads, myClosed, myRate, teamRate };
-//   };
-
-//   if (loading) {
-//     return (
-//       <div className="min-h-screen bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
-//         <div className="text-black text-xl">Loading teams...</div>
-//       </div>
-//     );
-//   }
-
-//   if (error) {
-//     return (
-//       <div className="min-h-screen bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
-//         <div className="text-black text-xl">{error}</div>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="min-h-screen bg-white text-black p-8">
-//       {/* ------------------ TEAM LIST VIEW ------------------ */}
-//       {!selectedTeam ? (
-//         <div className="max-w-7xl mx-auto space-y-8">
-//           <h2 className="text-4xl font-bold text-black mb-8">All Teams</h2>
-          
-//           <div className="grid grid-cols-1 gap-8">
-//             {teams.length > 0 ? (
-//               teams.map((team) => {
-//                 const stats = calculateTeamStats(team);
-//                 const leader = team.teamLeader || {};
-//                 const initials = leader.fullName
-//                   ? leader.fullName.split(" ").map(n => n[0]).join("").toUpperCase()
-//                   : "T";
-                
-//                 return (
-//                   <div
-//                     key={team._id}
-//                     className="bg-white bg-opacity-10 backdrop-blur-lg rounded-3xl shadow-2xl"
-//                   >
-//                     <div className="p-8">
-//                       {/* Header Section */}
-//                       <div className="flex items-start justify-between mb-8">
-//                         <div className="flex items-center gap-6">
-//                           <div className="w-20 h-20 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center">
-//                             <span className="text-3xl font-bold text-black">{initials}</span>
-//                           </div>
-//                           <div>
-//                             <h3 className="text-3xl font-bold text-black mb-2">
-//                               {leader.fullName || "Team Leader"}
-//                             </h3>
-//                             <div className="flex items-center gap-4 text-black text-opacity-90">
-//                               <span className="flex items-center gap-2">
-//                                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-//                                   <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-//                                   <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-//                                 </svg>
-//                                 {leader.email || "email@company.com"}
-//                               </span>
-//                               <span className="flex items-center gap-2">
-//                                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-//                                   <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-//                                 </svg>
-//                                 +1 (555) 999-0001
-//                               </span>
-//                             </div>
-//                             <p className="text-black text-opacity-80 mt-3 flex items-center gap-2">
-//                               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-//                                 <path fillRule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clipRule="evenodd" />
-//                                 <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z" />
-//                               </svg>
-//                               Leading Enterprise Sales Team in San Francisco Bay Area - Strategic partnerships and key accounts
-//                             </p>
-//                           </div>
-//                         </div>
-//                       </div>
-
-//                       {/* Stats Grid */}
-//                       <div className="grid grid-cols-5 gap-4 mb-6">
-//                         <div className="bg-white bg-opacity-10 rounded-2xl p-4 backdrop-blur-sm">
-//                           <div className="flex items-center gap-2 text-black text-opacity-80 text-sm mb-2">
-//                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-//                               <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-//                             </svg>
-//                             <span>My Leads</span>
-//                           </div>
-//                           <div className="text-3xl font-bold text-black">{stats.myLeads}</div>
-//                         </div>
-
-//                         <div className="bg-white bg-opacity-10 rounded-2xl p-4 backdrop-blur-sm">
-//                           <div className="flex items-center gap-2 text-black text-opacity-80 text-sm mb-2">
-//                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-//                               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-//                             </svg>
-//                             <span>My Closed</span>
-//                           </div>
-//                           <div className="text-3xl font-bold text-black">{stats.myClosed}</div>
-//                         </div>
-
-//                         <div className="bg-white bg-opacity-10 rounded-2xl p-4 backdrop-blur-sm">
-//                           <div className="flex items-center gap-2 text-black text-opacity-80 text-sm mb-2">
-//                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-//                               <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
-//                             </svg>
-//                             <span>My Rate</span>
-//                           </div>
-//                           <div className="text-3xl font-bold text-black">{stats.myRate}%</div>
-//                         </div>
-
-//                         <div className="bg-white bg-opacity-10 rounded-2xl p-4 backdrop-blur-sm">
-//                           <div className="flex items-center gap-2 text-black text-opacity-80 text-sm mb-2">
-//                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-//                               <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-//                             </svg>
-//                             <span>Team Size</span>
-//                           </div>
-//                           <div className="text-3xl font-bold text-black">{stats.totalMembers}</div>
-//                         </div>
-
-//                         <div className="bg-white bg-opacity-10 rounded-2xl p-4 backdrop-blur-sm">
-//                           <div className="flex items-center gap-2 text-black text-opacity-80 text-sm mb-2">
-//                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-//                               <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
-//                             </svg>
-//                             <span>Team Rate</span>
-//                           </div>
-//                           <div className="text-3xl font-bold text-black">{stats.teamRate}%</div>
-//                         </div>
-//                       </div>
-
-//                       {/* Bottom Stats */}
-//                       <div className="grid grid-cols-3 gap-4 mb-6">
-//                         <div className="bg-white bg-opacity-5 rounded-xl p-4">
-//                           <div className="text-black text-opacity-70 text-sm mb-1">Total Team Leads</div>
-//                           <div className="text-2xl font-bold text-black">234</div>
-//                         </div>
-//                         <div className="bg-white bg-opacity-5 rounded-xl p-4">
-//                           <div className="text-black text-opacity-70 text-sm mb-1">Total Closed Deals</div>
-//                           <div className="text-2xl font-bold text-black">77</div>
-//                         </div>
-//                         <div className="bg-white bg-opacity-5 rounded-xl p-4">
-//                           <div className="text-black text-opacity-70 text-sm mb-1">Overall Conversion</div>
-//                           <div className="text-2xl font-bold text-black">32.9%</div>
-//                         </div>
-//                       </div>
-
-//                       {/* Toggle Button */}
-//                       <button
-//                         onClick={() => toggleTeamMembers(team._id)}
-//                         className="w-full bg-white bg-opacity-10 hover:bg-opacity-20 backdrop-blur-sm rounded-xl p-4 text-black font-semibold transition-all flex items-center justify-center gap-2"
-//                       >
-//                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-//                           <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-//                         </svg>
-//                         {expandedTeamId === team._id ? 'Hide Team Members' : `View Team Members (${team.members?.length || 0})`}
-//                         <svg 
-//                           className={`w-5 h-5 transition-transform ${expandedTeamId === team._id ? 'rotate-180' : ''}`} 
-//                           fill="currentColor" 
-//                           viewBox="0 0 20 20"
-//                         >
-//                           <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-//                         </svg>
-//                       </button>
-//                     </div>
-
-//                     {/* Team Members Section */}
-//                     {expandedTeamId === team._id && team.members && team.members.length > 0 && (
-//                       <div className="mt-8 pt-8 border-t border-white border-opacity-20">
-//                         <div className="flex items-center justify-between mb-6">
-//                           <h4 className="text-black text-2xl font-semibold flex items-center gap-2">
-//                             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-//                               <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-//                             </svg>
-//                             Team Members ({team.members.length})
-//                           </h4>
-//                           <span className="text-black text-opacity-70 text-sm">All Active</span>
-//                         </div>
-
-//                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-//                           {team.members.map((member, index) => {
-//                             const memberInitials = member.fullName
-//                               ? member.fullName.split(" ").map(n => n[0]).join("").toUpperCase()
-//                               : "M";
-//                             const memberStats = {
-//                               leads: Math.floor(Math.random() * 60),
-//                               closed: Math.floor(Math.random() * 25),
-//                             };
-//                             memberStats.rate = memberStats.leads > 0 
-//                               ? ((memberStats.closed / memberStats.leads) * 100).toFixed(1) 
-//                               : "0.0";
-
-//                             return (
-//                               <div
-//                                 key={member._id}
-//                                 className="bg-white rounded-2xl p-6 shadow-lg"
-//                               >
-//                                 {/* Member Header */}
-//                                 <div className="flex items-start gap-4 mb-4">
-//                                   <div className={`w-16 h-16 ${index === 0 ? 'bg-blue-600' : index === 1 ? 'bg-teal-500' : 'bg-teal-600'} rounded-2xl flex items-center justify-center relative`}>
-//                                     <span className="text-xl font-bold text-black">{memberInitials}</span>
-//                                     {index === 0 && (
-//                                       <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
-//                                         <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
-//                                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-//                                         </svg>
-//                                       </div>
-//                                     )}
-//                                   </div>
-//                                   <div className="flex-1">
-//                                     <h5 className="text-lg font-bold text-gray-900 mb-1">{member.fullName}</h5>
-//                                     <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${index === 0 ? 'bg-yellow-100 text-yellow-800 border border-yellow-300' : 'bg-blue-100 text-blue-800 border border-blue-300'}`}>
-//                                       {index === 0 ? 'Senior Executive' : 'Sales Executive'}
-//                                     </span>
-//                                   </div>
-//                                 </div>
-
-//                                 {/* Contact Info */}
-//                                 <div className="space-y-2 mb-4">
-//                                   <div className="flex items-center gap-2 text-gray-600">
-//                                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-//                                       <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-//                                       <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-//                                     </svg>
-//                                     <span className="text-sm">{member.email}</span>
-//                                   </div>
-//                                   <div className="flex items-center gap-2 text-gray-600">
-//                                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-//                                       <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-//                                     </svg>
-//                                     <span className="text-sm">+1 (555) {Math.floor(Math.random() * 900) + 100}-{Math.floor(Math.random() * 9000) + 1000}</span>
-//                                   </div>
-//                                 </div>
-
-//                                 {/* Current Assignment */}
-//                                 <div className="bg-gray-50 rounded-xl p-4 mb-4">
-//                                   <div className="flex items-center gap-2 text-blue-600 text-sm font-medium mb-2">
-//                                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-//                                       <path fillRule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clipRule="evenodd" />
-//                                       <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z" />
-//                                     </svg>
-//                                     Current Assignment
-//                                   </div>
-//                                   <p className="text-sm text-gray-700 leading-relaxed">
-//                                     {index === 0 
-//                                       ? "Enterprise accounts in San Francisco, CA - focusing on Fortune 500 companies in tech sector"
-//                                       : index === 1
-//                                       ? "Mid-market SaaS solutions in Boston, MA for healthcare providers"
-//                                       : "Regional retail chains in New York, NY - Northeast territory expansion"}
-//                                   </p>
-//                                 </div>
-
-//                                 {/* Stats */}
-//                                 <div className="flex gap-2">
-//                                   <div className="flex-1 bg-orange-500 rounded-xl p-3 text-black">
-//                                     <div className="flex items-center gap-1 text-xs mb-1 opacity-90">
-//                                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-//                                         <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-//                                       </svg>
-//                                       Leads
-//                                     </div>
-//                                     <div className="text-2xl font-bold">{memberStats.leads}</div>
-//                                   </div>
-//                                   <div className="flex-1 bg-green-500 rounded-xl p-3 text-black">
-//                                     <div className="flex items-center gap-1 text-xs mb-1 opacity-90">
-//                                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-//                                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-//                                       </svg>
-//                                       Closed
-//                                     </div>
-//                                     <div className="text-2xl font-bold">{memberStats.closed}</div>
-//                                   </div>
-//                                   <div className="flex-1 bg-blue-500 rounded-xl p-3 text-black">
-//                                     <div className="flex items-center gap-1 text-xs mb-1 opacity-90">
-//                                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-//                                         <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
-//                                       </svg>
-//                                       Rate
-//                                     </div>
-//                                     <div className="text-2xl font-bold">{memberStats.rate}%</div>
-//                                   </div>
-//                                 </div>
-//                               </div>
-//                             );
-//                           })}
-//                         </div>
-//                       </div>
-//                     )}
-//                   </div>
-//                 );
-//               })
-//             ) : (
-//               <div className="text-black text-center text-xl">No teams found.</div>
-//             )}
-//           </div>
-//         </div>
-//       ) : (
-//         /* ------------------ TEAM DETAILS VIEW ------------------ */
-//         <div className="max-w-7xl mx-auto">
-//           <button
-//             className="mb-6 px-6 py-3 bg-white bg-opacity-20 backdrop-blur-sm text-black rounded-xl hover:bg-opacity-30 transition-all"
-//             onClick={() => setSelectedTeam(null)}
-//           >
-//             ← Back to Teams
-//           </button>
-
-//           <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl">
-//             <h3 className="text-3xl font-bold text-black mb-6">
-//               Team Members - {selectedTeam.teamLeader?.fullName}
-//             </h3>
-
-//             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-//               {selectedTeam.members?.length > 0 ? (
-//                 selectedTeam.members.map((member) => (
-//                   <div
-//                     key={member._id}
-//                     className="bg-white bg-opacity-10 rounded-2xl p-6 backdrop-blur-sm"
-//                   >
-//                     <div className="flex items-center gap-4 mb-3">
-//                       <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
-//                         <span className="text-lg font-bold text-black">
-//                           {member.fullName?.split(" ").map(n => n[0]).join("").toUpperCase()}
-//                         </span>
-//                       </div>
-//                       <div>
-//                         <p className="font-semibold text-black text-lg">{member.fullName}</p>
-//                         <p className="text-black text-opacity-70 text-sm">{member.email}</p>
-//                       </div>
-//                     </div>
-//                   </div>
-//                 ))
-//               ) : (
-//                 <p className="text-black text-opacity-80">No members found.</p>
-//               )}
-//             </div>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default AllTeam;
-
-
-
-
-
-// import React, { useState, useEffect } from "react";
-// import axios from "axios";
-
-// const AllTeam = () => {
-//   const [teams, setTeams] = useState([]);
-//   const [selectedTeam, setSelectedTeam] = useState(null);
-//   const [loading, setLoading] = useState(true);
-
-//   // Fetch teams
-//   useEffect(() => {
-//     const fetchTeams = async () => {
-//       try {
-//         const res = await axios.get(`${import.meta.env.VITE_API_URL}/teams/`);
-//         setTeams(res.data);
-//       } catch (error) {
-//         console.error("Error fetching teams:", error);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-//     fetchTeams();
-//   }, []);
-
-//   const getInitials = (name) => {
-//     if (!name) return "U";
-//     return name
-//       .split(" ")
-//       .map((n) => n[0])
-//       .join("")
-//       .toUpperCase();
-//   };
-
-//   if (loading) return <p className="p-6 text-center">Loading teams...</p>;
-
-//   return (
-//     <div className="p-6 bg-[#F5FAFB] min-h-screen">
-//       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-//         All Teams
-//       </h2>
-
-//       {/* ---------------- TEAM LIST PAGE ---------------- */}
-//       {!selectedTeam && (
-//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-//           {teams.map((team) => (
-//             <div
-//               key={team._id}
-//               onClick={() => setSelectedTeam(team)}
-//               className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm cursor-pointer hover:shadow-md transition"
-//             >
-//               <h3 className="text-xl font-semibold text-gray-800 mb-2">
-//                 Team #{team._id.slice(-4)}
-//               </h3>
-//               <p className="text-gray-600">
-//                 Leader:{" "}
-//                 <span className="font-medium">{team.teamLeader?.fullName}</span>
-//               </p>
-//               <p className="text-gray-600">
-//                 Members: {team.members?.length || 0}
-//               </p>
-//             </div>
-//           ))}
-//         </div>
-//       )}
-
-//       {/* ---------------- TEAM DETAILS PAGE ---------------- */}
-//       {selectedTeam && (
-//         <div className="bg-white w-full p-8 rounded-2xl border border-gray-200 shadow-sm">
-//           {/* Back Button */}
-//           <button
-//             onClick={() => setSelectedTeam(null)}
-//             className="mb-6 px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
-//           >
-//             ← Back to all teams
-//           </button>
-
-//           {/* TEAM LEADER HEADER */}
-//           <div className="flex items-center gap-4 mb-8">
-//             <div className="w-20 h-20 bg-[#D2EEF2] text-teal-700 font-bold text-3xl rounded-xl flex items-center justify-center">
-//               {getInitials(selectedTeam.teamLeader.fullName)}
-//             </div>
-
-//             <div>
-//               <p className="text-3xl font-bold text-gray-800">
-//                 {selectedTeam.teamLeader.fullName}
-//               </p>
-//               <p className="text-gray-600 text-sm">
-//                 {selectedTeam.teamLeader.email}
-//               </p>
-//             </div>
-//           </div>
-
-//           {/* LEADER STATS */}
-//           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
-//             {[
-//               { label: "My Leads", value: 49 },
-//               { label: "My Closed", value: 7 },
-//               { label: "My Rate", value: "14.3%" },
-//               { label: "Team Size", value: selectedTeam.members.length },
-//               { label: "Team Rate", value: "32.9%" },
-//             ].map((box, idx) => (
-//               <div
-//                 key={idx}
-//                 className="bg-[#F9FCFD] border border-gray-200 rounded-xl p-4"
-//               >
-//                 <p className="text-gray-600 text-sm">{box.label}</p>
-//                 <p className="text-2xl font-bold text-teal-700">{box.value}</p>
-//               </div>
-//             ))}
-//           </div>
-
-//           {/* TEAM MEMBERS SECTION */}
-//           <h3 className="text-2xl font-bold text-gray-800 mb-4">
-//             Team Members
-//           </h3>
-
-//           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//             {selectedTeam.members.map((member) => {
-//               // Example stats (Replace when backend gives real stats)
-//               const leads = Math.floor(Math.random() * 50);
-//               const closed = Math.floor(Math.random() * 20);
-//               const rate = leads ? ((closed / leads) * 100).toFixed(1) : "0";
-
-//               return (
-//                 <div
-//                   key={member._id}
-//                   className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm"
-//                 >
-//                   {/* Member Header */}
-//                   <div className="flex items-center gap-4 mb-6">
-//                     <div className="w-16 h-16 bg-[#D2EEF2] text-teal-700 font-bold text-xl rounded-xl flex items-center justify-center">
-//                       {getInitials(member.fullName)}
-//                     </div>
-
-//                     <div>
-//                       <p className="font-semibold text-gray-800 text-lg">
-//                         {member.fullName}
-//                       </p>
-//                       <p className="text-gray-600 text-sm">{member.email}</p>
-//                     </div>
-//                   </div>
-
-//                   {/* Member Stats */}
-//                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
-//                     <div className="border border-gray-200 rounded-xl p-3 bg-[#F9FCFD]">
-//                       <p className="text-gray-600 text-xs">My Leads</p>
-//                       <p className="text-xl font-bold text-teal-700">{leads}</p>
-//                     </div>
-
-//                     <div className="border border-gray-200 rounded-xl p-3 bg-[#F9FCFD]">
-//                       <p className="text-gray-600 text-xs">My Closed</p>
-//                       <p className="text-xl font-bold text-teal-700">
-//                         {closed}
-//                       </p>
-//                     </div>
-
-//                     <div className="border border-gray-200 rounded-xl p-3 bg-[#F9FCFD]">
-//                       <p className="text-gray-600 text-xs">My Rate</p>
-//                       <p className="text-xl font-bold text-teal-700">
-//                         {rate}%
-//                       </p>
-//                     </div>
-//                   </div>
-
-//                   {/* Assignment Box */}
-//                   <div className="bg-[#F6FAFB] border border-gray-200 rounded-xl p-4 text-sm text-gray-700">
-//                     Current Assignment:
-//                     <span className="block mt-1 text-gray-600">
-//                       (assignment goes here)
-//                     </span>
-//                   </div>
-//                 </div>
-//               );
-//             })}
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default AllTeam;
-
-
-
-
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 
+// ── Toast ──────────────────────────────────────────────────────────────────
+const Toast = ({ message, type, onClose }) => {
+  useEffect(() => {
+    const t = setTimeout(onClose, 3000);
+    return () => clearTimeout(t);
+  }, [onClose]);
+
+  const colors =
+    type === "success"
+      ? "bg-blue-600 text-white"
+      : "bg-red-500 text-white";
+
+  return (
+    <div
+      className={`fixed bottom-6 right-6 z-[100] px-5 py-3 rounded-xl shadow-lg text-sm font-medium flex items-center gap-3 ${colors}`}
+    >
+      {type === "success" ? (
+        <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+      ) : (
+        <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      )}
+      {message}
+      <button onClick={onClose} className="ml-2 opacity-70 hover:opacity-100 transition">✕</button>
+    </div>
+  );
+};
+
+// ── Delete Confirm Modal ───────────────────────────────────────────────────
+const DeleteConfirm = ({ onConfirm, onCancel }) => (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+    <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 border border-blue-100">
+      <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg className="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </div>
+      <h3 className="text-lg font-bold text-gray-800 text-center mb-1">Delete Team?</h3>
+      <p className="text-sm text-gray-500 text-center mb-6">This action cannot be undone.</p>
+      <div className="flex gap-3">
+        <button
+          onClick={onCancel}
+          className="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition text-sm font-semibold"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={onConfirm}
+          className="flex-1 px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition text-sm font-semibold"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+const getInitials = (name) => {
+  if (!name) return "U";
+  return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+};
+
+const Avatar = ({ name, size = "md" }) => {
+  const sizes = {
+    sm: "w-10 h-10 text-sm",
+    md: "w-14 h-14 text-lg",
+    lg: "w-20 h-20 text-2xl",
+  };
+  return (
+    <div className={`${sizes[size]} bg-gradient-to-br from-blue-500 to-blue-700 text-white font-bold rounded-xl flex items-center justify-center shrink-0 shadow-md`}>
+      {getInitials(name)}
+    </div>
+  );
+};
+
+const StatBox = ({ label, value, accent = false }) => (
+  <div className={`rounded-xl p-4 border ${accent ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-blue-100 text-gray-800"}`}>
+    <p className={`text-xs font-medium mb-1 ${accent ? "text-blue-200" : "text-gray-500"}`}>{label}</p>
+    <p className={`text-2xl font-bold ${accent ? "text-white" : "text-blue-700"}`}>{value}</p>
+  </div>
+);
+
+// ── Main Component ─────────────────────────────────────────────────────────
 const AllTeam = () => {
   const [teams, setTeams] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch teams
+  // Edit state
+  const [editingTeam, setEditingTeam] = useState(null);
+  const [editLeader, setEditLeader] = useState("");
+  const [editMembers, setEditMembers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  // UI state
+  const [toast, setToast] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
+  const showToast = (message, type = "success") => setToast({ message, type });
+
+  // Fetch data
   useEffect(() => {
-    const fetchTeams = async () => {
+    const fetchData = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/teams/`);
-        setTeams(res.data);
-      } catch (error) {
-        console.error("Error fetching teams:", error);
+        const [teamsRes, empRes] = await Promise.all([
+          axios.get(`${import.meta.env.VITE_API_URL}/teams/`),
+          axios.get(`${import.meta.env.VITE_API_URL}/employee/allEmployee`),
+        ]);
+        setTeams(teamsRes.data);
+        if (empRes.data?.success && Array.isArray(empRes.data.employees)) {
+          setEmployees(empRes.data.employees);
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        showToast("Failed to load teams", "error");
       } finally {
         setLoading(false);
       }
     };
-    fetchTeams();
+    fetchData();
   }, []);
 
-  const getInitials = (name) => {
-    if (!name) return "U";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
-  };
+  // Selectable employees derived from editing team's company
+  const selectableEmployees = useMemo(() => {
+    if (!editingTeam) return [];
 
-  const handleEdit = (teamId) => {
-    console.log('Edit team:', teamId);
-    // Add your edit logic here
-    // Example: navigate to edit page or open modal
-  };
+    // Resolve company from currently selected leader OR fallback to original leader
+    const leaderEmp = employees.find((e) => e._id === (editLeader || editingTeam.teamLeader?._id));
+    const companyId = leaderEmp?.company?._id || leaderEmp?.company;
+    if (!companyId) return [];
 
-  const handleDelete = async (teamId) => {
-    if (window.confirm('Are you sure you want to delete this team?')) {
-      try {
-        await axios.delete(`${import.meta.env.VITE_API_URL}/teams/${teamId}`);
-        setTeams(teams.filter(team => team._id !== teamId));
-        console.log('Team deleted:', teamId);
-      } catch (error) {
-        console.error('Error deleting team:', error);
+    const companyActive = employees.filter(
+      (e) => (e.company?._id === companyId || e.company === companyId) && e.accountActive === true
+    );
+
+    const otherTeamsAssigned = new Set();
+    teams.forEach((t) => {
+      if (t._id !== editingTeam._id) {
+        if (t.teamLeader?._id) otherTeamsAssigned.add(t.teamLeader._id);
+        t.members?.forEach((m) => m._id && otherTeamsAssigned.add(m._id));
       }
+    });
+
+    return companyActive.filter((e) => !otherTeamsAssigned.has(e._id));
+  }, [editingTeam, editLeader, employees, teams]);
+
+  const handleEdit = (team) => {
+    setEditingTeam(team);
+    setEditLeader(team.teamLeader?._id || "");
+    setEditMembers(team.members?.map((m) => m._id) || []);
+    setSearchTerm("");
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editLeader) return showToast("Please select a team leader.", "error");
+    if (!editMembers.length) return showToast("Please add at least one member.", "error");
+
+    try {
+      setSubmitting(true);
+      await axios.put(`${import.meta.env.VITE_API_URL}/teams/${editingTeam._id}/members`, {
+        teamLeaderId: editLeader,
+        memberIds: editMembers,
+      });
+
+      const teamsRes = await axios.get(`${import.meta.env.VITE_API_URL}/teams/`);
+      const updatedTeams = teamsRes.data;
+      setTeams(updatedTeams);
+
+      // Keep selectedTeam in sync
+      if (selectedTeam?._id === editingTeam._id) {
+        setSelectedTeam(updatedTeams.find((t) => t._id === editingTeam._id) || null);
+      }
+
+      setEditingTeam(null);
+      showToast("Team updated successfully!");
+    } catch (err) {
+      showToast(err.response?.data?.message || "Failed to update team.", "error");
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  if (loading) return <p className="p-6 text-center">Loading teams...</p>;
+  const handleDeleteConfirmed = async () => {
+    const teamId = deleteTarget;
+    setDeleteTarget(null);
+    try {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/teams/${teamId}`);
+      setTeams((prev) => prev.filter((t) => t._id !== teamId));
+      if (selectedTeam?._id === teamId) setSelectedTeam(null);
+      showToast("Team deleted.");
+    } catch (err) {
+      showToast("Failed to delete team.", "error");
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-slate-100">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+          <p className="text-blue-700 font-medium">Loading teams…</p>
+        </div>
+      </div>
+    );
 
   return (
-    <div className="p-6 bg-[#F5FAFB] min-h-screen">
-      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-        All Teams
-      </h2>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-slate-50 to-blue-100 p-6">
+      {/* Toast */}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
-      {/* ---------------- TEAM LIST PAGE ---------------- */}
-      {!selectedTeam && (
-        <div className="space-y-4">
-          {teams.map((team) => (
-            <div
-              key={team._id}
-              className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition flex items-center justify-between"
-            >
-              <div 
-                onClick={() => setSelectedTeam(team)}
-                className="cursor-pointer flex-1"
-              >
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  Team #{team._id.slice(-4)}
-                </h3>
-                <p className="text-gray-600">
-                  Leader:{" "}
-                  <span className="font-medium">{team.teamLeader?.fullName}</span>
-                </p>
-                <p className="text-gray-600">
-                  Members: {team.members?.length || 0}
-                </p>
-              </div>
-              
-              <div className="flex items-center gap-2 ml-4">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEdit(team._id);
-                  }}
-                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                  title="Edit"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                  </svg>
-                </button>
-                
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(team._id);
-                  }}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                  title="Delete"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+      {/* Delete Confirm */}
+      {deleteTarget && (
+        <DeleteConfirm onConfirm={handleDeleteConfirmed} onCancel={() => setDeleteTarget(null)} />
       )}
 
-      {/* ---------------- TEAM DETAILS PAGE ---------------- */}
-      {selectedTeam && (
-        <div className="bg-white w-full p-8 rounded-2xl border border-gray-200 shadow-sm">
-          {/* Back Button */}
-          <button
-            onClick={() => setSelectedTeam(null)}
-            className="mb-6 px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
-          >
-            ← Back to all teams
-          </button>
-
-          {/* TEAM LEADER HEADER */}
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-20 h-20 bg-[#D2EEF2] text-teal-700 font-bold text-3xl rounded-xl flex items-center justify-center">
-              {getInitials(selectedTeam.teamLeader.fullName)}
-            </div>
-
-            <div>
-              <p className="text-3xl font-bold text-gray-800">
-                {selectedTeam.teamLeader.fullName}
-              </p>
-              <p className="text-gray-600 text-sm">
-                {selectedTeam.teamLeader.email}
-              </p>
-            </div>
+      {/* Page Header */}
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center gap-3 mb-8">
+          {selectedTeam && (
+            <button
+              onClick={() => setSelectedTeam(null)}
+              className="p-2 rounded-xl bg-white border border-blue-100 text-blue-600 hover:bg-blue-50 transition shadow-sm"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          )}
+          <div>
+            <h1 className="text-3xl font-extrabold text-blue-900 tracking-tight">
+              {selectedTeam ? selectedTeam.teamLeader?.fullName + "'s Team" : "All Teams"}
+            </h1>
+            <p className="text-sm text-blue-400 mt-0.5">
+              {selectedTeam ? `${selectedTeam.members?.length || 0} members` : `${teams.length} teams`}
+            </p>
           </div>
+        </div>
 
-          {/* LEADER STATS */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
-            {[
-              { label: "My Leads", value: 49 },
-              { label: "My Closed", value: 7 },
-              { label: "My Rate", value: "14.3%" },
-              { label: "Team Size", value: selectedTeam.members.length },
-              { label: "Team Rate", value: "32.9%" },
-            ].map((box, idx) => (
+        {/* ── TEAM LIST ── */}
+        {!selectedTeam && (
+          <div className="space-y-3">
+            {teams.map((team) => (
               <div
-                key={idx}
-                className="bg-[#F9FCFD] border border-gray-200 rounded-xl p-4"
+                key={team._id}
+                className="bg-white rounded-2xl border border-blue-100 shadow-sm hover:shadow-blue-100 hover:shadow-md transition-all group"
               >
-                <p className="text-gray-600 text-sm">{box.label}</p>
-                <p className="text-2xl font-bold text-teal-700">{box.value}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* TEAM MEMBERS SECTION */}
-          <h3 className="text-2xl font-bold text-gray-800 mb-4">
-            Team Members
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {selectedTeam.members.map((member) => {
-              // Example stats (Replace when backend gives real stats)
-              const leads = Math.floor(Math.random() * 50);
-              const closed = Math.floor(Math.random() * 20);
-              const rate = leads ? ((closed / leads) * 100).toFixed(1) : "0";
-
-              return (
-                <div
-                  key={member._id}
-                  className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm"
-                >
-                  {/* Member Header */}
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-16 h-16 bg-[#D2EEF2] text-teal-700 font-bold text-xl rounded-xl flex items-center justify-center">
-                      {getInitials(member.fullName)}
-                    </div>
-
-                    <div>
-                      <p className="font-semibold text-gray-800 text-lg">
-                        {member.fullName}
+                <div className="flex items-center gap-4 p-5">
+                  {/* Click area */}
+                  <button
+                    onClick={() => setSelectedTeam(team)}
+                    className="flex items-center gap-4 flex-1 text-left min-w-0"
+                  >
+                    <Avatar name={team.teamLeader?.fullName} size="md" />
+                    <div className="min-w-0">
+                      <p className="font-bold text-gray-900 text-lg leading-tight truncate">
+                        {team.teamLeader?.fullName || "Unassigned"}
                       </p>
-                      <p className="text-gray-600 text-sm">{member.email}</p>
+                      <p className="text-sm text-gray-500 truncate">{team.teamLeader?.email}</p>
                     </div>
-                  </div>
-
-                  {/* Member Stats */}
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
-                    <div className="border border-gray-200 rounded-xl p-3 bg-[#F9FCFD]">
-                      <p className="text-gray-600 text-xs">My Leads</p>
-                      <p className="text-xl font-bold text-teal-700">{leads}</p>
+                    <div className="ml-auto flex items-center gap-4 pr-2 shrink-0">
+                      <div className="text-center hidden sm:block">
+                        <p className="text-xs text-gray-400">Members</p>
+                        <p className="text-lg font-bold text-blue-700">{team.members?.length || 0}</p>
+                      </div>
+                      <svg
+                        className="w-5 h-5 text-blue-300 group-hover:text-blue-600 transition"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
                     </div>
+                  </button>
 
-                    <div className="border border-gray-200 rounded-xl p-3 bg-[#F9FCFD]">
-                      <p className="text-gray-600 text-xs">My Closed</p>
-                      <p className="text-xl font-bold text-teal-700">
-                        {closed}
-                      </p>
-                    </div>
-
-                    <div className="border border-gray-200 rounded-xl p-3 bg-[#F9FCFD]">
-                      <p className="text-gray-600 text-xs">My Rate</p>
-                      <p className="text-xl font-bold text-teal-700">
-                        {rate}%
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Assignment Box */}
-                  <div className="bg-[#F6FAFB] border border-gray-200 rounded-xl p-4 text-sm text-gray-700">
-                    Current Assignment:
-                    <span className="block mt-1 text-gray-600">
-                      (assignment goes here)
-                    </span>
+                  {/* Action buttons */}
+                  <div className="flex items-center gap-1 pl-3 border-l border-blue-50">
+                    <button
+                      onClick={() => handleEdit(team)}
+                      className="p-2 rounded-lg text-blue-500 hover:bg-blue-50 transition"
+                      title="Edit team"
+                    >
+                      <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => setDeleteTarget(team._id)}
+                      className="p-2 rounded-lg text-red-400 hover:bg-red-50 transition"
+                      title="Delete team"
+                    >
+                      <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
+
+            {teams.length === 0 && (
+              <div className="text-center py-16 text-blue-300">
+                <svg className="w-12 h-12 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <p className="font-medium">No teams yet</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── TEAM DETAIL ── */}
+        {selectedTeam && (
+          <div className="space-y-6">
+            {/* Leader card */}
+            <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-6 text-white shadow-lg shadow-blue-200">
+              <div className="flex items-center gap-5 mb-6">
+                <div className="w-20 h-20 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center text-3xl font-extrabold text-white shrink-0 shadow-inner">
+                  {getInitials(selectedTeam.teamLeader?.fullName)}
+                </div>
+                <div>
+                  <p className="text-2xl font-extrabold">{selectedTeam.teamLeader?.fullName}</p>
+                  <p className="text-blue-200 text-sm">{selectedTeam.teamLeader?.email}</p>
+                  <span className="inline-block mt-2 px-3 py-0.5 bg-white/20 rounded-full text-xs font-semibold">Team Leader</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                {[
+                  { label: "My Leads", value: 49 },
+                  { label: "My Closed", value: 7 },
+                  { label: "My Rate", value: "14.3%" },
+                  { label: "Team Size", value: selectedTeam.members?.length || 0 },
+                  { label: "Team Rate", value: "32.9%" },
+                ].map((box, i) => (
+                  <div key={i} className="bg-white/15 backdrop-blur rounded-xl p-3 text-center">
+                    <p className="text-blue-200 text-xs mb-1">{box.label}</p>
+                    <p className="text-xl font-bold">{box.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Members */}
+            <div>
+              <h2 className="text-xl font-bold text-blue-900 mb-4">Team Members</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {selectedTeam.members?.map((member) => (
+                  <MemberCard key={member._id} member={member} />
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── EDIT MODAL ── */}
+      {editingTeam && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl border border-blue-100 flex flex-col max-h-[90vh]">
+            {/* Header */}
+            <div className="p-6 border-b border-blue-50 flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-bold text-blue-900">Edit Team</h3>
+                <p className="text-xs text-blue-400 mt-0.5">Update leader and members</p>
+              </div>
+              <button onClick={() => setEditingTeam(null)} className="text-gray-400 hover:text-gray-600 transition p-1">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 overflow-y-auto flex-1 space-y-5">
+              {/* Leader */}
+              <div>
+                <label className="block text-sm font-semibold text-blue-800 mb-1.5">Team Leader</label>
+                <select
+                  value={editLeader}
+                  onChange={(e) => {
+                    setEditLeader(e.target.value);
+                    setEditMembers((prev) => prev.filter((id) => id !== e.target.value));
+                  }}
+                  className="w-full px-4 py-2.5 border border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-gray-700 bg-blue-50/40"
+                >
+                  <option value="">Select leader…</option>
+                  {selectableEmployees.map((emp) => (
+                    <option key={emp._id} value={emp._id}>{emp.fullName}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Members */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-sm font-semibold text-blue-800">Members</label>
+                  <button
+                    onClick={() => {
+                      const pool = selectableEmployees.filter((e) => e._id !== editLeader);
+                      setEditMembers(editMembers.length === pool.length ? [] : pool.map((e) => e._id));
+                    }}
+                    className="text-xs text-blue-600 hover:text-blue-800 font-semibold transition"
+                  >
+                    {editMembers.length === selectableEmployees.filter((e) => e._id !== editLeader).length
+                      ? "Deselect All"
+                      : "Select All"}
+                  </button>
+                </div>
+
+                <div className="relative mb-2">
+                  <svg className="w-4 h-4 text-blue-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <input
+                    type="text"
+                    placeholder="Search employees…"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2.5 border border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-blue-50/40"
+                  />
+                </div>
+
+                <div className="border border-blue-100 rounded-xl max-h-48 overflow-y-auto bg-blue-50/30 p-2 space-y-1">
+                  {selectableEmployees
+                    .filter((e) => e._id !== editLeader)
+                    .filter((e) => e.fullName.toLowerCase().includes(searchTerm.toLowerCase()))
+                    .map((emp) => {
+                      const checked = editMembers.includes(emp._id);
+                      return (
+                        <label
+                          key={emp._id}
+                          className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition select-none ${
+                            checked ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-blue-50 border border-blue-100"
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() =>
+                              setEditMembers((prev) =>
+                                checked ? prev.filter((id) => id !== emp._id) : [...prev, emp._id]
+                              )
+                            }
+                            className="w-4 h-4 accent-blue-600 shrink-0"
+                          />
+                          <span className="text-sm font-medium">{emp.fullName}</span>
+                        </label>
+                      );
+                    })}
+                  {selectableEmployees.filter((e) => e._id !== editLeader).length === 0 && (
+                    <p className="text-center text-xs text-blue-300 py-4">No employees available</p>
+                  )}
+                </div>
+
+                <p className="text-xs text-blue-400 mt-1.5">{editMembers.length} member{editMembers.length !== 1 ? "s" : ""} selected</p>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-5 border-t border-blue-50 flex items-center justify-end gap-3 bg-blue-50/40">
+              <button
+                onClick={() => setEditingTeam(null)}
+                className="px-4 py-2 border border-blue-200 text-blue-700 bg-white rounded-xl hover:bg-blue-50 transition text-sm font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={submitting}
+                className="px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition text-sm font-semibold disabled:opacity-50 flex items-center gap-2"
+              >
+                {submitting && <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />}
+                {submitting ? "Saving…" : "Save Changes"}
+              </button>
+            </div>
           </div>
         </div>
       )}
     </div>
   );
 };
+
+// ── Member Card (memoized to avoid random stat flicker) ───────────────────
+const MemberCard = React.memo(({ member }) => {
+  const leads = useMemo(() => Math.floor(Math.random() * 50), [member._id]);
+  const closed = useMemo(() => Math.floor(Math.random() * 20), [member._id]);
+  const rate = leads ? ((closed / leads) * 100).toFixed(1) : "0";
+
+  return (
+    <div className="bg-white rounded-2xl border border-blue-100 p-5 shadow-sm hover:shadow-blue-100 hover:shadow-md transition-all">
+      <div className="flex items-center gap-3 mb-4">
+        <Avatar name={member.fullName} size="sm" />
+        <div className="min-w-0">
+          <p className="font-bold text-gray-800 truncate">{member.fullName}</p>
+          <p className="text-xs text-gray-500 truncate">{member.email}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2 mb-4">
+        <StatBox label="Leads" value={leads} />
+        <StatBox label="Closed" value={closed} />
+        <StatBox label="Rate" value={`${rate}%`} />
+      </div>
+
+      <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 text-sm text-blue-700">
+        <span className="text-xs text-blue-400 block mb-0.5">Current Assignment</span>
+        <span className="text-gray-500 text-xs">No assignment yet</span>
+      </div>
+    </div>
+  );
+});
 
 export default AllTeam;

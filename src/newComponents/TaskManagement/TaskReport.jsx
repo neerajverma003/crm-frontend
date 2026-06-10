@@ -279,60 +279,108 @@ const TaskReport = () => {
                   <p className="text-gray-600 text-lg">No overdue tasks! Great job!</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Task Title</th>
-                        <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Assigned To</th>
-                        <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Due Date</th>
-                        <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Days Overdue</th>
-                        <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Priority</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {overdueTasks.map((task) => {
-                        const daysOverdue = Math.floor(
-                          (new Date() - new Date(task.dueDate)) / (1000 * 60 * 60 * 24)
-                        );
+                <div className="overflow-hidden">
+                  {/* Mobile Cards View */}
+                  <div className="grid grid-cols-1 gap-4 p-4 md:hidden bg-gray-50/50">
+                    {overdueTasks.map((task) => {
+                      const daysOverdue = Math.floor(
+                        (new Date() - new Date(task.dueDate)) / (1000 * 60 * 60 * 24)
+                      );
+                      return (
+                        <div key={task._id} className="bg-white rounded-xl border border-red-100 p-4 shadow-sm">
+                          <div className="flex justify-between items-start mb-3">
+                            <h3 className="font-bold text-gray-900 text-base leading-tight">{task.taskTitle}</h3>
+                            <span className="px-2.5 py-1 bg-red-100 text-red-800 text-xs font-bold rounded-full whitespace-nowrap">
+                              {daysOverdue} days
+                            </span>
+                          </div>
+                          
+                          <div className="space-y-2 text-sm text-gray-600 mb-4">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-gray-700 w-24">Assigned To:</span>
+                              <span className="text-gray-900">{getAssigneeName(task.assignedTo)}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-gray-700 w-24">Due Date:</span>
+                              <span className="text-red-600 font-semibold">{new Date(task.dueDate).toLocaleDateString()}</span>
+                            </div>
+                          </div>
 
-                        return (
-                          <tr key={task._id} className="hover:bg-red-50 transition">
-                            <td className="px-6 py-4">
-                              <div className="text-sm font-semibold text-gray-900">{task.taskTitle}</div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="text-sm text-gray-900">{getAssigneeName(task.assignedTo)}</div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="text-sm font-semibold text-red-600">
-                                {new Date(task.dueDate).toLocaleDateString()}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <span className="px-3 py-1 bg-red-100 text-red-800 text-xs font-bold rounded-full">
-                                {daysOverdue} days
-                              </span>
-                            </td>
-                            <td className="px-6 py-4">
-                              <span
-                                className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                                  {
-                                    Low: "bg-green-100 text-green-800",
-                                    Medium: "bg-yellow-100 text-yellow-800",
-                                    High: "bg-orange-100 text-orange-800",
-                                    Critical: "bg-red-100 text-red-800",
-                                  }[task.priority] || "bg-gray-100 text-gray-800"
-                                }`}
-                              >
-                                {task.priority}
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                          <div className="pt-3 border-t border-gray-100">
+                            <span
+                              className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                                {
+                                  Low: "bg-green-100 text-green-800",
+                                  Medium: "bg-yellow-100 text-yellow-800",
+                                  High: "bg-orange-100 text-orange-800",
+                                  Critical: "bg-red-100 text-red-800",
+                                }[task.priority] || "bg-gray-100 text-gray-800"
+                              }`}
+                            >
+                              {task.priority} Priority
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Task Title</th>
+                          <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Assigned To</th>
+                          <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Due Date</th>
+                          <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Days Overdue</th>
+                          <th className="px-6 py-3 text-left text-sm font-bold text-gray-700">Priority</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {overdueTasks.map((task) => {
+                          const daysOverdue = Math.floor(
+                            (new Date() - new Date(task.dueDate)) / (1000 * 60 * 60 * 24)
+                          );
+
+                          return (
+                            <tr key={task._id} className="hover:bg-red-50 transition">
+                              <td className="px-6 py-4">
+                                <div className="text-sm font-semibold text-gray-900">{task.taskTitle}</div>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="text-sm text-gray-900">{getAssigneeName(task.assignedTo)}</div>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="text-sm font-semibold text-red-600">
+                                  {new Date(task.dueDate).toLocaleDateString()}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4">
+                                <span className="px-3 py-1 bg-red-100 text-red-800 text-xs font-bold rounded-full">
+                                  {daysOverdue} days
+                                </span>
+                              </td>
+                              <td className="px-6 py-4">
+                                <span
+                                  className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                                    {
+                                      Low: "bg-green-100 text-green-800",
+                                      Medium: "bg-yellow-100 text-yellow-800",
+                                      High: "bg-orange-100 text-orange-800",
+                                      Critical: "bg-red-100 text-red-800",
+                                    }[task.priority] || "bg-gray-100 text-gray-800"
+                                  }`}
+                                >
+                                  {task.priority}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </div>

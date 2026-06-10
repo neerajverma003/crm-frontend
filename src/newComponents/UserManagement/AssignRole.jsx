@@ -208,10 +208,11 @@ const AssignRoleToAdmin = () => {
                   <div key={role._id} className={`${roleIdx !== roles.length - 1 ? "border-b border-gray-100" : ""}`}>
 
                     {/* Role Row */}
-                    <button
-                      type="button"
+                    <div
+                      role="button"
+                      tabIndex={0}
                       onClick={() => handleRoleToggle(role.role)}
-                      className={`w-full flex items-center gap-3 px-4 py-3.5 text-left transition-all duration-150 ${formData.selectedRoles.includes(role.role) ? "bg-blue-50/50" : "bg-slate-50 hover:bg-slate-100"}`}
+                      className={`w-full flex items-center gap-3 px-4 py-3.5 text-left cursor-pointer transition-all duration-150 ${formData.selectedRoles.includes(role.role) ? "bg-blue-50/50" : "bg-slate-50 hover:bg-slate-100"}`}
                     >
                       <span className={`w-5 h-5 rounded border flex items-center justify-center flex-shrink-0 transition-all duration-150 ${formData.selectedRoles.includes(role.role)
                           ? "border-blue-600 bg-blue-600 shadow-sm"
@@ -229,7 +230,7 @@ const AssignRoleToAdmin = () => {
                       {formData.selectedRoles.includes(role.role) && (
                         <span className="ml-auto text-xs text-blue-700 font-bold bg-blue-100 px-2 py-0.5 rounded-md">Selected</span>
                       )}
-                    </button>
+                    </div>
 
                     {/* SubRoles Container */}
                     {Array.isArray(role.subRole) && role.subRole.length > 0 && (
@@ -240,10 +241,11 @@ const AssignRoleToAdmin = () => {
                           return (
                             <div key={subId} className="flex flex-col mb-1">
                               {/* SubRole Row */}
-                              <button
-                                type="button"
+                              <div
+                                role="button"
+                                tabIndex={0}
                                 onClick={() => handleSubRoleToggle(subId)}
-                                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${subSelected ? "bg-blue-50/50" : "hover:bg-slate-50"}`}
+                                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer text-left transition-colors ${subSelected ? "bg-blue-50/50" : "hover:bg-slate-50"}`}
                               >
                                 <span className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-all ${subSelected ? "border-blue-500 bg-blue-500" : "border-gray-300 bg-white"}`}>
                                   {subSelected && (
@@ -255,7 +257,7 @@ const AssignRoleToAdmin = () => {
                                 <span className={`text-sm ${subSelected ? "text-blue-800 font-bold" : "text-slate-600 font-medium"}`}>
                                   {sub.subRoleName}
                                 </span>
-                              </button>
+                              </div>
 
                               {/* Points Container */}
                               {Array.isArray(sub.points) && sub.points.length > 0 && (
@@ -263,11 +265,12 @@ const AssignRoleToAdmin = () => {
                                   {sub.points.map((point, idx) => {
                                     const pointSelected = formData.selectedPoints.includes(point);
                                     return (
-                                      <button
+                                      <div
                                         key={idx}
-                                        type="button"
+                                        role="button"
+                                        tabIndex={0}
                                         onClick={() => handlePointToggle(point)}
-                                        className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-left transition-colors ${pointSelected ? "bg-indigo-50/50" : "hover:bg-slate-50"}`}
+                                        className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg cursor-pointer text-left transition-colors ${pointSelected ? "bg-indigo-50/50" : "hover:bg-slate-50"}`}
                                       >
                                         <span className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center flex-shrink-0 ${pointSelected ? "border-indigo-500 bg-indigo-500" : "border-gray-300 bg-white"}`}>
                                           {pointSelected && (
@@ -279,7 +282,7 @@ const AssignRoleToAdmin = () => {
                                         <span className={`text-xs ${pointSelected ? "text-indigo-800 font-bold" : "text-slate-500 font-medium"}`}>
                                           {point}
                                         </span>
-                                      </button>
+                                      </div>
                                     );
                                   })}
                                 </div>

@@ -533,21 +533,21 @@ const CreateHotel = () => {
             </div>
 
             {/* FILTER BAR */}
-            <div className="flex flex-wrap gap-3 mb-6 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-              <select className="border-2 border-slate-200 px-4 py-2 rounded-xl bg-white text-sm font-bold text-slate-600 focus:outline-none focus:border-indigo-400" value={filterType} onChange={(e) => setFilterType(e.target.value)}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+              <select className="w-full border-2 border-slate-200 px-4 py-2 rounded-xl bg-white text-sm font-bold text-slate-600 focus:outline-none focus:border-indigo-400" value={filterType} onChange={(e) => setFilterType(e.target.value)}>
                 <option value="All">All Types</option>
                 <option value="Domestic">Domestic</option>
                 <option value="International">International</option>
               </select>
-              <select className="border-2 border-slate-200 px-4 py-2 rounded-xl bg-white text-sm font-bold text-slate-600 focus:outline-none focus:border-indigo-400" value={filterState} onChange={(e) => setFilterState(e.target.value)}>
+              <select className="w-full border-2 border-slate-200 px-4 py-2 rounded-xl bg-white text-sm font-bold text-slate-600 focus:outline-none focus:border-indigo-400" value={filterState} onChange={(e) => setFilterState(e.target.value)}>
                 <option value="All">All States</option>
                 {[...new Set(hotels.map(h => h.state?.state))].map((st, idx) => st && <option key={idx} value={st}>{st}</option>)}
               </select>
-              <select className="border-2 border-slate-200 px-4 py-2 rounded-xl bg-white text-sm font-bold text-slate-600 focus:outline-none focus:border-indigo-400" value={filterRating} onChange={(e) => setFilterRating(e.target.value)}>
+              <select className="w-full border-2 border-slate-200 px-4 py-2 rounded-xl bg-white text-sm font-bold text-slate-600 focus:outline-none focus:border-indigo-400" value={filterRating} onChange={(e) => setFilterRating(e.target.value)}>
                 <option value="All">All Ratings</option>
                 {[1,2,3,4,5,6,7].map(r => <option key={r} value={r}>{r} ⭐</option>)}
               </select>
-              <div className="flex-1 min-w-[200px]">
+              <div className="w-full">
                 <input type="text" placeholder="Search hotel name..." className="w-full border-2 border-slate-200 px-4 py-2 rounded-xl bg-white text-sm font-bold text-slate-600 focus:outline-none focus:border-indigo-400" value={searchName} onChange={(e) => setSearchName(e.target.value)} />
               </div>
             </div>

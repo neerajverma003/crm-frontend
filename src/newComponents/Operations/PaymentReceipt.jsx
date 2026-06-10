@@ -50,6 +50,26 @@ const PaymentReceipt = ({ customer, invoiceNo, date, endDate, amount, advancePay
           box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
+        @media (max-width: 380px) {
+          .container {
+            zoom: 0.35;
+            padding: 8mm;
+          }
+        }
+        
+        @media (min-width: 381px) and (max-width: 768px) {
+          .container {
+            zoom: 0.4;
+            padding: 10mm;
+          }
+        }
+        
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .container {
+            zoom: 0.7;
+          }
+        }
+
         .header {
           text-align: center;
           border-bottom: 1px solid #000;

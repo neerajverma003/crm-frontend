@@ -9,9 +9,27 @@ function EmployeeSidebar() {
     const [loading, setLoading] = useState(true);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [openDropdowns, setOpenDropdowns] = useState({});
+    const [myTeam, setMyTeam] = useState(null);
 
     const userId = localStorage.getItem("userId");
     const userRole = localStorage.getItem("role")?.trim()?.toLowerCase();
+
+    useEffect(() => {
+        if (!userId) return;
+        const checkTeamLeader = async () => {
+            try {
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/teams`);
+                const teams = await res.json();
+                const foundTeam = teams.find(t => t.teamLeader?._id === userId);
+                if (foundTeam) {
+                    setMyTeam(foundTeam);
+                }
+            } catch (err) {
+                console.error("Error checking team leader status:", err);
+            }
+        };
+        checkTeamLeader();
+    }, [userId]);
 
     useEffect(() => {
         const fetchEmployee = async () => {
@@ -125,7 +143,7 @@ function EmployeeSidebar() {
             try {
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/employee/getAssignedRoles/${userId}`);
                 const data = await res.json();
-                console.log("📥 Assigned Roles for Employee:", data);
+                // console.log(" Assigned Roles for Employee:", data);
                 
                 if (data.success && Array.isArray(data.assignedRoles)) {
                     // Backend returns enriched data with roleNames, subRoles, and points
@@ -292,6 +310,20 @@ function EmployeeSidebar() {
                             <FaCheckSquare className={location.pathname === "/employee-tasks" ? "text-white" : "text-gray-400"} size={16} />
                             My Tasks
                         </Link>
+
+                        {myTeam && (
+                            <Link
+                                to="/my-team-dashboard"
+                                className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                                    location.pathname === "/my-team-dashboard" 
+                                    ? "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-lg shadow-indigo-200/50" 
+                                    : "text-gray-600 hover:bg-indigo-50 hover:text-indigo-600"
+                                }`}
+                            >
+                                <FaBriefcase className={location.pathname === "/my-team-dashboard" ? "text-white" : "text-gray-400"} size={16} />
+                                My Team Dashboard
+                            </Link>
+                        )}
 
                         {loading ? (
                             <p className="mt-4 text-center text-sm text-gray-400">Loading...</p>

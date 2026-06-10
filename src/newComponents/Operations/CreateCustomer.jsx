@@ -839,78 +839,111 @@ const CreateCustomer = () => {
           )}
 
           {!loading && transferLeads.length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-gray-300">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Name</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Email</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Phone</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Destination</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Status</th>
-                    <th className="border border-gray-300 px-4 py-2 text-center">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <>
+              <div className="overflow-x-auto hidden md:block">
+                <table className="w-full border-collapse border border-gray-300">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="border border-gray-300 px-4 py-2 text-left">Name</th>
+                      <th className="border border-gray-300 px-4 py-2 text-left">Email</th>
+                      <th className="border border-gray-300 px-4 py-2 text-left">Phone</th>
+                      <th className="border border-gray-300 px-4 py-2 text-left">Destination</th>
+                      <th className="border border-gray-300 px-4 py-2 text-left">Status</th>
+                      <th className="border border-gray-300 px-4 py-2 text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {transferLeads.map((lead) => (
+                      <tr key={lead._id} className="hover:bg-gray-50">
+                        <td className="border border-gray-300 px-4 py-2">{lead.name}</td>
+                        <td className="border border-gray-300 px-4 py-2">{lead.email}</td>
+                        <td className="border border-gray-300 px-4 py-2">{lead.phone}</td>
+                        <td className="border border-gray-300 px-4 py-2">{lead.destination}</td>
+                        <td className="border border-gray-300 px-4 py-2">
+                          <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm">
+                            {lead.leadStatus || "Pending"}
+                          </span>
+                        </td>
+                        <td className="border border-gray-300 px-4 py-2">
+                          <div className="flex gap-2 justify-center flex-wrap">
+                            <button
+                              onClick={() => handleViewLead(lead)}
+                              className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition flex items-center justify-center"
+                              title="View Lead Details"
+                            >
+                              <Eye size={18} />
+                            </button>
+                            <button
+                              onClick={() => { setSelectedLead(lead); setEditModalOpen(true); }}
+                              className="bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700 transition flex items-center justify-center"
+                              title="Edit Lead"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 11l6 6L21 11l-6-6-6 6z" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => handleUploadDocuments(lead)}
+                              className="bg-orange-500 text-white p-2 rounded hover:bg-orange-600 transition flex items-center justify-center"
+                              title="Upload Documents"
+                            >
+                              <FileUp size={18} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleMoveLead(lead)}
+                              className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition flex items-center justify-center"
+                              title="Move Lead"
+                            >
+                              <Move size={18} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              {/* Mobile View */}
+              <div className="block md:hidden">
+                <div className="flex flex-col gap-4">
                   {transferLeads.map((lead) => (
-                    <tr key={lead._id} className="hover:bg-gray-50">
-                      <td className="border border-gray-300 px-4 py-2">{lead.name}</td>
-                      <td className="border border-gray-300 px-4 py-2">{lead.email}</td>
-                      <td className="border border-gray-300 px-4 py-2">{lead.phone}</td>
-                      <td className="border border-gray-300 px-4 py-2">{lead.destination}</td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm">
+                    <div key={lead._id} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col gap-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-bold text-gray-900">{lead.name}</h4>
+                          <p className="text-xs text-gray-500 mt-1">{lead.email}</p>
+                        </div>
+                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-[10px] font-bold">
                           {lead.leadStatus || "Pending"}
                         </span>
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        <div className="flex gap-2 justify-center flex-wrap">
-                          {/* View Button */}
-                          <button
-                            onClick={() => handleViewLead(lead)}
-                            className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition flex items-center justify-center"
-                            title="View Lead Details"
-                          >
-                            <Eye size={18} />
-                          </button>
-
-                          {/* Edit Button */}
-                          <button
-                            onClick={() => { setSelectedLead(lead); setEditModalOpen(true); }}
-                            className="bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700 transition flex items-center justify-center"
-                            title="Edit Lead"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 11l6 6L21 11l-6-6-6 6z" />
-                            </svg>
-                          </button>
-
-                          {/* Upload Documents Button */}
-                          <button
-                            onClick={() => handleUploadDocuments(lead)}
-                            className="bg-orange-500 text-white p-2 rounded hover:bg-orange-600 transition flex items-center justify-center"
-                            title="Upload Documents"
-                          >
-                            <FileUp size={18} />
-                          </button>
-
-                          {/* Move Button */}
-                          <button
-                            type="button"
-                            onClick={() => handleMoveLead(lead)}
-                            className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition flex items-center justify-center"
-                            title="Move Lead"
-                          >
-                            <Move size={18} />
-                          </button>
-                          
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-sm mt-1">
+                        <div>
+                          <p className="text-[10px] text-gray-500 uppercase font-bold">Destination</p>
+                          <p className="text-gray-800 font-medium">{lead.destination || "N/A"}</p>
                         </div>
-                      </td>
-                    </tr>
+                        <div>
+                          <p className="text-[10px] text-gray-500 uppercase font-bold">Phone</p>
+                          <p className="text-gray-800 font-medium">{lead.phone}</p>
+                        </div>
+                      </div>
+                      <div className="flex justify-end gap-2 mt-2 pt-3 border-t border-gray-100">
+                        <button onClick={() => handleViewLead(lead)} className="p-2 rounded-lg bg-blue-50 text-blue-600"><Eye size={16} /></button>
+                        <button onClick={() => { setSelectedLead(lead); setEditModalOpen(true); }} className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
+                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 11l6 6L21 11l-6-6-6 6z" />
+                           </svg>
+                        </button>
+                        <button onClick={() => handleUploadDocuments(lead)} className="p-2 rounded-lg bg-orange-50 text-orange-600"><FileUp size={16} /></button>
+                        <button onClick={() => handleMoveLead(lead)} className="p-2 rounded-lg bg-green-50 text-green-600"><Move size={16} /></button>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </div>
+              </div>
+            </>
           )}
         </div>
       )}
@@ -937,82 +970,116 @@ const CreateCustomer = () => {
           )}
 
           {!loading && b2bTransferLeads.length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-gray-300">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Reference ID</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Company Name</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Email</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Phone</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Destination</th>
-                    <th className="border border-gray-300 px-4 py-2 text-left">Passengers</th>
-                    <th className="border border-gray-300 px-4 py-2 text-center">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {b2bTransferLeads.map((lead) => (
-                    <tr key={lead._id} className="hover:bg-gray-50">
-                      <td className="border border-gray-300 px-4 py-2 font-medium text-blue-600">{lead.referenceId}</td>
-                      <td className="border border-gray-300 px-4 py-2">{lead.companyName}</td>
-                      <td className="border border-gray-300 px-4 py-2">{lead.email}</td>
-                      <td className="border border-gray-300 px-4 py-2">{lead.phone}</td>
-                      <td className="border border-gray-300 px-4 py-2">{lead.destination}</td>
-                      <td className="border border-gray-300 px-4 py-2">{lead.noOfPerson || "-"}</td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        <div className="flex gap-2 justify-center flex-wrap">
-                          {/* View Button */}
-                          <button
-                            onClick={() => handleViewLead(lead)}
-                            className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition flex items-center justify-center"
-                            title="View Lead Details"
-                          >
-                            <Eye size={18} />
-                          </button>
-
-                          {/* Edit Button */}
-                          <button
-                            onClick={() => { setSelectedLead(lead); setEditModalOpen(true); }}
-                            className="bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700 transition flex items-center justify-center"
-                            title="Edit Lead"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 11l6 6L21 11l-6-6-6 6z" />
-                            </svg>
-                          </button>
-
-                          {/* Upload Documents Button */}
-                          <button
-                            onClick={() => handleUploadDocuments(lead)}
-                            className="bg-orange-500 text-white p-2 rounded hover:bg-orange-600 transition flex items-center justify-center"
-                            title="Upload Documents"
-                          >
-                            <FileUp size={18} />
-                          </button>
-
-                          {/* Move Button */}
-                          <button
-                            type="button"
-                            onClick={() => handleMoveLead(lead)}
-                            className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition flex items-center justify-center"
-                            title="Move Lead"
-                          >
-                            <Move size={18} />
-                          </button>
-                        </div>
-                      </td>
+            <>
+              <div className="overflow-x-auto hidden md:block">
+                <table className="w-full border-collapse border border-gray-300">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="border border-gray-300 px-4 py-2 text-left">Reference ID</th>
+                      <th className="border border-gray-300 px-4 py-2 text-left">Company Name</th>
+                      <th className="border border-gray-300 px-4 py-2 text-left">Email</th>
+                      <th className="border border-gray-300 px-4 py-2 text-left">Phone</th>
+                      <th className="border border-gray-300 px-4 py-2 text-left">Destination</th>
+                      <th className="border border-gray-300 px-4 py-2 text-left">Passengers</th>
+                      <th className="border border-gray-300 px-4 py-2 text-center">Action</th>
                     </tr>
+                  </thead>
+                  <tbody>
+                    {b2bTransferLeads.map((lead) => (
+                      <tr key={lead._id} className="hover:bg-gray-50">
+                        <td className="border border-gray-300 px-4 py-2 font-medium text-blue-600">{lead.referenceId}</td>
+                        <td className="border border-gray-300 px-4 py-2">{lead.companyName}</td>
+                        <td className="border border-gray-300 px-4 py-2">{lead.email}</td>
+                        <td className="border border-gray-300 px-4 py-2">{lead.phone}</td>
+                        <td className="border border-gray-300 px-4 py-2">{lead.destination}</td>
+                        <td className="border border-gray-300 px-4 py-2">{lead.noOfPerson || "-"}</td>
+                        <td className="border border-gray-300 px-4 py-2">
+                          <div className="flex gap-2 justify-center flex-wrap">
+                            <button
+                              onClick={() => handleViewLead(lead)}
+                              className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition flex items-center justify-center"
+                              title="View Lead Details"
+                            >
+                              <Eye size={18} />
+                            </button>
+                            <button
+                              onClick={() => { setSelectedLead(lead); setEditModalOpen(true); }}
+                              className="bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700 transition flex items-center justify-center"
+                              title="Edit Lead"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 11l6 6L21 11l-6-6-6 6z" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => handleUploadDocuments(lead)}
+                              className="bg-orange-500 text-white p-2 rounded hover:bg-orange-600 transition flex items-center justify-center"
+                              title="Upload Documents"
+                            >
+                              <FileUp size={18} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleMoveLead(lead)}
+                              className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition flex items-center justify-center"
+                              title="Move Lead"
+                            >
+                              <Move size={18} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile View */}
+              <div className="block md:hidden">
+                <div className="flex flex-col gap-4">
+                  {b2bTransferLeads.map((lead) => (
+                    <div key={lead._id} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col gap-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-bold text-gray-900">{lead.companyName}</h4>
+                          <p className="text-xs text-gray-500 mt-1">Ref: {lead.referenceId}</p>
+                        </div>
+                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-[10px] font-bold">
+                          {lead.noOfPerson || "-"} Pax
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-sm mt-1">
+                        <div>
+                          <p className="text-[10px] text-gray-500 uppercase font-bold">Destination</p>
+                          <p className="text-gray-800 font-medium">{lead.destination || "N/A"}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-500 uppercase font-bold">Phone</p>
+                          <p className="text-gray-800 font-medium">{lead.phone}</p>
+                        </div>
+                      </div>
+                      <div className="flex justify-end gap-2 mt-2 pt-3 border-t border-gray-100">
+                        <button onClick={() => handleViewLead(lead)} className="p-2 rounded-lg bg-blue-50 text-blue-600"><Eye size={16} /></button>
+                        <button onClick={() => { setSelectedLead(lead); setEditModalOpen(true); }} className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
+                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 11l6 6L21 11l-6-6-6 6z" />
+                           </svg>
+                        </button>
+                        <button onClick={() => handleUploadDocuments(lead)} className="p-2 rounded-lg bg-orange-50 text-orange-600"><FileUp size={16} /></button>
+                        <button onClick={() => handleMoveLead(lead)} className="p-2 rounded-lg bg-green-50 text-green-600"><Move size={16} /></button>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </div>
+              </div>
+            </>
           )}
         </div>
       )}
 
       {/* View Modal (read-only form) */}
       {viewModalOpen && selectedLead && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
           <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-bold text-gray-900">Lead Details</h3>
@@ -1348,7 +1415,7 @@ const CreateCustomer = () => {
 
       {/* Edit Modal */}
       {typeof editModalOpen !== 'undefined' && editModalOpen && selectedLead && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
           <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-bold text-gray-900">{leadSource === "b2b-transfer" ? "Edit B2B Operation Lead" : "Edit Transfer Lead"}</h3>
@@ -1647,7 +1714,7 @@ const CreateCustomer = () => {
 
       {/* Move Modal: show full lead details (same as view modal) and Confirm/Cancel */}
       {moveModalOpen && selectedLead && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold">Move Lead</h3>
@@ -1822,7 +1889,7 @@ const CreateCustomer = () => {
 
       {/* Upload Documents Modal */}
       {uploadModalOpen && selectedLead && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-bold mb-4">Upload Documents</h3>
             <p className="mb-4 text-gray-700">Upload documents for <strong>{selectedLead.name}</strong></p>
@@ -2193,7 +2260,7 @@ const CreateCustomer = () => {
 
       {/* File Viewer Modal */}
       {viewingFile && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold">Document Viewer</h3>
