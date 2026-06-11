@@ -290,169 +290,157 @@ const CustomerData = () => {
               </div>
 
               {/* Notes Section */}
-              {selectedCustomer.notes && (
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <div className="w-1 h-6 bg-indigo-600 rounded-full"></div>
-                    Additional Notes
-                  </h4>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <textarea rows={3} value={selectedCustomer.notes} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900" />
-                  </div>
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <div className="w-1 h-6 bg-indigo-600 rounded-full"></div>
+                  Additional Notes
+                </h4>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <textarea rows={3} value={selectedCustomer.notes || ""} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900" />
                 </div>
-              )}
+              </div>
 
               {/* Messages Section */}
-              {selectedCustomer.messages && selectedCustomer.messages.length > 0 && (
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
-                    Messages
-                  </h4>
-                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-300 max-h-64 overflow-y-auto">
-                    {selectedCustomer.messages.map((msg, idx) => (
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+                  Messages
+                </h4>
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-300 max-h-64 overflow-y-auto">
+                  {selectedCustomer.messages && selectedCustomer.messages.length > 0 ? (
+                    selectedCustomer.messages.map((msg, idx) => (
                       <div key={idx} className="mb-3 pb-3 border-b border-gray-200 last:border-0">
                         <div className="text-xs text-gray-500 mb-1">
                           {msg.sentAt ? new Date(msg.sentAt).toLocaleString() : "No date"}
                         </div>
                         <div className="text-sm text-gray-800 whitespace-pre-wrap">{msg.text}</div>
                       </div>
-                    ))}
-                  </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500">No messages</p>
+                  )}
                 </div>
-              )}
+              </div>
 
               {/* Trip Details Section */}
-              {(selectedCustomer.itinerary || selectedCustomer.inclusion || selectedCustomer.exclusion || selectedCustomer.totalAmount) && (
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <div className="w-1 h-6 bg-green-600 rounded-full"></div>
-                    Trip Details
-                  </h4>
-                  <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
-                    {/* Itinerary PDF */}
-                    {selectedCustomer.itinerary && (
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-600 uppercase mb-2">Itinerary</label>
-                        <button
-                          type="button"
-                          onClick={() => handleViewDoc({ name: 'Itinerary', url: selectedCustomer.itinerary, key: selectedCustomer.itineraryKey, fileType: 'application/pdf', isExisting: true })}
-                          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium"
-                        >
-                          📄 View Itinerary PDF
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Inclusions */}
-                    {selectedCustomer.inclusion && (
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Inclusions</label>
-                        <textarea rows={3} value={selectedCustomer.inclusion} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900" />
-                      </div>
-                    )}
-
-                    {/* Special Inclusions */}
-                    {selectedCustomer.specialInclusions && (
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Special Inclusions</label>
-                        <textarea rows={2} value={selectedCustomer.specialInclusions} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900" />
-                      </div>
-                    )}
-
-                    {/* Exclusions */}
-                    {selectedCustomer.exclusion && (
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Exclusions</label>
-                        <textarea rows={3} value={selectedCustomer.exclusion} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900" />
-                      </div>
-                    )}
-
-                    {/* Land Package Calculation */}
-                    {selectedCustomer.totalAmount && (
-                      <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                        <div className="text-sm font-semibold text-gray-800 mb-3">Land Package Calculation:</div>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">Total Cost:</span>
-                            <span className="font-medium">₹ {selectedCustomer.totalAmount || 0}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">- Advance:</span>
-                            <span className="font-medium">₹ {selectedCustomer.advanceRequired || 0}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">- Discount:</span>
-                            <span className="font-medium">₹ {selectedCustomer.discount || 0}</span>
-                          </div>
-                          <div className="border-t border-blue-300 pt-2 flex justify-between">
-                            <span className="text-gray-900 font-semibold">Final:</span>
-                            <span className="font-bold text-blue-700">₹ {Math.max(0, (parseFloat(selectedCustomer.totalAmount || 0) - parseFloat(selectedCustomer.advanceRequired || 0) - parseFloat(selectedCustomer.discount || 0)).toFixed(2))}</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Airfare Calculation */}
-                    {selectedCustomer.totalAirfare && (
-                      <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                        <div className="text-sm font-semibold text-gray-800 mb-3">Airfare Calculation:</div>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">Total Cost:</span>
-                            <span className="font-medium">₹ {selectedCustomer.totalAirfare || 0}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">- Advance:</span>
-                            <span className="font-medium">₹ {selectedCustomer.advanceAirfare || 0}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">- Discount:</span>
-                            <span className="font-medium">₹ {selectedCustomer.discountAirfare || 0}</span>
-                          </div>
-                          <div className="border-t border-green-300 pt-2 flex justify-between">
-                            <span className="text-gray-900 font-semibold">Final:</span>
-                            <span className="font-bold text-green-700">₹ {Math.max(0, (parseFloat(selectedCustomer.totalAirfare || 0) - parseFloat(selectedCustomer.advanceAirfare || 0) - parseFloat(selectedCustomer.discountAirfare || 0)).toFixed(2))}</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Overall Calculation */}
-                    {(selectedCustomer.totalAmount || selectedCustomer.totalAirfare) && (
-                      <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                        <div className="text-sm font-semibold text-gray-800 mb-3">Grand Total Calculation:</div>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">Land Package:</span>
-                            <span className="font-medium">₹ {parseFloat(selectedCustomer.totalAmount || 0).toFixed(2)}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">Airfare:</span>
-                            <span className="font-medium">₹ {parseFloat(selectedCustomer.totalAirfare || 0).toFixed(2)}</span>
-                          </div>
-                          <div className="flex justify-between font-semibold bg-white bg-opacity-50 px-2 py-1 rounded">
-                            <span>Combined:</span>
-                            <span className="text-purple-700">₹ {(parseFloat(selectedCustomer.totalAmount || 0) + parseFloat(selectedCustomer.totalAirfare || 0)).toFixed(2)}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">- Total Advance:</span>
-                            <span className="font-medium">₹ {(parseFloat(selectedCustomer.advanceRequired || 0) + parseFloat(selectedCustomer.advanceAirfare || 0)).toFixed(2)}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">- Total Discount:</span>
-                            <span className="font-medium">₹ {(parseFloat(selectedCustomer.discount || 0) + parseFloat(selectedCustomer.discountAirfare || 0)).toFixed(2)}</span>
-                          </div>
-                          <div className="border-t border-purple-300 pt-2 flex justify-between">
-                            <span className="text-gray-900 font-semibold">Grand Total (Payable):</span>
-                            <span className="font-bold text-purple-700">₹ {(Math.max(0, (parseFloat(selectedCustomer.totalAmount || 0) + parseFloat(selectedCustomer.totalAirfare || 0)) - (parseFloat(selectedCustomer.advanceRequired || 0) + parseFloat(selectedCustomer.advanceAirfare || 0)) - (parseFloat(selectedCustomer.discount || 0) + parseFloat(selectedCustomer.discountAirfare || 0)))).toFixed(2)}</span>
-                          </div>
-                        </div>
-                      </div>
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <div className="w-1 h-6 bg-green-600 rounded-full"></div>
+                  Trip Details
+                </h4>
+                <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
+                  {/* Itinerary PDF */}
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 uppercase mb-2">Itinerary</label>
+                    {selectedCustomer.itinerary ? (
+                      <button
+                        type="button"
+                        onClick={() => handleViewDoc({ name: 'Itinerary', url: selectedCustomer.itinerary, key: selectedCustomer.itineraryKey, fileType: 'application/pdf', isExisting: true })}
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium"
+                      >
+                        📄 View Itinerary PDF
+                      </button>
+                    ) : (
+                      <p className="text-sm text-gray-500">No Itinerary</p>
                     )}
                   </div>
+
+                  {/* Inclusions */}
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Inclusions</label>
+                    <textarea rows={3} value={selectedCustomer.inclusion || ""} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900" />
+                  </div>
+
+                  {/* Special Inclusions */}
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Special Inclusions</label>
+                    <textarea rows={2} value={selectedCustomer.specialInclusions || ""} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900" />
+                  </div>
+
+                  {/* Exclusions */}
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Exclusions</label>
+                    <textarea rows={3} value={selectedCustomer.exclusion || ""} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900" />
+                  </div>
+
+                  {/* Land Package Calculation */}
+                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                    <div className="text-sm font-semibold text-gray-800 mb-3">Land Package Calculation:</div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Total Cost:</span>
+                        <span className="font-medium">₹ {selectedCustomer.totalAmount || 0}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">- Advance:</span>
+                        <span className="font-medium">₹ {selectedCustomer.advanceRequired || 0}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">- Discount:</span>
+                        <span className="font-medium">₹ {selectedCustomer.discount || 0}</span>
+                      </div>
+                      <div className="border-t border-blue-300 pt-2 flex justify-between">
+                        <span className="text-gray-900 font-semibold">Final:</span>
+                        <span className="font-bold text-blue-700">₹ {Math.max(0, (parseFloat(selectedCustomer.totalAmount || 0) - parseFloat(selectedCustomer.advanceRequired || 0) - parseFloat(selectedCustomer.discount || 0)).toFixed(2))}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Airfare Calculation */}
+                  <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                    <div className="text-sm font-semibold text-gray-800 mb-3">Airfare Calculation:</div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Total Cost:</span>
+                        <span className="font-medium">₹ {selectedCustomer.totalAirfare || 0}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">- Advance:</span>
+                        <span className="font-medium">₹ {selectedCustomer.advanceAirfare || 0}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">- Discount:</span>
+                        <span className="font-medium">₹ {selectedCustomer.discountAirfare || 0}</span>
+                      </div>
+                      <div className="border-t border-green-300 pt-2 flex justify-between">
+                        <span className="text-gray-900 font-semibold">Final:</span>
+                        <span className="font-bold text-green-700">₹ {Math.max(0, (parseFloat(selectedCustomer.totalAirfare || 0) - parseFloat(selectedCustomer.advanceAirfare || 0) - parseFloat(selectedCustomer.discountAirfare || 0)).toFixed(2))}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Overall Calculation */}
+                  <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                    <div className="text-sm font-semibold text-gray-800 mb-3">Grand Total Calculation:</div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Land Package:</span>
+                        <span className="font-medium">₹ {parseFloat(selectedCustomer.totalAmount || 0).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Airfare:</span>
+                        <span className="font-medium">₹ {parseFloat(selectedCustomer.totalAirfare || 0).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between font-semibold bg-white bg-opacity-50 px-2 py-1 rounded">
+                        <span>Combined:</span>
+                        <span className="text-purple-700">₹ {(parseFloat(selectedCustomer.totalAmount || 0) + parseFloat(selectedCustomer.totalAirfare || 0)).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">- Total Advance:</span>
+                        <span className="font-medium">₹ {(parseFloat(selectedCustomer.advanceRequired || 0) + parseFloat(selectedCustomer.advanceAirfare || 0)).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">- Total Discount:</span>
+                        <span className="font-medium">₹ {(parseFloat(selectedCustomer.discount || 0) + parseFloat(selectedCustomer.discountAirfare || 0)).toFixed(2)}</span>
+                      </div>
+                      <div className="border-t border-purple-300 pt-2 flex justify-between">
+                        <span className="text-gray-900 font-semibold">Grand Total (Payable):</span>
+                        <span className="font-bold text-purple-700">₹ {(Math.max(0, (parseFloat(selectedCustomer.totalAmount || 0) + parseFloat(selectedCustomer.totalAirfare || 0)) - (parseFloat(selectedCustomer.advanceRequired || 0) + parseFloat(selectedCustomer.advanceAirfare || 0)) - (parseFloat(selectedCustomer.discount || 0) + parseFloat(selectedCustomer.discountAirfare || 0)))).toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              )}
+              </div>
 
               {/* Documents Section */}
               {selectedCustomer.documents && selectedCustomer.documents.length > 0 && (

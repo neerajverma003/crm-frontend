@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Eye, Move, FileUp, CheckCircle, X, Trash2 } from "lucide-react";
+import { Eye, Move, FileUp, CheckCircle, X, Trash2, Edit } from "lucide-react";
 
 const CreateCustomer = () => {
   const [form, setForm] = useState({
@@ -221,6 +221,17 @@ const CreateCustomer = () => {
         leadSource: selectedLead.leadSource || "",
         leadType: selectedLead.leadType || "",
         tripType: selectedLead.tripType || "",
+
+        // Trip Details
+        inclusion: selectedLead.inclusion || "",
+        specialInclusions: selectedLead.specialInclusions || "",
+        exclusion: selectedLead.exclusion || "",
+        totalAmount: selectedLead.totalAmount || "",
+        advanceRequired: selectedLead.advanceRequired || "",
+        discount: selectedLead.discount || "",
+        totalAirfare: selectedLead.totalAirfare || "",
+        advanceAirfare: selectedLead.advanceAirfare || "",
+        discountAirfare: selectedLead.discountAirfare || "",
       });
     }
   }, [editModalOpen, selectedLead]);
@@ -878,9 +889,7 @@ const CreateCustomer = () => {
                               className="bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700 transition flex items-center justify-center"
                               title="Edit Lead"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 11l6 6L21 11l-6-6-6 6z" />
-                              </svg>
+                              <Edit size={18} />
                             </button>
                             <button
                               onClick={() => handleUploadDocuments(lead)}
@@ -932,9 +941,7 @@ const CreateCustomer = () => {
                       <div className="flex justify-end gap-2 mt-2 pt-3 border-t border-gray-100">
                         <button onClick={() => handleViewLead(lead)} className="p-2 rounded-lg bg-blue-50 text-blue-600"><Eye size={16} /></button>
                         <button onClick={() => { setSelectedLead(lead); setEditModalOpen(true); }} className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
-                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 11l6 6L21 11l-6-6-6 6z" />
-                           </svg>
+                           <Edit size={16} />
                         </button>
                         <button onClick={() => handleUploadDocuments(lead)} className="p-2 rounded-lg bg-orange-50 text-orange-600"><FileUp size={16} /></button>
                         <button onClick={() => handleMoveLead(lead)} className="p-2 rounded-lg bg-green-50 text-green-600"><Move size={16} /></button>
@@ -1007,9 +1014,7 @@ const CreateCustomer = () => {
                               className="bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700 transition flex items-center justify-center"
                               title="Edit Lead"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 11l6 6L21 11l-6-6-6 6z" />
-                              </svg>
+                              <Edit size={18} />
                             </button>
                             <button
                               onClick={() => handleUploadDocuments(lead)}
@@ -1061,9 +1066,7 @@ const CreateCustomer = () => {
                       <div className="flex justify-end gap-2 mt-2 pt-3 border-t border-gray-100">
                         <button onClick={() => handleViewLead(lead)} className="p-2 rounded-lg bg-blue-50 text-blue-600"><Eye size={16} /></button>
                         <button onClick={() => { setSelectedLead(lead); setEditModalOpen(true); }} className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
-                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 11l6 6L21 11l-6-6-6 6z" />
-                           </svg>
+                           <Edit size={16} />
                         </button>
                         <button onClick={() => handleUploadDocuments(lead)} className="p-2 rounded-lg bg-orange-50 text-orange-600"><FileUp size={16} /></button>
                         <button onClick={() => handleMoveLead(lead)} className="p-2 rounded-lg bg-green-50 text-green-600"><Move size={16} /></button>
@@ -1105,17 +1108,15 @@ const CreateCustomer = () => {
 
             <form className="space-y-6">
               {/* Reference ID Section (for B2B Transfer Leads) */}
-              {selectedLead.referenceId && (
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
-                    Reference ID
-                  </h4>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <input type="text" value={selectedLead.referenceId || ""} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 font-bold" />
-                  </div>
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+                  Reference ID
+                </h4>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <input type="text" value={selectedLead.referenceId || ""} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 font-bold" />
                 </div>
-              )}
+              </div>
 
               {/* Contact/Company Information Section */}
               <div>
@@ -1234,169 +1235,157 @@ const CreateCustomer = () => {
               </div>
 
               {/* Notes Section */}
-              {selectedLead.notes && (
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <div className="w-1 h-6 bg-indigo-600 rounded-full"></div>
-                    Additional Notes
-                  </h4>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <textarea rows={3} value={selectedLead.notes} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900" />
-                  </div>
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <div className="w-1 h-6 bg-indigo-600 rounded-full"></div>
+                  Additional Notes
+                </h4>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <textarea rows={3} value={selectedLead.notes || ""} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900" />
                 </div>
-              )}
+              </div>
 
               {/* Messages Section */}
-              {selectedLead.messages && selectedLead.messages.length > 0 && (
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
-                    Messages
-                  </h4>
-                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-300 max-h-64 overflow-y-auto">
-                    {selectedLead.messages.map((msg, idx) => (
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+                  Messages
+                </h4>
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-300 max-h-64 overflow-y-auto">
+                  {selectedLead.messages && selectedLead.messages.length > 0 ? (
+                    selectedLead.messages.map((msg, idx) => (
                       <div key={idx} className="mb-3 pb-3 border-b border-gray-200 last:border-0">
                         <div className="text-xs text-gray-500 mb-1">
                           {msg.sentAt ? new Date(msg.sentAt).toLocaleString() : "No date"}
                         </div>
                         <div className="text-sm text-gray-800 whitespace-pre-wrap">{msg.text}</div>
                       </div>
-                    ))}
-                  </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500">No messages</p>
+                  )}
                 </div>
-              )}
+              </div>
 
               {/* Trip Details Section */}
-              {(selectedLead.itinerary || selectedLead.inclusion || selectedLead.exclusion || selectedLead.totalAmount) && (
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <div className="w-1 h-6 bg-green-600 rounded-full"></div>
-                    Trip Details
-                  </h4>
-                  <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
-                    {/* Itinerary PDF */}
-                    {selectedLead.itinerary && (
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-600 uppercase mb-2">Itinerary</label>
-                        <button
-                          type="button"
-                          onClick={() => handleViewDoc({ name: 'Itinerary', url: selectedLead.itinerary, key: selectedLead.itineraryKey, fileType: 'application/pdf', isExisting: true })}
-                          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium"
-                        >
-                          📄 View Itinerary PDF
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Inclusions */}
-                    {selectedLead.inclusion && (
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Inclusions</label>
-                        <textarea rows={3} value={selectedLead.inclusion} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900" />
-                      </div>
-                    )}
-
-                    {/* Special Inclusions */}
-                    {selectedLead.specialInclusions && (
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Special Inclusions</label>
-                        <textarea rows={2} value={selectedLead.specialInclusions} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900" />
-                      </div>
-                    )}
-
-                    {/* Exclusions */}
-                    {selectedLead.exclusion && (
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Exclusions</label>
-                        <textarea rows={3} value={selectedLead.exclusion} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900" />
-                      </div>
-                    )}
-
-                    {/* Land Package Calculation */}
-                    {selectedLead.totalAmount && (
-                      <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                        <div className="text-sm font-semibold text-gray-800 mb-3">Land Package Calculation:</div>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">Total Cost:</span>
-                            <span className="font-medium">₹ {selectedLead.totalAmount || 0}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">- Advance:</span>
-                            <span className="font-medium">₹ {selectedLead.advanceRequired || 0}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">- Discount:</span>
-                            <span className="font-medium">₹ {selectedLead.discount || 0}</span>
-                          </div>
-                          <div className="border-t border-blue-300 pt-2 flex justify-between">
-                            <span className="text-gray-900 font-semibold">Final:</span>
-                            <span className="font-bold text-blue-700">₹ {Math.max(0, (parseFloat(selectedLead.totalAmount || 0) - parseFloat(selectedLead.advanceRequired || 0) - parseFloat(selectedLead.discount || 0)).toFixed(2))}</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Airfare Calculation */}
-                    {selectedLead.totalAirfare && (
-                      <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                        <div className="text-sm font-semibold text-gray-800 mb-3">Airfare Calculation:</div>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">Total Cost:</span>
-                            <span className="font-medium">₹ {selectedLead.totalAirfare || 0}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">- Advance:</span>
-                            <span className="font-medium">₹ {selectedLead.advanceAirfare || 0}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">- Discount:</span>
-                            <span className="font-medium">₹ {selectedLead.discountAirfare || 0}</span>
-                          </div>
-                          <div className="border-t border-green-300 pt-2 flex justify-between">
-                            <span className="text-gray-900 font-semibold">Final:</span>
-                            <span className="font-bold text-green-700">₹ {Math.max(0, (parseFloat(selectedLead.totalAirfare || 0) - parseFloat(selectedLead.advanceAirfare || 0) - parseFloat(selectedLead.discountAirfare || 0)).toFixed(2))}</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Overall Calculation */}
-                    {(selectedLead.totalAmount || selectedLead.totalAirfare) && (
-                      <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                        <div className="text-sm font-semibold text-gray-800 mb-3">Grand Total Calculation:</div>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">Land Package:</span>
-                            <span className="font-medium">₹ {parseFloat(selectedLead.totalAmount || 0).toFixed(2)}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">Airfare:</span>
-                            <span className="font-medium">₹ {parseFloat(selectedLead.totalAirfare || 0).toFixed(2)}</span>
-                          </div>
-                          <div className="flex justify-between font-semibold bg-white bg-opacity-50 px-2 py-1 rounded">
-                            <span>Combined:</span>
-                            <span className="text-purple-700">₹ {(parseFloat(selectedLead.totalAmount || 0) + parseFloat(selectedLead.totalAirfare || 0)).toFixed(2)}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">- Total Advance:</span>
-                            <span className="font-medium">₹ {(parseFloat(selectedLead.advanceRequired || 0) + parseFloat(selectedLead.advanceAirfare || 0)).toFixed(2)}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-700">- Total Discount:</span>
-                            <span className="font-medium">₹ {(parseFloat(selectedLead.discount || 0) + parseFloat(selectedLead.discountAirfare || 0)).toFixed(2)}</span>
-                          </div>
-                          <div className="border-t border-purple-300 pt-2 flex justify-between">
-                            <span className="text-gray-900 font-semibold">Grand Total (Payable):</span>
-                            <span className="font-bold text-purple-700">₹ {(Math.max(0, (parseFloat(selectedLead.totalAmount || 0) + parseFloat(selectedLead.totalAirfare || 0)) - (parseFloat(selectedLead.advanceRequired || 0) + parseFloat(selectedLead.advanceAirfare || 0)) - (parseFloat(selectedLead.discount || 0) + parseFloat(selectedLead.discountAirfare || 0)))).toFixed(2)}</span>
-                          </div>
-                        </div>
-                      </div>
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <div className="w-1 h-6 bg-green-600 rounded-full"></div>
+                  Trip Details
+                </h4>
+                <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
+                  {/* Itinerary PDF */}
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 uppercase mb-2">Itinerary</label>
+                    {selectedLead.itinerary ? (
+                      <button
+                        type="button"
+                        onClick={() => handleViewDoc({ name: 'Itinerary', url: selectedLead.itinerary, key: selectedLead.itineraryKey, fileType: 'application/pdf', isExisting: true })}
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium"
+                      >
+                        📄 View Itinerary PDF
+                      </button>
+                    ) : (
+                      <p className="text-sm text-gray-500">No Itinerary</p>
                     )}
                   </div>
+
+                  {/* Inclusions */}
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Inclusions</label>
+                    <textarea rows={3} value={selectedLead.inclusion || ""} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900" />
+                  </div>
+
+                  {/* Special Inclusions */}
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Special Inclusions</label>
+                    <textarea rows={2} value={selectedLead.specialInclusions || ""} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900" />
+                  </div>
+
+                  {/* Exclusions */}
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Exclusions</label>
+                    <textarea rows={3} value={selectedLead.exclusion || ""} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900" />
+                  </div>
+
+                  {/* Land Package Calculation */}
+                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                    <div className="text-sm font-semibold text-gray-800 mb-3">Land Package Calculation:</div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Total Cost:</span>
+                        <span className="font-medium">₹ {selectedLead.totalAmount || 0}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">- Advance:</span>
+                        <span className="font-medium">₹ {selectedLead.advanceRequired || 0}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">- Discount:</span>
+                        <span className="font-medium">₹ {selectedLead.discount || 0}</span>
+                      </div>
+                      <div className="border-t border-blue-300 pt-2 flex justify-between">
+                        <span className="text-gray-900 font-semibold">Final:</span>
+                        <span className="font-bold text-blue-700">₹ {Math.max(0, (parseFloat(selectedLead.totalAmount || 0) - parseFloat(selectedLead.advanceRequired || 0) - parseFloat(selectedLead.discount || 0)).toFixed(2))}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Airfare Calculation */}
+                  <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                    <div className="text-sm font-semibold text-gray-800 mb-3">Airfare Calculation:</div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Total Cost:</span>
+                        <span className="font-medium">₹ {selectedLead.totalAirfare || 0}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">- Advance:</span>
+                        <span className="font-medium">₹ {selectedLead.advanceAirfare || 0}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">- Discount:</span>
+                        <span className="font-medium">₹ {selectedLead.discountAirfare || 0}</span>
+                      </div>
+                      <div className="border-t border-green-300 pt-2 flex justify-between">
+                        <span className="text-gray-900 font-semibold">Final:</span>
+                        <span className="font-bold text-green-700">₹ {Math.max(0, (parseFloat(selectedLead.totalAirfare || 0) - parseFloat(selectedLead.advanceAirfare || 0) - parseFloat(selectedLead.discountAirfare || 0)).toFixed(2))}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Overall Calculation */}
+                  <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                    <div className="text-sm font-semibold text-gray-800 mb-3">Grand Total Calculation:</div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Land Package:</span>
+                        <span className="font-medium">₹ {parseFloat(selectedLead.totalAmount || 0).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Airfare:</span>
+                        <span className="font-medium">₹ {parseFloat(selectedLead.totalAirfare || 0).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between font-semibold bg-white bg-opacity-50 px-2 py-1 rounded">
+                        <span>Combined:</span>
+                        <span className="text-purple-700">₹ {(parseFloat(selectedLead.totalAmount || 0) + parseFloat(selectedLead.totalAirfare || 0)).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">- Total Advance:</span>
+                        <span className="font-medium">₹ {(parseFloat(selectedLead.advanceRequired || 0) + parseFloat(selectedLead.advanceAirfare || 0)).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">- Total Discount:</span>
+                        <span className="font-medium">₹ {(parseFloat(selectedLead.discount || 0) + parseFloat(selectedLead.discountAirfare || 0)).toFixed(2)}</span>
+                      </div>
+                      <div className="border-t border-purple-300 pt-2 flex justify-between">
+                        <span className="text-gray-900 font-semibold">Grand Total (Payable):</span>
+                        <span className="font-bold text-purple-700">₹ {(Math.max(0, (parseFloat(selectedLead.totalAmount || 0) + parseFloat(selectedLead.totalAirfare || 0)) - (parseFloat(selectedLead.advanceRequired || 0) + parseFloat(selectedLead.advanceAirfare || 0)) - (parseFloat(selectedLead.discount || 0) + parseFloat(selectedLead.discountAirfare || 0)))).toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              )}
+              </div>
 
               {/* Close Button */}
               <div className="flex justify-end pt-4">
@@ -1455,6 +1444,15 @@ const CreateCustomer = () => {
                   leadSource: editForm.leadSource,
                   leadType: editForm.leadType,
                   tripType: editForm.tripType,
+                  inclusion: editForm.inclusion,
+                  specialInclusions: editForm.specialInclusions,
+                  exclusion: editForm.exclusion,
+                  totalAmount: editForm.totalAmount,
+                  advanceRequired: editForm.advanceRequired,
+                  discount: editForm.discount,
+                  totalAirfare: editForm.totalAirfare,
+                  advanceAirfare: editForm.advanceAirfare,
+                  discountAirfare: editForm.discountAirfare,
                 };
 
                 const res = await fetch(endpoint, {
@@ -1670,6 +1668,85 @@ const CreateCustomer = () => {
                       onChange={(e)=>setEditForm(prev=>({...prev, tripType: e.target.value}))} 
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500" 
                     />
+                  </div>
+                </div>
+              </div>
+
+              {/* Trip Details Section */}
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <div className="w-1 h-6 bg-pink-600 rounded-full"></div>
+                  Trip Details
+                </h4>
+                <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
+                  {/* Inclusions */}
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Inclusions</label>
+                    <textarea 
+                      rows={3} 
+                      value={editForm.inclusion || ''} 
+                      onChange={(e)=>setEditForm(prev=>({...prev, inclusion: e.target.value}))} 
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500" 
+                    />
+                  </div>
+
+                  {/* Special Inclusions */}
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Special Inclusions</label>
+                    <textarea 
+                      rows={2} 
+                      value={editForm.specialInclusions || ''} 
+                      onChange={(e)=>setEditForm(prev=>({...prev, specialInclusions: e.target.value}))} 
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500" 
+                    />
+                  </div>
+
+                  {/* Exclusions */}
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Exclusions</label>
+                    <textarea 
+                      rows={3} 
+                      value={editForm.exclusion || ''} 
+                      onChange={(e)=>setEditForm(prev=>({...prev, exclusion: e.target.value}))} 
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500" 
+                    />
+                  </div>
+
+                  {/* Pricing Details */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Land Package Calculation */}
+                    <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 space-y-3">
+                      <div className="text-sm font-semibold text-gray-800">Land Package Calculation</div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Total Cost</label>
+                        <input type="number" value={editForm.totalAmount || ''} onChange={(e)=>setEditForm(prev=>({...prev, totalAmount: e.target.value}))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Advance Required</label>
+                        <input type="number" value={editForm.advanceRequired || ''} onChange={(e)=>setEditForm(prev=>({...prev, advanceRequired: e.target.value}))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Discount</label>
+                        <input type="number" value={editForm.discount || ''} onChange={(e)=>setEditForm(prev=>({...prev, discount: e.target.value}))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                      </div>
+                    </div>
+
+                    {/* Airfare Calculation */}
+                    <div className="bg-green-50 rounded-lg p-4 border border-green-200 space-y-3">
+                      <div className="text-sm font-semibold text-gray-800">Airfare Calculation</div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Total Airfare</label>
+                        <input type="number" value={editForm.totalAirfare || ''} onChange={(e)=>setEditForm(prev=>({...prev, totalAirfare: e.target.value}))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-green-500" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Advance Airfare</label>
+                        <input type="number" value={editForm.advanceAirfare || ''} onChange={(e)=>setEditForm(prev=>({...prev, advanceAirfare: e.target.value}))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-green-500" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Discount Airfare</label>
+                        <input type="number" value={editForm.discountAirfare || ''} onChange={(e)=>setEditForm(prev=>({...prev, discountAirfare: e.target.value}))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-green-500" />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

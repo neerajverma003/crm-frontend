@@ -15,16 +15,14 @@ const B2bAddCompany = () => {
   });
 
   const [companies, setCompanies] = useState([]);
-  const [editData, setEditData] = useState(null); // For Edit modal
-  const [viewData, setViewData] = useState(null); // For View modal
+  const [editData, setEditData] = useState(null);
+  const [viewData, setViewData] = useState(null);
   const [states, setStates] = useState([]);
   const [activeTab, setActiveTab] = useState("All");
   const [company, setCompany] = useState([]);
-
-  const [employeeCompany, setEmployeeCompany] = useState(null); // For employee's company details
+  const [employeeCompany, setEmployeeCompany] = useState(null);
 
   const companyId = localStorage.getItem("companyId");
-  // Try multiple possible keys for employee id (some apps use different keys)
   const employeeId =
     localStorage.getItem("employeeId") ||
     localStorage.getItem("userId") ||
@@ -32,8 +30,6 @@ const B2bAddCompany = () => {
     localStorage.getItem("_id") ||
     null;
   const role = localStorage.getItem("role");
-  console.log(companyId);
-
 
   if (role === "employee") {
     useEffect(() => {
@@ -42,11 +38,8 @@ const B2bAddCompany = () => {
           const res = await fetch(`${import.meta.env.VITE_API_URL}/company/${companyId}`);
           if (!res.ok) throw new Error("Failed to fetch company details");
           const data = await res.json();
-          console.log(data.company.companyName);
           setEmployeeCompany(data.company.companyName);
-          // Auto-set company field for employees
           setFormData(prev => ({ ...prev, company: data.company.companyName }));
-
         } catch (err) {
           console.error(err);
         }
@@ -54,6 +47,7 @@ const B2bAddCompany = () => {
       fetchEmployeeCompany();
     }, [companyId]);
   }
+
   useEffect(() => {
     const fetchCompanyDetails = async () => {
       try {
@@ -62,11 +56,10 @@ const B2bAddCompany = () => {
         const data = await res.json();
         if (role === "superAdmin" || role === "admin") {
           setCompany(data.companies || []);
-        }
-        else {
+        } else {
           setCompany(data.companies.filter(comp => comp.companyName === employeeCompany) || []);
           setActiveTab(employeeCompany);
-        } // Assuming the response has a 'companies' array
+        }
       } catch (err) {
         console.error(err);
       }
@@ -74,7 +67,6 @@ const B2bAddCompany = () => {
     fetchCompanyDetails();
   }, [employeeCompany]);
 
-  // Fetch states on mount
   useEffect(() => {
     const fetchStates = async () => {
       try {
@@ -89,7 +81,6 @@ const B2bAddCompany = () => {
     fetchStates();
   }, []);
 
-  // Fetch companies on mount
   useEffect(() => {
     const fetchCompaniesData = async () => {
       try {
@@ -97,8 +88,7 @@ const B2bAddCompany = () => {
         if (role === "employee") {
           endpoint = `${import.meta.env.VITE_API_URL}/b2bcompany/employee/${employeeId}`;
           if (employeeCompany) endpoint += `?companyName=${encodeURIComponent(employeeCompany)}`;
-        }
-        else if (activeTab === "All") {
+        } else if (activeTab === "All") {
           endpoint = `${import.meta.env.VITE_API_URL}/b2bcompany`;
         } else {
           endpoint = `${import.meta.env.VITE_API_URL}/b2bcompany/${activeTab}`;
@@ -106,7 +96,6 @@ const B2bAddCompany = () => {
         const res = await fetch(endpoint);
         if (!res.ok) throw new Error("Failed to fetch companies");
         const data = await res.json();
-        // Normalize response to array
         if (Array.isArray(data)) setCompanies(data);
         else if (data && Array.isArray(data.companies)) setCompanies(data.companies);
         else if (data && data.company) setCompanies([data.company]);
@@ -121,21 +110,7 @@ const B2bAddCompany = () => {
       fetchCompaniesData();
     }
   }, [activeTab, employeeId, role]);
-  // useEffect(() => {
-  //   const fetchCompanies = async () => {
-  //     try {
-  //       const res = await fetch(`${import.meta.env.VITE_API_URL}/b2bcompany`);
-  //       if (!res.ok) throw new Error("Failed to fetch companies");
-  //       const data = await res.json();
-  //       setCompanies(data);
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   };
-  //   fetchCompanies();
-  // }, []);
 
-  // Fetch the selected company data when viewData changes
   useEffect(() => {
     if (viewData && viewData.state) {
       const selectedState = states.find((state) => state._id === viewData.state);
@@ -150,26 +125,18 @@ const B2bAddCompany = () => {
   };
 
   const handleSubmit = async () => {
-    // Fields to validate (excluding 'company' as it's auto-filled)
     const requiredFields = ["country", "state", "companyName", "contactPersonName", "contactPersonNumber", "email", "whatsapp", "address"];
-    
     for (let field of requiredFields) {
       if (!formData[field]) {
         alert(`Please fill ${field}`);
         return;
       }
     }
-    console.log(formData);
-    // Set company ID from the first company in the list
     try {
       const submitData = { ...formData };
       if (role === "employee") {
-        // attach createdBy if we have an id
         if (employeeId) submitData.createdBy = employeeId;
-        else console.warn("No employeeId found in localStorage; createdBy will be empty");
       }
-      console.log("[b2b] submitting company:", submitData);
-      
       const res = await fetch(`${import.meta.env.VITE_API_URL}/b2bcompany`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -179,19 +146,14 @@ const B2bAddCompany = () => {
         const err = await res.text();
         throw new Error(err || "Failed to add company");
       }
-
       const newCompany = await res.json();
       setCompanies((prev) => Array.isArray(prev) ? [...prev, newCompany] : [newCompany]);
       alert("Company Added Successfully ✓");
-
-      // After adding the company, fetch the latest companies again
       if (role === "employee") {
         fetchCompaniesByEmployee();
       } else {
         fetchCompanies();
       }
-
-      // Reset the form
       setFormData({
         country: "India",
         state: "",
@@ -222,8 +184,6 @@ const B2bAddCompany = () => {
         newList.splice(index, 1);
         setCompanies(newList);
         alert("Company deleted successfully ✓");
-        
-        // Refresh the list to ensure consistency
         if (role === "employee") {
           await fetchCompaniesByEmployee();
         } else {
@@ -242,7 +202,6 @@ const B2bAddCompany = () => {
   const handleEditChange = (e) =>
     setEditData({ ...editData, [e.target.name]: e.target.value });
 
-  // Fetch the latest company list for all users
   const fetchCompanies = async () => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/b2bcompany`);
@@ -253,7 +212,6 @@ const B2bAddCompany = () => {
     }
   };
 
-  // Fetch the latest company list for employees (only their own)
   const fetchCompaniesByEmployee = async () => {
     try {
       let url = `${import.meta.env.VITE_API_URL}/b2bcompany/employee/${employeeId}`;
@@ -262,7 +220,6 @@ const B2bAddCompany = () => {
       const data = await res.json();
       if (Array.isArray(data)) setCompanies(data);
       else if (data && Array.isArray(data.companies)) setCompanies(data.companies);
-      else if (data && Array.isArray(data.companies) === false && data.companies) setCompanies(data.companies);
       else if (data && data.company) setCompanies([data.company]);
       else setCompanies([]);
     } catch (err) {
@@ -272,25 +229,20 @@ const B2bAddCompany = () => {
 
   const handleEditSave = async () => {
     const { index, _id, ...companyData } = editData;
-
     if (!_id) {
       alert("Invalid company ID");
       return;
     }
-
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/b2bcompany/${_id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(companyData),
       });
-
       if (!res.ok) {
         const err = await res.text();
         throw new Error(err || "Failed to update company");
       }
-
-      // Re-fetch the list after editing based on role
       if (role === "employee") {
         await fetchCompaniesByEmployee();
       } else {
@@ -303,24 +255,33 @@ const B2bAddCompany = () => {
     }
   };
 
-  // console.log(company[0].companyName);
-  console.log(company);
+  /* ─── Field config ─── */
+  const inputBase =
+    "w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 transition focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 hover:border-slate-300";
+
+  const labelBase = "block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f6f8fa] to-[#e9ecef] p-4 sm:p-8 lg:p-12">
-      <div className="w-full max-w-6xl mx-auto space-y-8">
-        {/* Header & Tabs */}
-        <div className="flex flex-col space-y-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h2 className="text-3xl font-black text-slate-900 tracking-tight leading-tight drop-shadow-sm">B2B Add Company</h2>
-              <p className="mt-1 text-sm font-medium text-slate-600">Register and manage B2B partner companies.</p>
-            </div>
-          </div>
+    <div className="min-h-screen bg-[#f4f6fb] font-sans">
 
-          {/* Mobile View: Select Dropdown instead of tabs */}
+      {/* ── Top accent bar ── */}
+      <div className="h-1 w-full bg-gradient-to-r from-violet-600 via-indigo-500 to-sky-400" />
+
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-8">
+
+        {/* ── Page header ── */}
+        <div className="mb-8 flex flex-col gap-1">
+          <p className="text-xs font-bold uppercase tracking-widest text-violet-500">CRM / B2B</p>
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+            Partner Companies
+          </h1>
+          <p className="text-sm text-slate-500">Register, view and manage your B2B partner network.</p>
+        </div>
+
+        {/* ── Company filter tabs ── */}
+        <div className="mb-6">
+          {/* Mobile dropdown */}
           <div className="block sm:hidden">
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Company Name</label>
             <div className="relative">
               <select
                 value={activeTab}
@@ -329,44 +290,42 @@ const B2bAddCompany = () => {
                   setActiveTab(val);
                   setFormData({ ...formData, company: val === "All" ? null : val });
                 }}
-                className="w-full appearance-none bg-white border border-slate-200 text-slate-700 py-3 px-4 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold"
+                className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-3 pl-4 pr-10 text-sm font-semibold text-slate-700 shadow-sm focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20"
               >
                 {role !== "employee" && <option value="All">All Companies</option>}
-                {company.length > 0 && company.map((comp) => (
-                  <option key={comp._id} value={comp.companyName}>
-                    {comp.companyName}
-                  </option>
+                {company.map((comp) => (
+                  <option key={comp._id} value={comp.companyName}>{comp.companyName}</option>
                 ))}
               </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
-                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                </svg>
-              </div>
+              <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+                <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+              </span>
             </div>
           </div>
 
-          {/* Desktop View: Horizontal Tabs */}
-          <div className="hidden sm:flex items-center gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
+          {/* Desktop tabs */}
+          <div className="hidden sm:flex flex-wrap items-center gap-2">
             {role !== "employee" && (
               <button
-                onClick={() => {
-                  setActiveTab("All")
-                  setFormData({ ...formData, company: null });
-                }}
-                className={`flex-none px-5 py-2.5 rounded-full font-semibold shadow-sm transition-all duration-300 ${activeTab === "All" ? 'bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}
+                onClick={() => { setActiveTab("All"); setFormData({ ...formData, company: null }); }}
+                className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
+                  activeTab === "All"
+                    ? "bg-violet-600 text-white shadow-md shadow-violet-200"
+                    : "bg-white text-slate-600 border border-slate-200 hover:border-violet-300 hover:text-violet-600"
+                }`}
               >
                 All
               </button>
             )}
-            {company.length > 0 && company.map((comp) => (
+            {company.map((comp) => (
               <button
                 key={comp._id}
-                onClick={() => {
-                  setActiveTab(comp.companyName)
-                  setFormData({ ...formData, company: comp.companyName });
-                }}
-                className={`flex-none px-5 py-2.5 rounded-full font-semibold shadow-sm transition-all duration-300 ${activeTab === comp.companyName ? 'bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}
+                onClick={() => { setActiveTab(comp.companyName); setFormData({ ...formData, company: comp.companyName }); }}
+                className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
+                  activeTab === comp.companyName
+                    ? "bg-violet-600 text-white shadow-md shadow-violet-200"
+                    : "bg-white text-slate-600 border border-slate-200 hover:border-violet-300 hover:text-violet-600"
+                }`}
               >
                 {comp.companyName}
               </button>
@@ -374,339 +333,401 @@ const B2bAddCompany = () => {
           </div>
         </div>
 
-        {/* ADD FORM */}
+        {/* ── Add Company form ── */}
         {!editData && (
-        <div className="md:bg-white/90 p-0 sm:p-8 md:rounded-2xl md:shadow-xl md:border border-slate-100 transition-all mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Country</label>
-              <input
-                type="text"
-                name="country"
-                value={formData.country}
-                readOnly
-                className="w-full border border-slate-200 bg-slate-100 rounded-xl px-4 py-2.5 text-sm text-slate-500 cursor-not-allowed outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">State</label>
-              <select
-                name="state"
-                value={formData.state}
-                onChange={handleChange}
-                className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
-              >
-                <option value="">Select State</option>
-                {states.map((s) => (
-                  <option key={s._id} value={s._id}>{s.state}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Company Name</label>
-              <input
-                type="text"
-                name="companyName"
-                value={formData.companyName}
-                onChange={handleChange}
-                placeholder="Enter company name"
-                className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Contact Person Name</label>
-              <input
-                type="text"
-                name="contactPersonName"
-                value={formData.contactPersonName}
-                onChange={handleChange}
-                placeholder="Enter contact person"
-                className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Phone</label>
-              <input
-                type="number"
-                name="contactPersonNumber"
-                value={formData.contactPersonNumber}
-                onChange={handleChange}
-                placeholder="Phone number"
-                className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Email address"
-                className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">WhatsApp</label>
-              <input
-                type="number"
-                name="whatsapp"
-                value={formData.whatsapp}
-                onChange={handleChange}
-                placeholder="WhatsApp number"
-                className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Address</label>
-              <textarea
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                placeholder="Enter full address"
-                className="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-2.5 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none resize-y min-h-[100px]"
-              />
-            </div>
-          </div>
-
-          <div className="mt-6 flex justify-end">
-            <button
-              onClick={handleSubmit}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-xl font-semibold bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 hover:shadow-md hover:-translate-y-0.5 transition-all"
-            >
-              Add Company
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* TABLE LISTING COMPANIES */}
-      <div className="sm:bg-white/90 sm:rounded-2xl sm:shadow-xl sm:border border-slate-100 overflow-hidden">
-        
-        {/* MOBILE VIEW */}
-        <div className="block sm:hidden divide-y divide-slate-100">
-          {companies.length === 0 ? (
-            <div className="p-6 text-center text-sm text-slate-500 font-medium bg-slate-50/30">
-              No companies added yet.
-            </div>
-          ) : (
-            companies.map((company, index) => (
-              <div key={company._id || index} className="p-4 space-y-3 hover:bg-slate-50/50 transition-colors">
-                <div className="flex justify-between items-start">
-                  <span className="font-bold text-slate-800 text-lg">{company.companyName}</span>
-                </div>
-                <div className="text-sm text-slate-600 space-y-1">
-                  <p><span className="font-medium text-slate-500">WhatsApp:</span> {company.whatsapp || "—"}</p>
-                  <p><span className="font-medium text-slate-500">Phone:</span> {company.contactPersonNumber || "—"}</p>
-                  <p><span className="font-medium text-slate-500">Email:</span> {company.email || "—"}</p>
-                </div>
-                <div className="flex items-center gap-2 pt-2">
-                  <button onClick={() => setViewData(company)} className="flex-1 inline-flex items-center justify-center py-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors text-sm font-semibold">
-                    <FaEye className="mr-2" /> View
-                  </button>
-                  <button onClick={() => handleEdit(company, index)} className="flex-1 inline-flex items-center justify-center py-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors text-sm font-semibold">
-                    <FaEdit className="mr-2" /> Edit
-                  </button>
-                  <button onClick={() => handleDelete(index, company._id)} className="flex-1 inline-flex items-center justify-center py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors text-sm font-semibold">
-                    <FaTrash className="mr-2" /> Delete
-                  </button>
-                </div>
+          <div className="mb-8 rounded-2xl border border-slate-200 bg-white shadow-sm">
+            {/* Card header */}
+            <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-4">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50 text-violet-600">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                  <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
+                </svg>
               </div>
-            ))
-          )}
-        </div>
-
-        {/* DESKTOP VIEW */}
-        <div className="hidden sm:block overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-100">
-            <thead className="bg-slate-50/80">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Company Name</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">WhatsApp</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Phone</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Email</th>
-                <th className="px-6 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider w-32">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-slate-50">
-              {companies.length === 0 ? (
-                <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center text-sm text-slate-500 font-medium bg-slate-50/30">
-                    No companies added yet.
-                  </td>
-                </tr>
-              ) : (
-                companies.map((company, index) => (
-                  <tr key={company._id || index} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="font-semibold text-slate-800">{company.companyName}</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{company.whatsapp}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{company.contactPersonNumber}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{company.email}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center justify-center space-x-2">
-                        <button
-                          onClick={() => setViewData(company)}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-100 hover:text-blue-700 transition-colors"
-                          title="View Details"
-                        >
-                          <FaEye className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleEdit(company, index)}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50 text-emerald-500 hover:bg-emerald-100 hover:text-emerald-700 transition-colors"
-                          title="Edit Company"
-                        >
-                          <FaEdit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(index, company._id)}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 transition-colors"
-                          title="Delete Company"
-                        >
-                          <FaTrash className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* EDIT MODAL */}
-      {editData && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full relative shadow-lg">
-            {/* Close button */}
-            <button
-              onClick={() => setEditData(null)}
-              className="absolute top-3 right-3 text-gray-600 hover:text-black text-2xl"
-            >
-              ✖
-            </button>
-            <h3 className="text-xl font-semibold mb-4">Edit Company</h3>
-            <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium mb-1">State</label>
-                <select
-                  name="state"
-                  value={editData.state}
-                  onChange={handleEditChange}
-                  className="w-full border p-2 rounded"
-                >
-                  <option value="">Select State</option>
+                <h2 className="text-sm font-bold text-slate-800">Add New Company</h2>
+                <p className="text-xs text-slate-400">All fields marked are required.</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 p-6 md:grid-cols-2">
+              {/* Country */}
+              <div>
+                <label className={labelBase}>Country</label>
+                <input
+                  type="text"
+                  name="country"
+                  value={formData.country}
+                  readOnly
+                  className="w-full rounded-lg border border-slate-100 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-400 cursor-not-allowed outline-none"
+                />
+              </div>
+
+              {/* State */}
+              <div>
+                <label className={labelBase}>State</label>
+                <select name="state" value={formData.state} onChange={handleChange} className={inputBase}>
+                  <option value="">Select state…</option>
                   {states.map((s) => (
-                    <option key={s._id} value={s._id}>
-                      {s.state}
-                    </option>
+                    <option key={s._id} value={s._id}>{s.state}</option>
                   ))}
                 </select>
               </div>
 
+              {/* Company Name – full width */}
+              <div className="md:col-span-2">
+                <label className={labelBase}>Company Name</label>
+                <input
+                  type="text"
+                  name="companyName"
+                  value={formData.companyName}
+                  onChange={handleChange}
+                  placeholder="e.g. Acme Technologies Ltd."
+                  className={inputBase}
+                />
+              </div>
+
+              {/* Contact person */}
               <div>
-                <label className="block text-sm font-medium mb-1">Contact Person</label>
+                <label className={labelBase}>Contact Person</label>
                 <input
                   type="text"
                   name="contactPersonName"
-                  value={editData.contactPersonName}
-                  onChange={handleEditChange}
-                  className="w-full border p-2 rounded"
+                  value={formData.contactPersonName}
+                  onChange={handleChange}
+                  placeholder="Full name"
+                  className={inputBase}
                 />
               </div>
 
+              {/* Phone */}
               <div>
-                <label className="block text-sm font-medium mb-1">Phone</label>
+                <label className={labelBase}>Phone</label>
                 <input
                   type="number"
                   name="contactPersonNumber"
-                  value={editData.contactPersonNumber}
-                  onChange={handleEditChange}
-                  className="w-full border p-2 rounded"
+                  value={formData.contactPersonNumber}
+                  onChange={handleChange}
+                  placeholder="10-digit number"
+                  className={inputBase}
                 />
               </div>
 
+              {/* Email */}
               <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
+                <label className={labelBase}>Email</label>
                 <input
                   type="email"
                   name="email"
-                  value={editData.email}
-                  onChange={handleEditChange}
-                  className="w-full border p-2 rounded"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="contact@company.com"
+                  className={inputBase}
                 />
               </div>
 
+              {/* WhatsApp */}
               <div>
-                <label className="block text-sm font-medium mb-1">WhatsApp</label>
+                <label className={labelBase}>WhatsApp</label>
                 <input
                   type="number"
                   name="whatsapp"
-                  value={editData.whatsapp}
-                  onChange={handleEditChange}
-                  className="w-full border p-2 rounded"
+                  value={formData.whatsapp}
+                  onChange={handleChange}
+                  placeholder="WhatsApp number"
+                  className={inputBase}
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1">Address</label>
+              {/* Address – full width */}
+              <div className="md:col-span-2">
+                <label className={labelBase}>Address</label>
                 <textarea
                   name="address"
-                  value={editData.address}
-                  onChange={handleEditChange}
-                  className="w-full border p-2 rounded"
-                  rows="3"
+                  value={formData.address}
+                  onChange={handleChange}
+                  placeholder="Street, city, PIN code…"
+                  rows={3}
+                  className={`${inputBase} resize-y`}
                 />
               </div>
+            </div>
 
-              {/* Save button */}
+            <div className="flex justify-end border-t border-slate-100 px-6 py-4">
+              <button
+                onClick={handleSubmit}
+                className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-violet-200 transition hover:bg-violet-700 hover:-translate-y-px active:translate-y-0"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                  <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
+                </svg>
+                Add Company
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Company table ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          {/* Table header bar */}
+          <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                  <path fillRule="evenodd" d="M4 3a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4Zm3.5 3a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3ZM4.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5Z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <h2 className="text-sm font-bold text-slate-800">Registered Companies</h2>
+            </div>
+            <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-600">
+              {companies.length} {companies.length === 1 ? "company" : "companies"}
+            </span>
+          </div>
+
+          {/* ── Mobile cards ── */}
+          <div className="block sm:hidden divide-y divide-slate-100">
+            {companies.length === 0 ? (
+              <div className="flex flex-col items-center gap-2 py-14 text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-10 w-10 text-slate-300">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                </svg>
+                <p className="text-sm font-semibold text-slate-400">No companies yet</p>
+                <p className="text-xs text-slate-400">Add a company using the form above.</p>
+              </div>
+            ) : (
+              companies.map((co, index) => (
+                <div key={co._id || index} className="p-4 hover:bg-slate-50 transition-colors">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <p className="font-bold text-slate-800">{co.companyName}</p>
+                      <p className="text-xs text-slate-400 mt-0.5">{co.email}</p>
+                    </div>
+                    <span className="rounded-full bg-violet-50 px-2 py-0.5 text-xs font-semibold text-violet-600">{co.state?.state || "—"}</span>
+                  </div>
+                  <div className="flex gap-2 text-xs text-slate-500 mb-3">
+                    <span>📞 {co.contactPersonNumber || "—"}</span>
+                    <span>•</span>
+                    <span>💬 {co.whatsapp || "—"}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => setViewData(co)} className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-sky-50 py-2 text-xs font-semibold text-sky-600 hover:bg-sky-100 transition-colors">
+                      <FaEye className="h-3 w-3" /> View
+                    </button>
+                    <button onClick={() => handleEdit(co, index)} className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-emerald-50 py-2 text-xs font-semibold text-emerald-600 hover:bg-emerald-100 transition-colors">
+                      <FaEdit className="h-3 w-3" /> Edit
+                    </button>
+                    <button onClick={() => handleDelete(index, co._id)} className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-red-50 py-2 text-xs font-semibold text-red-500 hover:bg-red-100 transition-colors">
+                      <FaTrash className="h-3 w-3" /> Delete
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* ── Desktop table ── */}
+          <div className="hidden sm:block overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50 text-left">
+                  <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-slate-400">#</th>
+                  <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-slate-400">Company</th>
+                  <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-slate-400">Contact Person</th>
+                  <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-slate-400">Phone / WhatsApp</th>
+                  <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-slate-400">Email</th>
+                  <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-slate-400 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {companies.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="py-16 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-10 w-10 text-slate-300">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                        </svg>
+                        <p className="text-sm font-semibold text-slate-400">No companies yet</p>
+                        <p className="text-xs text-slate-400">Use the form above to register your first partner.</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  companies.map((co, index) => (
+                    <tr key={co._id || index} className="hover:bg-violet-50/30 transition-colors">
+                      <td className="px-6 py-4 text-slate-400 text-xs font-mono">{String(index + 1).padStart(2, "0")}</td>
+                      <td className="px-6 py-4">
+                        <p className="font-semibold text-slate-800">{co.companyName}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">{co.state?.state || "—"}</p>
+                      </td>
+                      <td className="px-6 py-4 text-slate-600">{co.contactPersonName || "—"}</td>
+                      <td className="px-6 py-4">
+                        <p className="text-slate-600">{co.contactPersonNumber || "—"}</p>
+                        <p className="text-xs text-slate-400">{co.whatsapp || "—"}</p>
+                      </td>
+                      <td className="px-6 py-4 text-slate-600">{co.email}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-center gap-1.5">
+                          <button
+                            onClick={() => setViewData(co)}
+                            title="View Details"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-50 text-sky-500 transition hover:bg-sky-100 hover:text-sky-700"
+                          >
+                            <FaEye className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleEdit(co, index)}
+                            title="Edit"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-500 transition hover:bg-emerald-100 hover:text-emerald-700"
+                          >
+                            <FaEdit className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(index, co._id)}
+                            title="Delete"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-400 transition hover:bg-red-100 hover:text-red-600"
+                          >
+                            <FaTrash className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* ════ EDIT MODAL ════ */}
+      {editData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden">
+            {/* Modal header */}
+            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                  <FaEdit className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-800">Edit Company</h3>
+                  <p className="text-xs text-slate-400">{editData.companyName}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEditData(null)}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
+                  <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal body */}
+            <div className="max-h-[70vh] overflow-y-auto px-6 py-5 space-y-4">
+              <div>
+                <label className={labelBase}>State</label>
+                <select name="state" value={editData.state} onChange={handleEditChange} className={inputBase}>
+                  <option value="">Select state…</option>
+                  {states.map((s) => (
+                    <option key={s._id} value={s._id}>{s.state}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className={labelBase}>Contact Person</label>
+                <input type="text" name="contactPersonName" value={editData.contactPersonName} onChange={handleEditChange} className={inputBase} />
+              </div>
+              <div>
+                <label className={labelBase}>Phone</label>
+                <input type="number" name="contactPersonNumber" value={editData.contactPersonNumber} onChange={handleEditChange} className={inputBase} />
+              </div>
+              <div>
+                <label className={labelBase}>Email</label>
+                <input type="email" name="email" value={editData.email} onChange={handleEditChange} className={inputBase} />
+              </div>
+              <div>
+                <label className={labelBase}>WhatsApp</label>
+                <input type="number" name="whatsapp" value={editData.whatsapp} onChange={handleEditChange} className={inputBase} />
+              </div>
+              <div>
+                <label className={labelBase}>Address</label>
+                <textarea name="address" value={editData.address} onChange={handleEditChange} rows={3} className={`${inputBase} resize-y`} />
+              </div>
+            </div>
+
+            {/* Modal footer */}
+            <div className="flex items-center justify-end gap-3 border-t border-slate-100 px-6 py-4">
+              <button
+                onClick={() => setEditData(null)}
+                className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </button>
               <button
                 onClick={handleEditSave}
-                className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 text-md font-semibold w-full"
+                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-200 transition hover:bg-emerald-700"
               >
-                Save
+                Save Changes
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* VIEW MODAL */}
+      {/* ════ VIEW MODAL ════ */}
       {viewData && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full relative shadow-lg">
-            <h3 className="text-xl font-semibold mb-4">{viewData.companyName}</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden">
+            {/* Modal header */}
+            <div className="relative bg-gradient-to-br from-violet-600 to-indigo-600 px-6 py-6 text-white">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6">
+                  <path fillRule="evenodd" d="M3 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5H15v-18a.75.75 0 0 0 0-1.5H3ZM6.75 19.5v-2.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75ZM6 6.75A.75.75 0 0 1 6.75 6h.75a.75.75 0 0 1 0 1.5h-.75A.75.75 0 0 1 6 6.75ZM6.75 9a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM6 12.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 6a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75Zm-.75 3.75A.75.75 0 0 1 10.5 9h.75a.75.75 0 0 1 0 1.5h-.75a.75.75 0 0 1-.75-.75ZM10.5 12a.75.75 0 0 0 0 1.5h.75a.75.75 0 0 0 0-1.5h-.75ZM16.5 6.75v15h5.25a.75.75 0 0 0 0-1.5H21v-12a.75.75 0 0 0 0-1.5h-4.5Zm1.5 4.5a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 0 1.5H18.75a.75.75 0 0 1-.75-.75Zm.75 2.25a.75.75 0 0 0 0 1.5h.008a.75.75 0 0 0 0-1.5H18.75Z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-extrabold">{viewData.companyName}</h3>
+              <p className="text-sm text-violet-200">{viewData.country} · {viewData.state?.state || viewData.state || "—"}</p>
+              <button
+                onClick={() => setViewData(null)}
+                className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-lg bg-white/20 text-white hover:bg-white/30 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                  <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+                </svg>
+              </button>
+            </div>
 
-            <ul className="space-y-2">
-              <li><strong>Country:</strong> {viewData.country}</li>
-              <li><strong>State:</strong> {viewData.state?.state}</li>
-              <li><strong>Contact Person:</strong> {viewData.contactPersonName}</li>
-              <li><strong>Phone:</strong> {viewData.contactPersonNumber}</li>
-              <li><strong>Email:</strong> {viewData.email}</li>
-              <li><strong>WhatsApp:</strong> {viewData.whatsapp}</li>
-              <li><strong>Address:</strong> {viewData.address}</li>
-            </ul>
+            {/* Modal details */}
+            <div className="px-6 py-5 space-y-3">
+              {[
+                { icon: "👤", label: "Contact Person", value: viewData.contactPersonName },
+                { icon: "📞", label: "Phone", value: viewData.contactPersonNumber },
+                { icon: "✉️", label: "Email", value: viewData.email },
+                { icon: "💬", label: "WhatsApp", value: viewData.whatsapp },
+                { icon: "📍", label: "Address", value: viewData.address },
+              ].map(({ icon, label, value }) => (
+                <div key={label} className="flex items-start gap-3 rounded-xl bg-slate-50 px-4 py-3">
+                  <span className="mt-0.5 text-base">{icon}</span>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{label}</p>
+                    <p className="text-sm font-medium text-slate-700 mt-0.5">{value || "—"}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-            <button
-              onClick={() => setViewData(null)}
-              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-xl"
-            >
-              ✖
-            </button>
+            <div className="border-t border-slate-100 px-6 py-4 flex justify-end">
+              <button
+                onClick={() => setViewData(null)}
+                className="rounded-xl bg-slate-100 px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-200 transition-colors"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
-      </div>
     </div>
   );
 };

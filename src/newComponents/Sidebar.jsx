@@ -474,7 +474,7 @@ const Sidebar = () => {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed top-4 z-[9999] p-2 text-black transition-all lg:hidden ${isOpen ? "left-1/2" : "left-4"}`}
+        className={`fixed top-4 z-[9999] p-2 text-black transition-all lg:hidden ${isOpen ? "left-[200px]" : "left-4"}`}
       >
         {isOpen ? <FiX size={24} /> : <FiMenu size={24} />}
       </button>
@@ -482,11 +482,11 @@ const Sidebar = () => {
       {isOpen && <div className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm lg:hidden" onClick={() => setIsOpen(false)}></div>}
 
       <aside
-        className={`fixed top-0 left-0 z-40 h-screen w-[280px] bg-gradient-to-br from-blue-50 via-white to-indigo-50 shadow-xl transition-all duration-300 flex flex-col ${
-          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0 lg:w-[270px]"
+        className={`fixed top-0 left-0 z-40 h-screen w-[250px] lg:w-[240px] bg-gradient-to-br from-blue-50 via-white to-indigo-50 shadow-xl transition-all duration-300 flex flex-col ${
+          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
-        <div className="px-6 py-8 border-b border-blue-200/60">
+        <div className="px-5 py-6 border-b border-blue-200/60">
             <div className="flex items-center gap-3">
                 <div className="flex size-12 items-center justify-center rounded-[12px] bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-bold text-lg shadow-lg">C</div>
                 <div>
