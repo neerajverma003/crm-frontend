@@ -42,6 +42,8 @@ const CompanyCard = ({
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/getAdmins`);
         const allAdmins = res.data || [];
         const filtered = allAdmins.filter((a) => {
+          if (a.accountActive !== true) return false;
+          
           try {
             // admin.company may be array of ids
             if (Array.isArray(a.company) && a.company.some((c) => String(c) === String(_id))) return true;
@@ -104,9 +106,9 @@ const CompanyCard = ({
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center font-bold text-xl text-slate-700 shadow-inner overflow-hidden border border-slate-200/50 group-hover:shadow-md transition-shadow">
               {/* Show logo if available, otherwise initial letter */}
-              {logoKey || logo ? (
+              {logo || logoKey ? (
                 <img 
-                  src={logoKey ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${logoKey}` : logo} 
+                  src={logo && (logo.startsWith("http") || logo.startsWith("data:") || logo.startsWith("blob:")) ? logo : `${import.meta.env.VITE_API_URL}/api/media/preview?key=${logoKey}`} 
                   alt={`${displayName} logo`} 
                   className="w-full h-full object-contain p-2" 
                 />
@@ -193,10 +195,7 @@ const CompanyCard = ({
             <MdVisibility size={18} className="group-hover/btn:scale-110 transition-transform" />
           </button>
           <button
-            onClick={() => {
-              setEditData({ _id, companyName, industry, status, email, phoneNumber, website, numberOfEmployees, address, deals, value, logo, logoKey });
-              setIsEditOpen(true);
-            }}
+            onClick={onEdit}
             title="Edit company"
             className="flex-1 bg-slate-50 hover:bg-amber-50 text-slate-500 hover:text-amber-600 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center group/btn shadow-sm"
           >
@@ -247,9 +246,9 @@ const CompanyCard = ({
                     {/* Company Header */}
                     <div className="flex items-center gap-4">
                       <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center font-bold text-2xl border border-blue-200 overflow-hidden">
-                        {logoKey || logo ? (
+                        {logo || logoKey ? (
                           <img 
-                            src={logoKey ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${logoKey}` : logo} 
+                            src={logo && (logo.startsWith("http") || logo.startsWith("data:") || logo.startsWith("blob:")) ? logo : `${import.meta.env.VITE_API_URL}/api/media/preview?key=${logoKey}`} 
                             alt={`${displayName} logo`} 
                             className="w-full h-full object-contain p-1" 
                           />

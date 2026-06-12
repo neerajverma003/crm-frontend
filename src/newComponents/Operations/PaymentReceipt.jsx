@@ -202,10 +202,10 @@ const PaymentReceipt = ({ customer, invoiceNo, date, endDate, amount, advancePay
         <div className="header">
           <div className="logo">
             <img
-              src="http://admireholidays.com/assets/AdmireLogo-D4RLcMNu.png"
+              src="https://media.admiresoftech.online/companies/logos/1778671412202-admire-holidays.png"
               alt="Admire Holidays"
               style={{
-                maxWidth: '300px',
+                maxWidth: '180px',
                 height: 'auto'
               }}
             />

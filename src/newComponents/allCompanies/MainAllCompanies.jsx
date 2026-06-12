@@ -81,6 +81,7 @@ const MainAllCompanies = () => {
     email:             company.email             || "N/A",
     phoneNumber:       company.phoneNumber       || "N/A",
     website:           company.website           || "N/A",
+    address:           company.address           || "N/A",
     numberOfEmployees: company.numberOfEmployees || 0,
     deals:             company.deals             || 0,
     value:             company.value             || "$0",

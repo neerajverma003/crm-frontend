@@ -385,11 +385,19 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
         if (!selectedDateForEdit) return;
 
         try {
+            const isAdmin = selectedUser?.userType === "Admin";
+            const baseUrl = import.meta.env.VITE_API_URL;
+
             if (selectedDateForEdit.records && selectedDateForEdit.records.length > 0) {
                 // Update existing record
                 const attendance = selectedDateForEdit.records[0];
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance/${attendance._id}`, {
-                    method: "PATCH",
+                const endpoint = isAdmin 
+                    ? `${baseUrl}/adminAttendance/editAttendance/${attendance._id}`
+                    : `${baseUrl}/attendance/${attendance._id}`;
+                const method = isAdmin ? "PUT" : "PATCH";
+
+                const res = await fetch(endpoint, {
+                    method: method,
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
@@ -406,17 +414,28 @@ const AdminAttendance = ({ searchText, isEmployeeView = false }) => {
                 }
             } else {
                 // Create new record
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/attendance`, {
+                const endpoint = isAdmin 
+                    ? `${baseUrl}/adminAttendance/create`
+                    : `${baseUrl}/attendance`;
+
+                const payload = {
+                    date: new Date(selectedDateForEdit.date),
+                    ...updatedData,
+                };
+
+                if (isAdmin) {
+                    payload.admin = selectedUser._id;
+                } else {
+                    payload.employee = selectedUser._id;
+                }
+
+                const res = await fetch(endpoint, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
                     },
-                    body: JSON.stringify({
-                        employee: selectedUser._id,
-                        date: new Date(selectedDateForEdit.date),
-                        ...updatedData,
-                    }),
+                    body: JSON.stringify(payload),
                 });
 
                 if (!res.ok) throw new Error("Failed to create attendance");

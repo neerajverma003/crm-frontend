@@ -63,9 +63,9 @@ const BusinessProfileCard = ({
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center font-semibold overflow-hidden border border-blue-200">
               {/* Show logo if available, otherwise initial letter */}
-              {logoKey || logo ? (
+              {logo || logoKey ? (
                 <img 
-                  src={logoKey ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${logoKey}` : logo} 
+                  src={logo && (logo.startsWith("http") || logo.startsWith("data:") || logo.startsWith("blob:")) ? logo : `${import.meta.env.VITE_API_URL}/api/media/preview?key=${logoKey}`} 
                   alt={`${displayName} logo`} 
                   className="w-full h-full object-contain p-1" 
                 />
@@ -138,10 +138,7 @@ const BusinessProfileCard = ({
             <MdVisibility size={16} className="group-hover/btn:scale-110 transition-transform" />
           </button>
           <button
-            onClick={() => {
-              setEditData({ _id, companyName, industry, status, email, phoneNumber, website, numberOfEmployees, address, deals, value, logo, logoKey });
-              setIsEditOpen(true);
-            }}
+            onClick={onEdit}
             title="Edit company"
             className="flex-1 bg-amber-50 hover:bg-amber-100 text-amber-600 hover:text-amber-700 p-2.5 rounded-lg transition-all duration-200 flex items-center justify-center group/btn"
           >
@@ -192,9 +189,9 @@ const BusinessProfileCard = ({
                     {/* Company Header */}
                     <div className="flex items-center gap-4">
                       <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center font-bold text-2xl border border-blue-200 overflow-hidden">
-                        {logoKey || logo ? (
+                        {logo || logoKey ? (
                           <img 
-                            src={logoKey ? `${import.meta.env.VITE_API_URL}/api/media/preview?key=${logoKey}` : logo} 
+                            src={logo && (logo.startsWith("http") || logo.startsWith("data:") || logo.startsWith("blob:")) ? logo : `${import.meta.env.VITE_API_URL}/api/media/preview?key=${logoKey}`} 
                             alt={`${displayName} logo`} 
                             className="w-full h-full object-contain p-1" 
                           />
