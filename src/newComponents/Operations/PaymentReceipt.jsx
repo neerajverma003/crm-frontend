@@ -174,16 +174,16 @@ const PaymentReceipt = ({ customer, invoiceNo, date, endDate, amount, advancePay
         .col-payment { width: 15%; }
 
         .page-break-container {
-          page-break-before: always;
           margin-top: 20px;
           padding-top: 20px;
+          page-break-inside: avoid;
         }
 
         @media print {
           .page-break-container {
-            page-break-before: always;
             margin-top: 0;
             padding-top: 0;
+            page-break-inside: avoid;
           }
         }
           body {
