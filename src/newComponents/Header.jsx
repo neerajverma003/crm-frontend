@@ -76,9 +76,6 @@ const Header = () => {
                         <div className="flex items-center gap-3">
                             {/* MOBILE — User avatar + name */}
                             <div className="flex items-center gap-3 sm:hidden">
-                                {/* <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold">
-                                    {userName.charAt(0)?.toUpperCase() || "U"}
-                                </div> */}
                                 <div className="hidden h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold md:flex">
                                     {userName.charAt(0)?.toUpperCase() || "U"}
                                 </div>

@@ -8,6 +8,9 @@ import App from "./App.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ExperienceLetterFormat from "./newComponents/experienceLetter/ExperienceLetterFormat.jsx";
+import PreviewExperienceLetter from "./newComponents/experienceLetter/PreviewExperienceLetter.jsx";
+
 
 // 🧩 Layouts & Components
 import ScreenLayout from "./newComponents/ScreenLayout.jsx";
@@ -95,6 +98,7 @@ import TaskAssign from "./newComponents/TaskManagement/TaskAssign.jsx";
 import TaskReport from "./newComponents/TaskManagement/TaskReport.jsx";
 import EmployeeTasks from "./newComponents/dashboard/EmployeeTasks.jsx";
 import MyTeamDashboard from "./newComponents/Teams/MyTeamDashboard.jsx";
+import ExperienceLetter from "./newComponents/experienceLetter/ExperienceLetter.jsx";
 
 // ✅ Role groups
 const roles = {
@@ -136,6 +140,16 @@ const router = createBrowserRouter([
   { path: "/", element: <App /> }, // Login
   { path: "/forgot-password", element: <ForgotPassword /> },
   { path: "/reset-password", element: <ResetLink /> },
+  
+  // 📄 Standalone Print / Preview Routes (No Sidebar)
+  {
+    path: "/preview-experience-letter/:id",
+    element: (
+      <ProtectedRoute allowedRoles={roles.adminOnly}>
+        <PreviewExperienceLetter />
+      </ProtectedRoute>
+    ),
+  },
 
   // 🔒 Protected Routes (inside ScreenLayout)
   {
@@ -533,6 +547,22 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={roles.adminOnly}>
             <OfferLetterFormat />
+          </ProtectedRoute>
+        ),
+      },
+            {
+        path: "/experience-letter-format",
+        element: (
+          <ProtectedRoute allowedRoles={roles.adminOnly}>
+            <ExperienceLetterFormat />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/experience-letter",
+        element: (
+          <ProtectedRoute allowedRoles={roles.adminOnly}>
+            <ExperienceLetter />
           </ProtectedRoute>
         ),
       },
